@@ -66,3 +66,23 @@ node server.js
 
 
 
+
+This project is a web-based smart parking management system for Stony Brook University. It features a React frontend and a Node.js/Express backend that connects to two databases:
+- **MongoDB**: A remote database (e.g., via MongoDB Atlas) for storing core application data such as Users, ParkingLots, ParkingSpots, Reservations, Payments, OTPs, Feedback, and OccupancyHistory.
+- **Neo4j**: A graph database for managing campus map data and supporting wayfinding queries. *(Note: The current Neo4j driver integration is under development and may have authentication issues that will be resolved in future updates.)*
+
+> **Note:**  
+> This project uses a `.env` file for environment configuration. For production, you should remove sensitive data from your repository and set environment variables using your hosting platform’s configuration tools.
+
+---
+
+## Features
+
+- **User Management:** Create and manage user accounts.
+- **Parking Management:** View and reserve parking spots.
+- **Database Integration:**  
+  - **MongoDB:** Remote connection ensures that every update is saved centrally.  
+  - **Neo4j:** (Planned) For map and wayfinding functionality.
+- **Full-stack Integration:** A React frontend communicates with a Node.js/Express backend via Axios.
+
+---
