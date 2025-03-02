@@ -1,9 +1,7 @@
-// server/routes/mapRoutes.js
 const express = require('express');
 const router = express.Router();
 const driver = require('../neo4j/neo4jDriver');
 
-// Route to insert test data into Neo4j (POST /api/map/insertTestData)
 router.post('/insertTestData', async (req, res) => {
   const session = driver.session();
   try {
