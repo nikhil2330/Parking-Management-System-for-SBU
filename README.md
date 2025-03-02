@@ -34,10 +34,7 @@ This project is a web-based smart parking management system for Stony Brook Univ
 - Neo4j Aura 
 
 ### 1. Clone the Repository
-```bash
-git clone git@github.com:UrviBhatnagar/CSE416.git
-cd CSE416
-```
+Clone using SSH or HTTPS and open it using code.
 ### 2. BackEnd
 ```bash
 cd server 
