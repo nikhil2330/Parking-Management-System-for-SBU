@@ -1,0 +1,198 @@
+/* src/pages/SearchParkingPage.css */
+
+/* ------------------ PAGE WRAPPER ------------------ */
+.search-parking-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh; /* Fill viewport if desired */
+  font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
+  background-color: #f6f6f6; /* Consistent with HomePage background */
+  margin: 0;
+  color: #0A2541; /* Use deep navy for primary text */
+}
+
+/* ------------------ TOP BAR ------------------ */
+.top-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #ccc;
+  color: #0A2541;
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+/* Logo on the left side */
+.logo {
+  height: 40px;
+  width: auto;
+  display: block;
+}
+
+/* Right side container for nav/support buttons */
+.top-bar-right {
+  display: flex;
+  gap: 1rem;
+}
+
+/* Nav buttons: mimic HomePage's button styling */
+.nav-button,
+.support-button {
+  background-color: #990000; /* deep red */
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.nav-button:hover,
+.support-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+}
+
+/* ------------------ MAIN CONTENT ------------------ */
+.search-content {
+  display: flex;
+  flex: 1;
+  overflow: hidden; /* manage scroll within child containers */
+}
+
+/* LEFT COLUMN: Filters */
+.filters {
+  width: 250px;
+  background-color: #eaeaea;
+  border-right: 1px solid #ccc;
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+.filters h2 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+  color: #444;
+  text-transform: uppercase;
+}
+
+.filter-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.filter-item input[type="checkbox"] {
+  margin-right: 0.5rem;
+}
+
+/* MIDDLE COLUMN: fixed width as desired */
+.middle-section {
+  width: 400px;
+  padding: 1rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Search bar wrapper in the middle column */
+.search-bar-wrapper {
+  margin-bottom: 1rem;
+}
+
+/* Spot cards */
+.spot-card {
+  background-color: #fff;
+  border: 1px solid #ccc; /* use consistent border color */
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  padding: 1rem;
+  position: relative;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.08);
+}
+
+.spot-card h3 {
+  margin: 0 0 0.5rem 0;
+  font-weight: bold;
+  /* Use primary deep navy for headings */
+  color: #0A2541;
+}
+
+.spot-card p {
+  margin: 0.25rem 0;
+  color: #555;
+  line-height: 1.4;
+}
+
+/* "Available" text in top-right corner */
+.spot-card::after {
+  content: "Available";
+  color: #ba0c2f;
+  font-weight: bold;
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+}
+
+.spot-card button {
+  background-color: #ba0c2f;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  margin-top: 0.75rem;
+  font-size: 0.9rem;
+}
+
+.spot-card button:hover {
+  background-color: #9a0a28;
+}
+
+/* RIGHT COLUMN: Map gets remaining space */
+.map-section {
+  flex: 1;
+  background-color: #f8f8f8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.map-image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+/* ---------- OPTIONAL: OVERRIDE SEARCH BAR STYLES ---------- */
+.search-bar {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  border-radius: 4px;
+  overflow: hidden;
+  background-color: #fff;
+}
+
+.search-bar input {
+  flex: 1;
+  border: none;
+  padding: 0.5rem 0.75rem;
+  font-size: 1rem;
+  outline: none;
+}
+
+.search-bar button {
+  background-color: #ba0c2f;
+  border: none;
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+  color: #fff;
+}
+
+.search-bar button:hover {
+  background-color: #9a0a28;
+}

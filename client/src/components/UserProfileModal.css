@@ -1,0 +1,110 @@
+/* src/components/UserProfileModal.css */
+
+/* Dark, translucent backdrop */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+/* Main modal container */
+.modal-container {
+  background-color: #fff;
+  padding: 1.5rem;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.15);
+
+  /* Make container flexible to push logout button down */
+  display: flex;
+  flex-direction: column;
+  max-height: 80vh; /* so it doesn't overflow too high */
+}
+
+.modal-title {
+  font-size: 1.25rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+/* The form can grow, pushing the logout section to the bottom. */
+.modal-form {
+  flex: 1; /* allows the form area to expand */
+}
+
+.modal-form > div {
+  margin-bottom: 1rem;
+}
+
+.modal-form label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.4rem;
+}
+
+.modal-form input {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.cancel-button {
+  background-color: #ccc;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.cancel-button:hover {
+  opacity: 0.9;
+}
+
+.save-button {
+  background-color: #990000;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.save-button:hover {
+  opacity: 0.9;
+}
+
+/* Logout section pinned at the bottom, right-aligned */
+.logout-section {
+  margin-top: auto; /* push to bottom of the modal container */
+  text-align: right;
+}
+
+/* Slightly smaller button */
+.logout-button {
+  background-color: #990000;
+  color: #fff;
+  border: none;
+  /* Reduced padding and a smaller font size to make it look smaller */
+  padding: 0.4rem 0.7rem;
+  font-size: 0.9rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.logout-button:hover {
+  opacity: 0.9;
+}

@@ -1,0 +1,35 @@
+/* src/components/Header.css */
+
+.header-container {
+    background-color: #ccc; /* Gray banner */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+  }
+  
+  .header-left {
+    display: flex;
+    align-items: center;
+  }
+  
+  .header-car-icon {
+    color: #990000; /* Red accent */
+    margin-right: 0.5rem;
+  }
+  
+  .header-title {
+    font-weight: bold;
+    font-size: 1.25rem;
+  }
+  
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .header-user-icon {
+    cursor: pointer;
+  }
+  
