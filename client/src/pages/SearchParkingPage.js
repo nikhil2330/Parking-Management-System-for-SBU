@@ -1,17 +1,74 @@
-// src/pages/SearchParkingPage.js
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import SearchBar from '../components/SearchBar';
 import './SearchParkingPage.css';
+import MapView from '../components/MapView';
+
 
 function SearchParkingPage() {
-  const handleSearch = (query) => {
-    console.log('Searching for:', query);
-    // Add your search logic here
+
+  const [searchedBuilding, setSearchedBuilding] = useState(null);
+  const [spot37, setSpot37] = useState(null);
+
+  useEffect(() => {
+    if (searchedBuilding) {
+      fetch('/api/map/parking-spot/037')
+        .then((res) => {
+          if (!res.ok) {
+            throw new Error(`HTTP error! Status: ${res.status}`);
+          }
+          return res.json();
+        })
+        .then((data) => {
+          console.log("Spot 037 data loaded:", data);
+          setSpot37(data);
+        })
+        .catch((err) =>
+          console.error("Error fetching spot 037 data:", err)
+        );
+    }
+  }, [searchedBuilding]);
+
+
+  const GOOGLE_API_KEY = 'AIzaSyAU3EHHB5187niRs1UAsvEtFmBsdCMBW7s'; 
+  const getDirectionsUrl = (origin, destLat, destLon) => {
+    return `https://www.google.com/maps/embed/v1/directions?key=${GOOGLE_API_KEY}&origin=${encodeURIComponent(
+      origin
+    )}&destination=${destLat},${destLon}&mode=walking`;
+  };
+
+  const renderMapSection = () => {
+    if (searchedBuilding && spot37) {
+      const { geometry } = spot37;
+      const [destLon, destLat] = geometry.coordinates;
+      const directionsUrl = getDirectionsUrl(searchedBuilding, destLat, destLon);
+
+      return (
+        <div className="map-directions">
+          <button
+            className="back-button"
+            onClick={() => {
+              setSearchedBuilding(null);
+              setSpot37(null);
+            }}
+          >
+            ← Back
+          </button>
+          <iframe
+            title="Walking Directions"
+            style={{ border: 0, width: '100%', height: '100%' }}
+            loading="lazy"
+            allowFullScreen
+            src={directionsUrl}
+          />
+        </div>
+      );
+    }
+
+    return <MapView />;
   };
 
   return (
     <div className="search-parking-page">
-      {/* TOP BAR */}
       <header className="top-bar">
         <div className="top-bar-left">
           <h1 style={{ margin: 0, fontSize: '1.5rem', color: '#0A2541' }}>P4SBU</h1>
@@ -24,9 +81,7 @@ function SearchParkingPage() {
         </div>
       </header>
 
-      {/* MAIN CONTENT */}
       <div className="search-content">
-        {/* LEFT COLUMN: Filters */}
         <aside className="filters">
           <h2>Filters</h2>
           <div className="filter-item">
@@ -47,10 +102,9 @@ function SearchParkingPage() {
           </div>
         </aside>
 
-        {/* MIDDLE COLUMN: Search bar + spot cards */}
         <div className="middle-section">
           <div className="search-bar-wrapper">
-            <SearchBar onSearch={handleSearch} />
+            <SearchBar onSearch={(query) => setSearchedBuilding(query)} />
           </div>
 
           <div className="spot-card">
@@ -70,17 +124,11 @@ function SearchParkingPage() {
           </div>
         </div>
 
-        {/* RIGHT COLUMN: Map */}
         <div className="map-section">
-          <img
-            src="https://via.placeholder.com/600x600?text=SBU+Campus+Map"
-            alt="SBU Campus Map"
-            className="map-image"
-          />
-        </div>
+        {renderMapSection()}        </div>
       </div>
     </div>
-  );
+  );  
 }
 
 export default SearchParkingPage;
