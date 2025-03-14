@@ -58,4 +58,18 @@
     margin: 0 auto; /* center horizontally if you want */
     display: block;
   }
+
+  .svg-container {
+    width: 100%; /* fill horizontally */
+    height: 100%; /* fill vertically */
+    overflow: auto; /* or hidden, depending on your preference */
+  }
+  
+  /* Force any <svg> inside that container to fill */
+  .svg-container svg {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; /* or cover, if you want to fill with possible crop */
+    /* You can also remove object-fit if the <svg> has its own viewBox logic */
+  }
   
