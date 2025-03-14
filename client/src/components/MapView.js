@@ -1,25 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import mapImage from '../assets/map.png';
+import React, { useState, useEffect, useRef } from 'react';
 import './MapView.css';
 
-const GOOGLE_API_KEY = 'AIzaSyAU3EHHB5187niRs1UAsvEtFmBsdCMBW7s'; 
+const GOOGLE_API_KEY = 'AIzaSyAU3EHHB5187niRs1UAsvEtFmBsdCMBW7s';
 const SAC_LAT = 40.9154;
 const SAC_LON = -73.1238;
-
-const spotPositions = [
-  { x: 150, y: 72 }, { x: 570, y: 120 },
-  { x: 149, y: 107 }, { x: 578, y: 150 },
-  { x: 148, y: 142 }, { x: 586, y: 180 }, 
-  { x: 147, y: 177 }, { x: 350, y: 177 }, { x: 400, y: 177 }, { x: 594, y: 210 },
-  { x: 146, y: 212 }, { x: 350, y: 212 }, { x: 400, y: 212 }, { x: 602, y: 240 }, 
-  { x: 145, y: 247 }, { x: 350, y: 247 }, { x: 400, y: 247 }, { x: 610, y: 270 }, 
-  { x: 144, y: 282 }, { x: 350, y: 282 }, { x: 400, y: 282 }, { x: 618, y: 300 }, 
-  { x: 143, y: 317 }, { x: 350, y: 317 }, { x: 400, y: 317 }, { x: 626, y: 330 },
-  { x: 142, y: 352 }, { x: 350, y: 352 }, { x: 400, y: 352 }, { x: 634, y: 360 },
-  { x: 141, y: 387 }, { x: 350, y: 387 }, { x: 400, y: 387 }, { x: 642, y: 390 }, 
-  { x: 140, y: 422 }, { x: 350, y: 422 },
-  { x: 139, y: 457 }, { x: 350, y: 457 },
-];
 
 function getGoogleDirectionsEmbed(lat, lon) {
   return `https://www.google.com/maps/embed/v1/directions?key=${GOOGLE_API_KEY}&origin=${lat},${lon}&destination=${SAC_LAT},${SAC_LON}&mode=walking`;
@@ -30,10 +14,13 @@ function MapView() {
   const [parkingData, setParkingData] = useState(null);
   const [chosenLat, setChosenLat] = useState(null);
   const [chosenLon, setChosenLon] = useState(null);
+  const [svgContent, setSvgContent] = useState('');
+  const svgContainerRef = useRef(null);
 
+  // Load parking data when zoomed in
   useEffect(() => {
     if (zoomedIn) {
-      fetch('/api/map/parking-spots/cpc01')
+      fetch('/api/map/parking-spots/cpc02')
         .then(res => {
           if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
           return res.json();
@@ -43,10 +30,48 @@ function MapView() {
     }
   }, [zoomedIn]);
 
+  // Load the SVG file as text from the public folder
+  useEffect(() => {
+    if (zoomedIn) {
+      fetch('/assets/1.svg')
+        .then(response => response.text())
+        .then(text => setSvgContent(text))
+        .catch(err => console.error("Error loading SVG:", err));
+    }
+  }, [zoomedIn]);
+
+  // Once SVG is loaded and parkingData is available, update the SVG DOM
+  useEffect(() => {
+    if (zoomedIn && parkingData && svgContent && svgContainerRef.current) {
+      // Query all elements with vectornator:layerName starting with "Spot"
+      const spotElements = svgContainerRef.current.querySelectorAll('[vectornator\\:layerName^="Spot"]');
+      spotElements.forEach((el, index) => {
+        // Make sure we have a corresponding parking feature
+        const feature = parkingData.features[index];
+        if (feature) {
+          const { properties } = feature;
+          // Available if userID is 0
+          const available = properties.userID === 0;
+          el.style.fill = available ? "#99dd99" : "#c4ccd6";
+          el.style.cursor = available ? "pointer" : "default";
+          el.onclick = (e) => {
+            e.stopPropagation();
+            if (available) {
+              const [lon, lat] = feature.geometry.coordinates;
+              setChosenLat(lat);
+              setChosenLon(lon);
+            }
+          };
+        }
+      });
+    }
+  }, [zoomedIn, parkingData, svgContent]);
+
+  // Overview mode: show campus map image with clickable overlay
   if (!zoomedIn) {
     return (
       <div className="map-overview">
-        <img src={mapImage} alt="Campus Map" className="map-image" />
+        <img src="/assets/map.png" alt="Campus Map" className="map-image" />
         <div
           className="parking-lot-polygon"
           onClick={() => setZoomedIn(true)}
@@ -55,6 +80,7 @@ function MapView() {
     );
   }
 
+  // When a spot is chosen, show the Google Directions iframe
   if (chosenLat !== null && chosenLon !== null) {
     const directionsUrl = getGoogleDirectionsEmbed(chosenLat, chosenLon);
     return (
@@ -83,6 +109,7 @@ function MapView() {
     );
   }
 
+  // Zoomed-in mode: render the loaded SVG
   return (
     <div className="zoomed-map-view">
       <button
@@ -96,53 +123,11 @@ function MapView() {
       >
         ← Back
       </button>
-      <svg className="lot-svg" viewBox="0 0 700 600">
-        <polygon
-          points="600,100 680,400 450,580 100,500 120,50"
-          fill="rgba(200,200,200,0.3)"
-          stroke="darkred"
-          strokeWidth="2"
-        />
-        {parkingData && parkingData.features && parkingData.features.map((feature, i) => {
-          if (i >= spotPositions.length) return null;
-          const [lon, lat] = feature.geometry.coordinates;
-          const { userID, id } = feature.properties;
-          const available = (userID === 0);
-          const fillColor = available ? "#00cc00" : "#999999";
-
-          const { x, y } = spotPositions[i];
-          const rectW = 40;
-          const rectH = 20;
-
-          const handleRectClick = (e) => {
-            e.stopPropagation();
-            if (available) {
-              setChosenLat(lat);
-              setChosenLon(lon);
-            }
-          };
-
-          return (
-            <rect
-              key={id}
-              x={x - rectW / 2}
-              y={y - rectH / 2}
-              width={rectW}
-              height={rectH}
-              fill={fillColor}
-              stroke="black"
-              strokeWidth="1"
-              style={{
-                cursor: available ? 'pointer' : 'default',
-                pointerEvents: available ? 'auto' : 'none'
-              }}
-              onClick={handleRectClick}
-            >
-              <title>{id}</title>
-            </rect>
-          );
-        })}
-      </svg>
+      <div
+        className="svg-container"
+        ref={svgContainerRef}
+        dangerouslySetInnerHTML={{ __html: svgContent }}
+      />
     </div>
   );
 }
