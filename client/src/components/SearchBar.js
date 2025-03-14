@@ -17,7 +17,7 @@ function SearchBar({ onSearch }) {
     <form className="search-bar" onSubmit={handleSubmit}>
       <input
         type="text"
-        placeholder="Search for parking spots..."
+        placeholder="Search by Building..."
         value={query}
         onChange={(e) => setQuery(e.target.value)}
       />

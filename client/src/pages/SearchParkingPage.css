@@ -156,6 +156,7 @@
   flex: 1;
   background-color: #f8f8f8;
   display: flex;
+  min-height: 600px;
   align-items: center;
   justify-content: center;
   overflow: hidden;
@@ -195,4 +196,26 @@
 
 .search-bar button:hover {
   background-color: #9a0a28;
+}
+
+
+
+.map-directions {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+/* The back button on top of the iframe */
+.back-button {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background-color: #990000;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  z-index: 10;
 }
