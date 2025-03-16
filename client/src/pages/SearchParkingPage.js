@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import SearchBar from '../components/SearchBar';
 import './SearchParkingPage.css';
 import MapView from '../components/MapView';
+import MapOverview from '../components/MapOverview';
+
 
 
 function SearchParkingPage() {
@@ -125,7 +127,7 @@ function SearchParkingPage() {
         </div>
 
         <div className="map-section">
-        {renderMapSection()}        </div>
+        <MapOverview />        </div>
       </div>
     </div>
   );  
