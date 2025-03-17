@@ -1,45 +1,54 @@
 import 'leaflet/dist/leaflet.css';
 
-import React from 'react';
+import { useState, React, useEffect} from 'react';
 import { MapContainer, TileLayer, Polygon } from 'react-leaflet';
+import { fetchParkingLotsOverlay } from '../services/mapService';
 import 'leaflet/dist/leaflet.css';
 
-const stonyBrookCenter = [40.912, -73.123]; // Approximate center coordinates for Stony Brook University
+const stonyBrookCenter = [40.912, -73.123]; 
 
-// Dummy polygon coordinates for a parking lot overlay.
-// Replace these with your actual parking lot boundaries.
-const parkingLotPolygon = [
-  [40.9125, -73.1240],
-  [40.9125, -73.1225],
-  [40.9115, -73.1225],
-  [40.9115, -73.1240]
-];
+const MapOverview = ({ onLotClick }) => {
+  const [parkingLots, setParkingLots] = useState([]);
+  const [hoveredLotId, setHoveredLotId] = useState(null);
 
-const MapOverview = () => {
+  useEffect(() => {
+    fetchParkingLotsOverlay()
+      .then(data => setParkingLots(data))
+      .catch(err => console.error("Error fetching parking lots", err));
+  }, []);
   return (
     <MapContainer center={stonyBrookCenter} zoom={16} style={{ height: '100vh', width: '100%' }}>
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
-      <Polygon
-        pathOptions={{ color: 'red', fillColor: 'red', fillOpacity: 0.5 }}
-        positions={parkingLotPolygon}
-        eventHandlers={{
-          click: () => {
-            console.log("Parking lot overlay clicked");
-            // Here you could trigger a transition to the zoomed-in SVG view.
-          },
-          mouseover: (e) => {
-            e.target.setStyle({ fillOpacity: 0.7 });
-          },
-          mouseout: (e) => {
-            e.target.setStyle({ fillOpacity: 0.5 });
-          },
-        }}
-      />
+      {parkingLots.map(lot => {
+         let polygons = lot.boundingBox;
+         if (polygons && polygons.length > 0 && typeof polygons[0][0] === 'number') {
+           polygons = [polygons];
+         }
+         return polygons.map((polygon, idx) => (
+            <Polygon
+              key={`${lot.lotId}-${idx}`}
+              positions={polygon}
+              pathOptions={{ color: "red", opacity: 0.2,  fillColor: "red", fillOpacity: hoveredLotId === lot.lotId ? 0.6 : 0.4, }}
+              eventHandlers={{
+                click: () => {
+                  console.log(`Clicked parking lot ${lot.lotId}`);
+                  onLotClick(lot.lotId);
+                  },
+                mouseover: (e) => {
+                  setHoveredLotId(lot.lotId);
+                },
+                mouseout: (e) => {
+                  setHoveredLotId(null);
+                },
+              }}
+            />
+         ));
+      })}
     </MapContainer>
-  );
+  );  
 };
 
 export default MapOverview;

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import './MapView.css';
+// import './MapView.css';
 
 const GOOGLE_API_KEY = 'AIzaSyAU3EHHB5187niRs1UAsvEtFmBsdCMBW7s';
 const SAC_LAT = 40.9154;

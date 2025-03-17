@@ -1,79 +1,29 @@
-import React, { useState, useEffect } from 'react';
+// client/src/pages/SearchParkingPage.js
+import React, { useState } from 'react';
 import SearchBar from '../components/SearchBar';
 import './SearchParkingPage.css';
-import MapView from '../components/MapView';
 import MapOverview from '../components/MapOverview';
-
-
+import LotMapView from '../components/lotMapView';
 
 function SearchParkingPage() {
-
   const [searchedBuilding, setSearchedBuilding] = useState(null);
-  const [spot37, setSpot37] = useState(null);
+  const [selectedLotId, setSelectedLotId] = useState(null);
 
-  useEffect(() => {
-    if (searchedBuilding) {
-      fetch('/api/map/parking-spot/037')
-        .then((res) => {
-          if (!res.ok) {
-            throw new Error(`HTTP error! Status: ${res.status}`);
-          }
-          return res.json();
-        })
-        .then((data) => {
-          console.log("Spot 037 data loaded:", data);
-          setSpot37(data);
-        })
-        .catch((err) =>
-          console.error("Error fetching spot 037 data:", err)
-        );
-    }
-  }, [searchedBuilding]);
-
-
-  const GOOGLE_API_KEY = 'AIzaSyAU3EHHB5187niRs1UAsvEtFmBsdCMBW7s'; 
-  const getDirectionsUrl = (origin, destLat, destLon) => {
-    return `https://www.google.com/maps/embed/v1/directions?key=${GOOGLE_API_KEY}&origin=${encodeURIComponent(
-      origin
-    )}&destination=${destLat},${destLon}&mode=walking`;
+  const handleLotClick = (lotId) => {
+    setSelectedLotId(lotId);
   };
 
-  const renderMapSection = () => {
-    if (searchedBuilding && spot37) {
-      const { geometry } = spot37;
-      const [destLon, destLat] = geometry.coordinates;
-      const directionsUrl = getDirectionsUrl(searchedBuilding, destLat, destLon);
-
-      return (
-        <div className="map-directions">
-          <button
-            className="back-button"
-            onClick={() => {
-              setSearchedBuilding(null);
-              setSpot37(null);
-            }}
-          >
-            ← Back
-          </button>
-          <iframe
-            title="Walking Directions"
-            style={{ border: 0, width: '100%', height: '100%' }}
-            loading="lazy"
-            allowFullScreen
-            src={directionsUrl}
-          />
-        </div>
-      );
-    }
-
-    return <MapView />;
+  const handleBackFromLot = () => {
+    setSelectedLotId(null);
   };
 
   return (
     <div className="search-parking-page">
       <header className="top-bar">
         <div className="top-bar-left">
-          <h1 style={{ margin: 0, fontSize: '1.5rem', color: '#0A2541' }}>P4SBU</h1>
+          <h1 style={{ margin: 0, fontSize: '1.5rem', color: '#0A2541' }}>
+            P4SBU
+          </h1>
         </div>
         <div className="top-bar-right">
           <button className="nav-button">Home</button>
@@ -127,10 +77,15 @@ function SearchParkingPage() {
         </div>
 
         <div className="map-section">
-        <MapOverview />        </div>
+          {selectedLotId ? (
+            <LotMapView lotId={selectedLotId} onBack={handleBackFromLot} />
+          ) : (
+            <MapOverview onLotClick={handleLotClick} />
+          )}
+        </div>
       </div>
     </div>
-  );  
+  );
 }
 
 export default SearchParkingPage;
