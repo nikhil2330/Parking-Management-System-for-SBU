@@ -5,533 +5,494 @@
         {
             "type": "Feature",
             "properties": {
-                "id": "027",
-                "lot": "CPC02"
+                "name": "026"
             },
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    -73.12684200771,
-                    40.91262020906
+                    -73.12680512801,
+                    40.91288624886
                 ]
             }
         },
         {
             "type": "Feature",
             "properties": {
-                "id": "030",
-                "lot": "CPC02"
+                "name": "027"
             },
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    -73.12682725556,
-                    40.91268608556
+                    -73.12680646911,
+                    40.91286091183
                 ]
             }
         },
         {
             "type": "Feature",
             "properties": {
-                "id": "037",
-                "lot": "CPC02"
+                "name": "032"
             },
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    -73.12679372795,
-                    40.91285483044
+                    -73.12683060899,
+                    40.91274638834
                 ]
             }
         },
         {
             "type": "Feature",
             "properties": {
-                "id": "019",
-                "lot": "CPC02"
+                "name": "007"
             },
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    -73.12669314511,
-                    40.91265922822
+                    -73.12647923961,
+                    40.91270686248
                 ]
             }
         },
         {
             "type": "Feature",
             "properties": {
-                "id": "017",
-                "lot": "CPC02"
+                "name": "012"
             },
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    -73.12660463221,
-                    40.91279807545
+                    -73.12660530344,
+                    40.91278084675
                 ]
             }
         },
         {
             "type": "Feature",
             "properties": {
-                "id": "014",
-                "lot": "CPC02"
+                "name": "021"
             },
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    -73.12662005492,
-                    40.91272510468
+                    -73.12667772308,
+                    40.91273828047
                 ]
             }
         },
         {
             "type": "Feature",
             "properties": {
-                "id": "004",
-                "lot": "CPC02"
+                "name": "025"
             },
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    -73.12648460336,
-                    40.91269774062
+                    -73.12669783965,
+                    40.91264605343
                 ]
             }
         },
         {
             "type": "Feature",
             "properties": {
-                "id": "007",
-                "lot": "CPC02"
+                "name": "030"
             },
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    -73.12646918066,
-                    40.91276969794
+                    -73.12681988016,
+                    40.91278794113
                 ]
             }
         },
         {
             "type": "Feature",
             "properties": {
-                "id": "031",
-                "lot": "CPC02"
+                "name": "031"
             },
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    -73.12682189114,
-                    40.91271446310
+                    -73.12682524458,
+                    40.91276767148
                 ]
             }
         },
         {
             "type": "Feature",
             "properties": {
-                "id": "034",
-                "lot": "CPC02"
+                "name": "036"
             },
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    -73.12681317396,
-                    40.91278591366
+                    -73.12684938379,
+                    40.91264706641
                 ]
             }
         },
         {
             "type": "Feature",
             "properties": {
-                "id": "020",
-                "lot": "CPC02"
+                "name": "010"
             },
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    -73.12668375738,
-                    40.91268253836
+                    -73.12649667397,
+                    40.91263287813
                 ]
             }
         },
         {
             "type": "Feature",
             "properties": {
-                "id": "023",
-                "lot": "CPC02"
+                "name": "011"
             },
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    -73.12667034633,
-                    40.91275297547
+                    -73.12660262123,
+                    40.91280517033
                 ]
             }
         },
         {
             "type": "Feature",
             "properties": {
-                "id": "013",
-                "lot": "CPC02"
+                "name": "016"
             },
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    -73.12662139602,
-                    40.91269976759
+                    -73.12662407890,
+                    40.91268355235
                 ]
             }
         },
         {
             "type": "Feature",
             "properties": {
-                "id": "001",
-                "lot": "CPC02"
+                "name": "004"
             },
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    -73.12649399109,
-                    40.91262831694
+                    -73.12646180525,
+                    40.91277780631
                 ]
             }
         },
         {
             "type": "Feature",
             "properties": {
-                "id": "008",
-                "lot": "CPC02"
+                "name": "029"
             },
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    -73.12646180458,
-                    40.91279199455
+                    -73.12681451574,
+                    40.91281327819
                 ]
             }
         },
         {
             "type": "Feature",
             "properties": {
-                "id": "028",
-                "lot": "CPC02"
+                "name": "034"
             },
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    -73.12683597274,
-                    40.91264149224
+                    -73.12683798440,
+                    40.91269419343
                 ]
             }
         },
         {
             "type": "Feature",
             "properties": {
-                "id": "035",
-                "lot": "CPC02"
+                "name": "035"
             },
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    -73.12680579789,
-                    40.91280618331
+                    -73.12684334882,
+                    40.91267037655
                 ]
             }
         },
         {
             "type": "Feature",
             "properties": {
-                "id": "038",
-                "lot": "CPC02"
+                "name": "009"
             },
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    -73.12678903408,
-                    40.91287763376
+                    -73.12648996845,
+                    40.91265517479
                 ]
             }
         },
         {
             "type": "Feature",
             "properties": {
-                "id": "024",
-                "lot": "CPC02"
+                "name": "014"
             },
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    -73.12666967578,
-                    40.91277983276
+                    -73.12661469117,
+                    40.91273017260
                 ]
             }
         },
         {
             "type": "Feature",
             "properties": {
-                "id": "016",
-                "lot": "CPC02"
+                "name": "015"
             },
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    -73.12660597332,
-                    40.91277375187
+                    -73.12662139669,
+                    40.91270584900
                 ]
             }
         },
         {
             "type": "Feature",
             "properties": {
-                "id": "002",
-                "lot": "CPC02"
+                "name": "020"
             },
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    -73.12649399109,
-                    40.91265213383
+                    -73.12667504087,
+                    40.91276564451
                 ]
             }
         },
         {
             "type": "Feature",
             "properties": {
-                "id": "005",
-                "lot": "CPC02"
+                "name": "002"
             },
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    -73.12647923894,
-                    40.91272206423
+                    -73.12645375863,
+                    40.91282341301
                 ]
             }
         },
         {
             "type": "Feature",
             "properties": {
-                "id": "029",
-                "lot": "CPC02"
+                "name": "003"
             },
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    -73.12683127888,
-                    40.91266530913
+                    -73.12645644084,
+                    40.91279908944
                 ]
             }
         },
         {
             "type": "Feature",
             "properties": {
-                "id": "032",
-                "lot": "CPC02"
+                "name": "024"
             },
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    -73.12681987949,
-                    40.91273675974
+                    -73.12669113413,
+                    40.91266632312
                 ]
             }
         },
         {
             "type": "Feature",
             "properties": {
-                "id": "018",
-                "lot": "CPC02"
+                "name": "033"
             },
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    -73.12669918008,
-                    40.91263135740
+                    -73.12683396108,
+                    40.91271851704
                 ]
             }
         },
         {
             "type": "Feature",
             "properties": {
-                "id": "021",
-                "lot": "CPC02"
+                "name": "038"
             },
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    -73.12668107517,
-                    40.91270736872
+                    -73.12685877219,
+                    40.91260450055
                 ]
             }
         },
         {
             "type": "Feature",
             "properties": {
-                "id": "015",
-                "lot": "CPC02"
+                "name": "013"
             },
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    -73.12661267884,
-                    40.91274892154
+                    -73.12661066785,
+                    40.91275550968
                 ]
             }
         },
         {
             "type": "Feature",
             "properties": {
-                "id": "012",
-                "lot": "CPC02"
+                "name": "018"
             },
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    -73.12662810154,
-                    40.91267645746
+                    -73.12666967645,
+                    40.91281125123
                 ]
             }
         },
         {
             "type": "Feature",
             "properties": {
-                "id": "006",
-                "lot": "CPC02"
+                "name": "019"
             },
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    -73.12647253342,
-                    40.91274638783
+                    -73.12667235866,
+                    40.91278692765
                 ]
             }
         },
         {
             "type": "Feature",
             "properties": {
-                "id": "009",
-                "lot": "CPC02"
+                "name": "001"
             },
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    -73.12646113403,
-                    40.91281631813
+                    -73.12644705310,
+                    40.91284672309
                 ]
             }
         },
         {
             "type": "Feature",
             "properties": {
-                "id": "026",
-                "lot": "CPC02"
+                "name": "006"
             },
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    -73.12685206600,
-                    40.91259943261
+                    -73.12647521630,
+                    40.91272814564
                 ]
             }
         },
         {
             "type": "Feature",
             "properties": {
-                "id": "033",
-                "lot": "CPC02"
+                "name": "023"
             },
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    -73.12681384452,
-                    40.91276057659
-                ]
-            }
-        },
-
-        {
-            "type": "Feature",
-            "properties": {
-                "id": "036",
-                "lot": "CPC02"
-            },
-            "geometry": {
-                "type": "Point",
-                "coordinates": [
-                    -73.12679976292,
-                    40.91282898665
+                    -73.12668979302,
+                    40.91269064674
                 ]
             }
         },
         {
             "type": "Feature",
             "properties": {
-                "id": "022",
-                "lot": "CPC02"
+                "name": "028"
             },
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    -73.12667571075,
-                    40.91273017210
+                    -73.12680781022,
+                    40.91283861524
                 ]
             }
         },
         {
             "type": "Feature",
             "properties": {
-                "id": "025",
-                "lot": "CPC02"
+                "name": "037"
             },
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    -73.12666229971,
-                    40.91280364960
+                    -73.12685340777,
+                    40.91262882419
                 ]
             }
         },
         {
             "type": "Feature",
             "properties": {
-                "id": "011",
-                "lot": "CPC02"
+                "name": "008"
             },
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    -73.12663346596,
-                    40.91265061361
+                    -73.12648326293,
+                    40.91267949842
                 ]
             }
         },
         {
             "type": "Feature",
             "properties": {
-                "id": "003",
-                "lot": "CPC02"
+                "name": "017"
             },
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    -73.12648795612,
-                    40.91267493723
+                    -73.12663078442,
+                    40.91265922873
                 ]
             }
         },
         {
             "type": "Feature",
             "properties": {
-                "id": "010",
-                "lot": "CPC02"
+                "name": "022"
             },
             "geometry": {
                 "type": "Point",
                 "coordinates": [
-                    -73.12645576961,
-                    40.91283962821
+                    -73.12668576971,
+                    40.91271598384
+                ]
+            }
+        },
+        {
+            "type": "Feature",
+            "properties": {
+                "name": "005"
+            },
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    -73.12647253409,
+                    40.91275652317
                 ]
             }
         }
