@@ -8,4 +8,14 @@ export const fetchParkingLotsOverlay = async () => {
       console.error("Error in fetchParkingLots:", error);
       throw error;
     }
-  };
+};
+
+export const fetchParkingLotDetails = async (lotId) => {
+    try {
+        const response = await axios.get(`/api/map/parking-lots/${lotId}/details`);
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching parking lot details:", error);
+        throw error;
+    }
+};

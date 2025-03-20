@@ -1,0 +1,80 @@
+.zoom-buttons {
+    position: absolute;
+    top: 70px; /* below the Back button */
+    left: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    z-index: 30;
+  }
+  
+  .zoom-buttons button {
+    width: 30px;
+    height: 30px;
+    border: none;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: #fff;
+    font-size: 1rem;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+  }
+  
+  .zoom-buttons button:hover:not(.disabled) {
+    background-color: rgba(0, 0, 0, 0.7);
+  }
+  
+  .pan-button {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    border: none;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: #fff;
+    font-size: 1rem;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+    z-index: 30;
+  }
+  
+  /* Top arrow (centered horizontally) */
+  .pan-up {
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
+  /* Bottom arrow (centered horizontally) */
+  .pan-down {
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
+  /* Left arrow (centered vertically) */
+  .pan-left {
+    left: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  
+  /* Right arrow (centered vertically) */
+  .pan-right {
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  
+  .pan-button:hover:not(.disabled) {
+    background-color: rgba(0, 0, 0, 0.7);
+  }
+  
+  /* Darker disabled state for better contrast */
+  .disabled,
+  .disabled:hover {
+    cursor: default;
+    background-color: #888 !important;
+    color: #444 !important;
+  }
+  

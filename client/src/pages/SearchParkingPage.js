@@ -1,20 +1,35 @@
 // client/src/pages/SearchParkingPage.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import SearchBar from '../components/SearchBar';
 import './SearchParkingPage.css';
 import MapOverview from '../components/MapOverview';
-import LotMapView from '../components/lotMapView';
+import LotMapView from '../components/LotView';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 function SearchParkingPage() {
   const [searchedBuilding, setSearchedBuilding] = useState(null);
   const [selectedLotId, setSelectedLotId] = useState(null);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const lotId = params.get('lotId');
+    if (lotId) {
+      setSelectedLotId(lotId);
+    } else {
+      setSelectedLotId(null);
+    }
+  }, [location]);
 
   const handleLotClick = (lotId) => {
     setSelectedLotId(lotId);
+    navigate(`/search-parking?lotId=${lotId}`);
   };
 
   const handleBackFromLot = () => {
     setSelectedLotId(null);
+    navigate('/search-parking');
   };
 
   return (
