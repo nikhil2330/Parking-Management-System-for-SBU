@@ -10,6 +10,8 @@ export const fetchParkingLotsOverlay = async () => {
     }
 };
 
+
+
 export const fetchParkingLotDetails = async (lotId) => {
     try {
         const response = await axios.get(`/api/map/parking-lots/${lotId}/details`);
