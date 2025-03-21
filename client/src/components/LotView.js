@@ -1,6 +1,7 @@
-// client/src/components/LotMapView.js
+// client/src/components/LotView.js
 import React, { useState, useEffect, useRef } from 'react';
 import { fetchParkingLotDetails } from '../services/MapService';
+import PanZoomControls from './PanZoomControls';
 import './LotView.css';
 
 const LotMapView = ({ lotId, onBack }) => {
@@ -114,6 +115,64 @@ const LotMapView = ({ lotId, onBack }) => {
     setOffset(clampOffset(newOffset, newScale));
   };
 
+  const zoomStepFactor = 1.1;
+  const panStep = 20;
+
+  const handleZoomIn = () => {
+    if (!containerRef.current || !svgDimensions) return;
+    let newScale = scale * zoomStepFactor;
+    if (newScale > 3) newScale = 3;
+    const cw = containerRef.current.clientWidth;
+    const ch = containerRef.current.clientHeight;
+    const centerX = cw / 2;
+    const centerY = ch / 2;
+    const newOffset = {
+      x: offset.x + (1 - newScale / scale) * (centerX - offset.x),
+      y: offset.y + (1 - newScale / scale) * (centerY - offset.y)
+    };
+    setScale(newScale);
+    setOffset(clampOffset(newOffset, newScale));
+  };
+
+  const handleZoomOut = () => {
+    if (!containerRef.current || !svgDimensions) return;
+    let newScale = scale / zoomStepFactor;
+    const cw = containerRef.current.clientWidth;
+    const ch = containerRef.current.clientHeight;
+    const newMinScale = Math.max(cw / svgDimensions.width, ch / svgDimensions.height);
+    if (newScale < newMinScale) newScale = newMinScale;
+    const centerX = cw / 2;
+    const centerY = ch / 2;
+    const newOffset = {
+      x: offset.x + (1 - newScale / scale) * (centerX - offset.x),
+      y: offset.y + (1 - newScale / scale) * (centerY - offset.y)
+    };
+    setScale(newScale);
+    setOffset(clampOffset(newOffset, newScale));
+  };
+
+  const handlePan = (dx, dy) => {
+    const newOffset = { x: offset.x + dx, y: offset.y + dy };
+    setOffset(clampOffset(newOffset, scale));
+  };
+
+  const handlePanUp = () => handlePan(0, panStep);
+  const handlePanDown = () => handlePan(0, -panStep);
+  const handlePanLeft = () => handlePan(panStep, 0);
+  const handlePanRight = () => handlePan(-panStep, 0);
+
+  // Compute booleans for enabling/disabling controls.
+  const containerWidth = containerRef.current ? containerRef.current.clientWidth : 0;
+  const containerHeight = containerRef.current ? containerRef.current.clientHeight : 0;
+  const minScale = svgDimensions ? Math.max(containerWidth / svgDimensions.width, containerHeight / svgDimensions.height) : 0;
+  const canZoomIn = scale < 3;
+  const canZoomOut = scale > minScale;
+  const canPanRight = svgDimensions ? offset.x > containerWidth - (svgDimensions.width * scale) : false;
+  const canPanLeft = offset.x < 0;
+  const canPanDown = svgDimensions ? offset.y > containerHeight - (svgDimensions.height * scale) : false;
+  const canPanUp = offset.y < 0;
+  
+
   // Once the SVG is rendered and the lot details are fetched,
   // attach event handlers to each spot element for hover and click.
   useEffect(() => {
@@ -160,6 +219,21 @@ const LotMapView = ({ lotId, onBack }) => {
   return (
     <div className="lot-map-view">
       <button className="back-button" onClick={onBack}>Back</button>
+      {/* Pan & Zoom Controls */}
+      <PanZoomControls 
+        canZoomIn={canZoomIn}
+        canZoomOut={canZoomOut}
+        canPanUp={canPanUp}
+        canPanDown={canPanDown}
+        canPanLeft={canPanLeft}
+        canPanRight={canPanRight}
+        onZoomIn={handleZoomIn}
+        onZoomOut={handleZoomOut}
+        onPanUp={handlePanUp}
+        onPanDown={handlePanDown}
+        onPanLeft={handlePanLeft}
+        onPanRight={handlePanRight}
+      />
       <div
         className="svg-container"
         ref={containerRef}
@@ -175,7 +249,7 @@ const LotMapView = ({ lotId, onBack }) => {
             transformOrigin: '0 0'
           }}
         >
-          {/* The id allows us to query for spot elements */}
+          {/* The id lets us attach event handlers to spot elements */}
           <SvgComponent id="svg-content" />
         </div>
       </div>
