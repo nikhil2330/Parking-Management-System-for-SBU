@@ -154,19 +154,13 @@
 /* RIGHT COLUMN: Map gets remaining space */
 .map-section {
   flex: 1;
+  overflow: hidden; 
+  /* remove min-height if you want it to shrink or grow
+     remove align-items, remove justify-content */
+  display: flex; /* so that child (the .zoomed-map-view) can fill it */
   background-color: #f8f8f8;
-  display: flex;
-  min-height: 600px;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
 }
 
-.map-image {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-}
 
 /* ---------- OPTIONAL: OVERRIDE SEARCH BAR STYLES ---------- */
 .search-bar {

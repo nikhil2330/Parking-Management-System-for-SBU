@@ -2,7 +2,7 @@ import 'leaflet/dist/leaflet.css';
 
 import { useState, React, useEffect} from 'react';
 import { MapContainer, TileLayer, Polygon } from 'react-leaflet';
-import { fetchParkingLotsOverlay } from '../services/mapService';
+import { fetchParkingLotsOverlay } from '../services/MapService';
 import 'leaflet/dist/leaflet.css';
 
 const stonyBrookCenter = [40.912, -73.123]; 
