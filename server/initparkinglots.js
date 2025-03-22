@@ -70,6 +70,7 @@ csv()
       // Build the ParkingLot document from CSV row.
       const parkingLotData = {
         lotId: lotId,
+        groupId: lotId === "SAC02" ? "SAC01" : lotId,
         officialLotName: row.officialLotName,
         campus: row.campus,
         capacity: capacity,
@@ -100,10 +101,14 @@ csv()
       };
 
       return {
-        insertOne: { document: parkingLotData }
+        updateOne: {
+          filter: { lotId: lotId },
+          update: { $set: parkingLotData },
+          upsert: true
+        }
       };
     })
-    .filter(op => op && typeof op === 'object' && op.insertOne);
+    .filter(op => op && typeof op === 'object' && op.updateOne);
     console.log("Bulk operations:", bulkOps);
 
     // Bulk insert the documents.
