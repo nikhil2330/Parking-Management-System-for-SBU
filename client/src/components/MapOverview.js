@@ -13,8 +13,15 @@ const MapOverview = ({ onLotClick }) => {
 
   useEffect(() => {
     fetchParkingLotsOverlay()
-      .then(data => setParkingLots(data))
-      .catch(err => console.error("Error fetching parking lots", err));
+    .then(data => {
+      const uniqueLots = data.reduce((acc, lot) => {
+        if (!acc.some(l => l.groupId === lot.groupId)) {
+          acc.push(lot);
+        }
+        return acc;
+      }, []);
+      setParkingLots(uniqueLots);
+    }).catch(err => console.error("Error fetching parking lots", err));
   }, []);
   return (
     <MapContainer center={stonyBrookCenter} zoom={16} style={{ height: '100vh', width: '100%' }}>
@@ -29,16 +36,16 @@ const MapOverview = ({ onLotClick }) => {
          }
          return polygons.map((polygon, idx) => (
             <Polygon
-              key={`${lot.lotId}-${idx}`}
+              key={`${lot.groupId}-${idx}`}
               positions={polygon}
-              pathOptions={{ color: "red", opacity: 0.2,  fillColor: "red", fillOpacity: hoveredLotId === lot.lotId ? 0.6 : 0.4, }}
+              pathOptions={{ color: "red", opacity: 0.2,  fillColor: "red", fillOpacity: hoveredLotId === lot.groupId ? 0.6 : 0.4, }}
               eventHandlers={{
                 click: () => {
-                  console.log(`Clicked parking lot ${lot.lotId}`);
-                  onLotClick(lot.lotId);
+                  console.log(`Clicked parking lot ${lot.groupId}`);
+                  onLotClick(lot.groupId);
                   },
                 mouseover: (e) => {
-                  setHoveredLotId(lot.lotId);
+                  setHoveredLotId(lot.groupId);
                 },
                 mouseout: (e) => {
                   setHoveredLotId(null);

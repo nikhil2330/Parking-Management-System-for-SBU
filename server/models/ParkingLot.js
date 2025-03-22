@@ -4,6 +4,7 @@ const Schema = mongoose.Schema;
 const ParkingLotSchema = new Schema(
   {
     lotId: { type: String, required: true, unique: true },
+    groupId: {type: String, required: true, unique: false },
     officialLotName: { type: String, required: true },    
     campus: { type: String, required: true },            
     capacity: { type: Number, required: true },
