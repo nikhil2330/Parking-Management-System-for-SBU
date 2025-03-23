@@ -1,26 +1,80 @@
-const express = require('express');
-const cors = require('cors');
-const bodyParser = require('body-parser');
-const app = express();
+// src/App.js
+import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
-app.use(cors());
-app.use(bodyParser.json());
+// Pages
+import SignInPage from './pages/SignInPage';
+import CreateAccountPage from './pages/CreateAccountPage';
+import HomePage from './pages/HomePage';
+import SearchParkingPage from './pages/SearchParkingPage';
+import ReservationsPage from './pages/ReservationsPage';
+import PaymentMethodsPage from './pages/PaymentMethodsPage';
+import ModifyReservationPage from './pages/ModifyReservationPage';
+import ClaimOfferPage from './pages/ClaimOfferPage';
 
+// Auth guard component
+const ProtectedRoute = ({ children }) => {
+  const isAuthenticated = localStorage.getItem('token') !== null;
+  
+  if (!isAuthenticated) {
+    // Redirect to sign in page if not authenticated
+    return <Navigate to="/" replace />;
+  }
+  
+  return children;
+};
 
-const userRoutes = require('./routes/userRoutes');
-app.use('/api/users', userRoutes);
+function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        {/* Public routes */}
+        <Route path="/" element={<SignInPage />} />
+        <Route path="/create" element={<CreateAccountPage />} />
+        
+        {/* Protected routes */}
+        <Route path="/home" element={
+          <ProtectedRoute>
+            <HomePage />
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/search-parking" element={
+          <ProtectedRoute>
+            <SearchParkingPage />
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/reservations" element={
+          <ProtectedRoute>
+            <ReservationsPage />
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/payment-methods" element={
+          <ProtectedRoute>
+            <PaymentMethodsPage />
+          </ProtectedRoute>
+        } />
+        
+        {/* Fix for the ModifyReservationPage route to include the :id parameter */}
+        <Route path="/modify-reservation/:id" element={
+          <ProtectedRoute>
+            <ModifyReservationPage />
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/claim-offer" element={
+          <ProtectedRoute>
+            <ClaimOfferPage />
+          </ProtectedRoute>
+        } />
+        
+        {/* Fallback route */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
 
-const mapRoutes = require('./routes/mapRoutes');
-app.use('/api/map', mapRoutes);
-
-app.use(express.static('build'));
-
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'build', 'index.html'));
-});
-
-app.get('/', (req, res) => {
-  res.send('Test');
-});
-
-module.exports = app;
+export default App;

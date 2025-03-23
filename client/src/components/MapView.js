@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import mapImage from '../assets/map.png';
+import ApiService from '../services/api';
 import './MapView.css';
 
 const GOOGLE_API_KEY = 'AIzaSyAU3EHHB5187niRs1UAsvEtFmBsdCMBW7s'; 
@@ -30,16 +31,24 @@ function MapView() {
   const [parkingData, setParkingData] = useState(null);
   const [chosenLat, setChosenLat] = useState(null);
   const [chosenLon, setChosenLon] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     if (zoomedIn) {
-      fetch('/api/map/parking-spots/cpc01')
-        .then(res => {
-          if (!res.ok) throw new Error(`HTTP error! Status: ${res.status}`);
-          return res.json();
+      setLoading(true);
+      setError(null);
+      
+      ApiService.map.getParkingSpots('cpc01')
+        .then(data => {
+          setParkingData(data);
+          setLoading(false);
         })
-        .then(data => setParkingData(data))
-        .catch(err => console.error("Error loading parking data:", err));
+        .catch(err => {
+          console.error("Error loading parking data:", err);
+          setError("Failed to load parking spots. Please try again.");
+          setLoading(false);
+        });
     }
   }, [zoomedIn]);
 
@@ -83,6 +92,28 @@ function MapView() {
     );
   }
 
+  if (loading) {
+    return (
+      <div className="zoomed-map-view">
+        <button className="back-button" onClick={() => setZoomedIn(false)}>
+          ← Back
+        </button>
+        <div className="loading-indicator">Loading parking data...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="zoomed-map-view">
+        <button className="back-button" onClick={() => setZoomedIn(false)}>
+          ← Back
+        </button>
+        <div className="error-message">{error}</div>
+      </div>
+    );
+  }
+
   return (
     <div className="zoomed-map-view">
       <button
@@ -119,6 +150,9 @@ function MapView() {
             if (available) {
               setChosenLat(lat);
               setChosenLon(lon);
+              
+              // Here you could also initiate a reservation process
+              console.log(`Selected parking spot ID: ${id}`);
             }
           };
 
