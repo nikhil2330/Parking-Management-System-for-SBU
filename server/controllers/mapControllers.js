@@ -5,7 +5,6 @@ const ParkingSpot = require('../models/ParkingSpot');
 
 exports.getParkingLots = async (req, res) => {
   try {
-    // Optionally, select only the fields needed for the overlay
     const lots = await ParkingLot.find({}, 'lotId groupId officialLotName campus boundingBox');
     res.json(lots);
   } catch (error) {

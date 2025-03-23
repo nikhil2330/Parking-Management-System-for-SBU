@@ -88,7 +88,6 @@
   margin-right: 0.5rem;
 }
 
-/* MIDDLE COLUMN: fixed width as desired */
 .middle-section {
   width: 400px;
   padding: 1rem;
@@ -97,15 +96,13 @@
   flex-direction: column;
 }
 
-/* Search bar wrapper in the middle column */
 .search-bar-wrapper {
   margin-bottom: 1rem;
 }
 
-/* Spot cards */
 .spot-card {
   background-color: #fff;
-  border: 1px solid #ccc; /* use consistent border color */
+  border: 1px solid #ccc; 
   border-radius: 8px;
   margin-bottom: 1rem;
   padding: 1rem;
@@ -151,18 +148,14 @@
   background-color: #9a0a28;
 }
 
-/* RIGHT COLUMN: Map gets remaining space */
 .map-section {
   flex: 1;
   overflow: hidden; 
-  /* remove min-height if you want it to shrink or grow
-     remove align-items, remove justify-content */
-  display: flex; /* so that child (the .zoomed-map-view) can fill it */
+  display: flex; 
   background-color: #f8f8f8;
 }
 
 
-/* ---------- OPTIONAL: OVERRIDE SEARCH BAR STYLES ---------- */
 .search-bar {
   display: flex;
   align-items: center;
@@ -200,7 +193,6 @@
   height: 100%;
 }
 
-/* The back button on top of the iframe */
 .back-button {
   position: absolute;
   top: 20px;

@@ -2,9 +2,8 @@ const csv = require('csvtojson');
 const mongoose = require('mongoose');
 const path = require('path');
 require('dotenv').config({ path: './config/.env' });
-const ParkingLot = require('./models/ParkingLot'); // Adjust path if needed
+const ParkingLot = require('../models/ParkingLot'); 
 
-// Connect to MongoDB (update your connection string as needed)
 const mongoURI = process.env.MONGO_URI;
 console.log(mongoURI)
 mongoose
@@ -15,14 +14,6 @@ mongoose
     process.exit(1);
   });
 
-/**
- * Helper function to parse the boundingBox field from CSV.
- * This function attempts to JSON.parse the string.
- * It should handle both a single polygon format:
- *    [[lat, long],[lat, long], ...]
- * and a multi-polygon format:
- *    [[[lat, long],[lat, long], ...], [[lat, long],[lat, long], ...]]
- */
 function parseBoundingBox(str) {
     if (!str || str.trim() === "") return [];
     let fixedStr = str.trim();
@@ -56,18 +47,14 @@ csv()
       const capacity = Number(row.capacity) || 0;
       const availabilityValue = Number(row.availability) || 0;
 
-      // For types, if the CSV value is "0" or empty, use an empty array; otherwise split by comma.
       const types = (row.types && row.types.trim() !== "0")
         ? row.types.split(',').map(s => s.trim())
         : [];
 
-      // Parse boundingBox (assuming the CSV field is named exactly "boundingBox")
       const bbox = parseBoundingBox(row.boundingBox);
 
-      // For "Time-Boolean", treat "TRUE" (case-insensitive) as true.
       const timeBoolean = row["Time-Boolean"] && row["Time-Boolean"].toUpperCase() === "TRUE";
 
-      // Build the ParkingLot document from CSV row.
       const parkingLotData = {
         lotId: lotId,
         groupId: lotId === "SAC02" ? "SAC01" : lotId,
@@ -97,7 +84,7 @@ csv()
         },
         timings: row.Timings || "",
         timeBoolean: timeBoolean,
-        spots: [] // Initially empty; will be populated later.
+        spots: [] 
       };
 
       return {
@@ -111,7 +98,6 @@ csv()
     .filter(op => op && typeof op === 'object' && op.updateOne);
     console.log("Bulk operations:", bulkOps);
 
-    // Bulk insert the documents.
     ParkingLot.bulkWrite(bulkOps)
       .then(result => {
         console.log('Bulk insert completed:', result);
