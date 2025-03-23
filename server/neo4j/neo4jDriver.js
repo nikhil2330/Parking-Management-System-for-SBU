@@ -1,4 +1,5 @@
-require('dotenv').config({ path: './config/.env' });
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '../config/.env') });
 const neo4j = require('neo4j-driver');
 
 const uri = process.env.NEO4J_URI;

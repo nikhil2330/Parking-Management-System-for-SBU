@@ -1,6 +1,6 @@
 .zoom-buttons {
     position: absolute;
-    top: 70px; /* below the Back button */
+    top: 70px; 
     left: 20px;
     display: flex;
     flex-direction: column;
@@ -38,28 +38,24 @@
     z-index: 30;
   }
   
-  /* Top arrow (centered horizontally) */
   .pan-up {
     top: 20px;
     left: 50%;
     transform: translateX(-50%);
   }
   
-  /* Bottom arrow (centered horizontally) */
   .pan-down {
     bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
   }
   
-  /* Left arrow (centered vertically) */
   .pan-left {
     left: 20px;
     top: 50%;
     transform: translateY(-50%);
   }
   
-  /* Right arrow (centered vertically) */
   .pan-right {
     right: 20px;
     top: 50%;
@@ -70,7 +66,6 @@
     background-color: rgba(0, 0, 0, 0.7);
   }
   
-  /* Darker disabled state for better contrast */
   .disabled,
   .disabled:hover {
     cursor: default;
