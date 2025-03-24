@@ -1,11 +1,11 @@
 // client/src/pages/SearchParkingPage.js
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header';
 import ApiService from '../services/api';
 import MapOverview from '../components/MapOverview';
 import LotMapView from '../components/LotView';
-import { useNavigate, useLocation } from 'react-router-dom';import DetailedLotModal from '../components/DetailedLotModal';
+import { useNavigate, useLocation } from 'react-router-dom';
+import DetailedLotModal from '../components/DetailedLotModal';
 import './premium-search-parking.css';
 
 function SearchParkingPage() {
@@ -13,14 +13,13 @@ function SearchParkingPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchedBuilding, setSearchedBuilding] = useState(null);
   const [selectedLotId, setSelectedLotId] = useState(null);
-  const navigate = useNavigate();
   const location = useLocation();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [showDetailedModal, setShowDetailedModal] = useState(false);
   const [selectedSpotForReservation, setSelectedSpotForReservation] = useState(null);
   const [activeFilters, setActiveFilters] = useState({
-    destination: '',
+    destination: '', 
     zone: '',
     ratePlan: '',
     covered: '',
@@ -29,38 +28,6 @@ function SearchParkingPage() {
     bikeRack: false,
     shuttleService: false
   });
-
-  useEffect(() => {
-    if (searchedBuilding) {
-      setLoading(true);
-      setError(null);
-      
-      ApiService.map.getParkingSpot('037')
-        .then((data) => {
-          console.log("Spot 037 data loaded:", data);
-          setSpot37(data);
-          setLoading(false);
-        })
-        .catch((err) => {
-          console.error("Error fetching spot 037 data:", err);
-          setError("Failed to load parking spot data. Please try again.");
-          setLoading(false);
-        });
-    const params = new URLSearchParams(location.search);
-    const lotId = params.get('lotId');
-    if (lotId) {
-      setSelectedLotId(lotId);
-    } else {
-      setSelectedLotId(null);
-    }
-  }, [searchedBuilding]);
-
-  const GOOGLE_API_KEY = 'AIzaSyAU3EHHB5187niRs1UAsvEtFmBsdCMBW7s'; 
-  const getDirectionsUrl = (origin, destLat, destLon) => {
-    return `https://www.google.com/maps/embed/v1/directions?key=${GOOGLE_API_KEY}&origin=${encodeURIComponent(
-      origin
-    )}&destination=${destLat},${destLon}&mode=walking`;
-  };
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -92,61 +59,6 @@ function SearchParkingPage() {
     navigate('/reservations', { state: { spotInfo } });
   };
 
-  const handleBackToOverview = () => {
-    setSearchedBuilding(null);
-    setSpot37(null);
-  };
-
-  const renderMapSection = () => {
-    if (loading) {
-      return (
-        <div className="loading-indicator">
-          <div className="loading-spinner"></div>
-          <p className="loading-text">Loading parking data...</p>
-        </div>
-      );
-    }
-    
-    if (error) {
-      return (
-        <div className="error-message">
-          <svg className="error-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="12" cy="12" r="10"></circle>
-            <line x1="12" y1="8" x2="12" y2="12"></line>
-            <line x1="12" y1="16" x2="12.01" y2="16"></line>
-          </svg>
-          {error}
-        </div>
-      );
-    }
-    
-    if (searchedBuilding && spot37) {
-      const { geometry } = spot37;
-      const [destLon, destLat] = geometry.coordinates;
-      const directionsUrl = getDirectionsUrl(searchedBuilding, destLat, destLon);
-
-      return (
-        <div className="map-wrapper">
-          <button className="back-button" onClick={handleBackToOverview}>
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="19" y1="12" x2="5" y2="12"></line>
-              <polyline points="12 19 5 12 12 5"></polyline>
-            </svg>
-            Back to Overview
-          </button>
-          <iframe
-            title="Walking Directions"
-            style={{ border: 0, width: '100%', height: '100%' }}
-            loading="lazy"
-            allowFullScreen
-            src={directionsUrl}
-          />
-        </div>
-      );
-    }
-
-    return <MapView />;
-  }, [location]);
 
   const handleLotClick = (lotId) => {
     setSelectedLotId(lotId);
@@ -414,17 +326,13 @@ function SearchParkingPage() {
 
             {/* Map */}
             <div className="map-container">
-              {renderMapSection()}
+              {selectedLotId ? (
+                <LotMapView lotId={selectedLotId} onBack={handleBackFromLot} />
+              ) : (
+                <MapOverview onLotClick={handleLotClick} />
+              )}
             </div>
           </div>
-        </div>
-
-        <div className="map-section">
-          {selectedLotId ? (
-            <LotMapView lotId={selectedLotId} onBack={handleBackFromLot} />
-          ) : (
-            <MapOverview onLotClick={handleLotClick} />
-          )}
         </div>
       </div>
 
