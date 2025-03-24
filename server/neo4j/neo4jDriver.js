@@ -14,4 +14,4 @@ driver.getServerInfo()
   .then(() => console.log('Neo4j works'))
   .catch(err => console.error('Neo4j connection issue:', err));
 
-module.exports = driver;
+module.exports = mockDriver;

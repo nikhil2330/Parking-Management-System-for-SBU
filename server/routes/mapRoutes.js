@@ -1,4 +1,4 @@
-// routes/mapRoutes.js
+// server/routes/mapRoutes.js
 const express = require('express');
 const router = express.Router();
 const mapController = require('../controllers/mapControllers');
