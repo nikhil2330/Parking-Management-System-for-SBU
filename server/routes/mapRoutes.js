@@ -7,4 +7,5 @@ router.get('/parking-lots/overlay', mapController.getParkingLots);
 router.get('/parking-lots/:lotId/details', mapController.getParkingLotDetails);
 
 
+
 module.exports = router;
