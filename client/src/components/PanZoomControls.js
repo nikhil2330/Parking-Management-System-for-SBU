@@ -17,7 +17,6 @@ const PanZoomControls = ({
 }) => {
   return (
     <>
-      {/* Zoom buttons (left side, stacked under Back button) */}
       <div className="zoom-buttons">
         <button onClick={onZoomIn} disabled={!canZoomIn} className={!canZoomIn ? 'disabled' : ''}>
           +

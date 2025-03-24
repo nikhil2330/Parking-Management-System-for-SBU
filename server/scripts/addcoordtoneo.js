@@ -4,6 +4,8 @@ const fs = require('fs');
 const path = require('path');
 const driver = require('../neo4j/neo4jDriver');
 
+
+// processes it by file not directory, doesnt delete stuff so duplicates will occur
 async function processGeojsonFile(filePath) {
   // Use the file name (without extension) as the prefix, e.g., "CPC01"
   const fileName = path.basename(filePath, path.extname(filePath));
