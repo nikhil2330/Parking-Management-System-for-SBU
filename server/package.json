@@ -18,8 +18,8 @@
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "express-validator": "^7.2.1",
-    "jsonwebtoken": "^9.0.2",
     "js-priority-queue": "^0.1.5",
+    "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.12.1",
     "neo4j-driver": "^5.28.1"
   }

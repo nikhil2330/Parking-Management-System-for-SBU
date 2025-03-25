@@ -9,8 +9,7 @@ const userRoutes = require('./routes/userRoutes');
 const mapRoutes = require('./routes/mapRoutes');
 const reservationRoutes = require('./routes/reservationRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
-
-// Import custom middleware
+const parkingRoutes = require('./routes/parkingRoutes');
 const authenticateJWT = require('./middleware/authenticateJWT');
 
 const app = express();
@@ -25,23 +24,16 @@ app.use('/api/users', authenticateJWT, userRoutes);
 app.use('/api/map', mapRoutes); // Public endpoints
 app.use('/api/reservation', authenticateJWT, reservationRoutes);
 app.use('/api/payment', authenticateJWT, paymentRoutes);
-
-const parkingRoutes = require('./routes/parkingRoutes');
-app.use('/api/map', parkingRoutes);
-
-app.use(express.static('build'));
-
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'build', 'index.html'));
-});
+app.use('/api/parking', parkingRoutes);
 
 if (process.env.NODE_ENV === 'production') {
+  // In production, serve the React build.
   app.use(express.static(path.join(__dirname, 'build')));
   app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'build', 'index.html'));
   });
 } else {
-  // For development, you can simply respond to '/' directly:
+  // In development, you don't have a build folder, so just return a test message.
   app.get('/', (req, res) => {
     res.send('Test');
   });
