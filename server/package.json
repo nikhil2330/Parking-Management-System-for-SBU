@@ -11,13 +11,16 @@
   "license": "ISC",
   "dependencies": {
     "@turf/turf": "^7.2.0",
+    "bcryptjs": "^3.0.2",
     "body-parser": "^1.20.3",
     "cors": "^2.8.5",
     "csvtojson": "^2.0.10",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "express-validator": "^7.2.1",
     "js-priority-queue": "^0.1.5",
-    "mongoose": "^8.11.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.12.1",
     "neo4j-driver": "^5.28.1"
   }
 }

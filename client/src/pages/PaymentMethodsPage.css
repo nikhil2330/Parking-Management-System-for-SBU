@@ -1,0 +1,443 @@
+/* src/pages/PaymentMethodsPage.css */
+.payment-methods-page {
+    min-height: 100vh;
+    background-color: #f5f5f5;
+  }
+  
+  .payment-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+  
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid #0A2541;
+    padding-bottom: 0.5rem;
+  }
+  
+  .page-header h1 {
+    margin: 0;
+    color: #0A2541;
+  }
+  
+  .return-home-btn {
+    background-color: #0A2541;
+    color: white;
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.2s;
+  }
+  
+  .return-home-btn:hover {
+    background-color: #153b63;
+  }
+  
+  .loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 400px;
+  }
+  
+  .spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid rgba(10, 37, 65, 0.2);
+    border-radius: 50%;
+    border-top-color: #0A2541;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+  }
+  
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  
+  .success-container {
+    max-width: 500px;
+    margin: 4rem auto;
+    padding: 2rem;
+    text-align: center;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .success-icon {
+    width: 80px;
+    height: 80px;
+    background-color: #4caf50;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    margin: 0 auto 1.5rem;
+  }
+  
+  .success-container h2 {
+    color: #4caf50;
+    margin-bottom: 1rem;
+  }
+  
+  .error-message {
+    background-color: #ffe6e6;
+    color: #cc0000;
+    padding: 1rem;
+    border-radius: 4px;
+    margin-bottom: 1.5rem;
+    border-left: 4px solid #cc0000;
+  }
+  
+  .field-error {
+    color: #cc0000;
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+  }
+  
+  .field-hint {
+    color: #666;
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+  }
+  
+  .payment-info-box {
+    background-color: #e3f2fd;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+    border-left: 4px solid #1976d2;
+  }
+  
+  .payment-info-box h2 {
+    margin-top: 0;
+    color: #0A2541;
+    margin-bottom: 1rem;
+  }
+  
+  .payment-amount {
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: #0A2541;
+  }
+  
+  .no-payment-methods {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    text-align: center;
+  }
+  
+  .add-payment-btn {
+    background-color: #0A2541;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    margin-top: 1rem;
+    transition: background-color 0.2s;
+  }
+  
+  .add-payment-btn:hover {
+    background-color: #153b63;
+  }
+  
+  .methods-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+  }
+  
+  .methods-header h2 {
+    margin: 0;
+    color: #0A2541;
+  }
+  
+  .methods-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
+  }
+  
+  .payment-method-card {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+    position: relative;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  
+  .payment-method-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  .default-method {
+    border: 2px solid #0A2541;
+  }
+  
+  .payment-method-icon {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
+  
+  .payment-method-details h3 {
+    margin: 0 0 0.5rem 0;
+    color: #0A2541;
+  }
+  
+  .payment-method-details p {
+    margin: 0.25rem 0;
+    color: #666;
+  }
+  
+  .default-badge {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background-color: #0A2541;
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+  
+  .payment-method-actions {
+    margin-top: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .use-method-btn, .delete-method-btn {
+    padding: 0.5rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    transition: background-color 0.2s;
+  }
+  
+  .use-method-btn {
+    background-color: #0A2541;
+    color: white;
+  }
+  
+  .use-method-btn:hover {
+    background-color: #153b63;
+  }
+  
+  .use-method-btn:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+  }
+  
+  .delete-method-btn {
+    background-color: #f8f8f8;
+    color: #d32f2f;
+    border: 1px solid #d32f2f;
+  }
+  
+  .delete-method-btn:hover {
+    background-color: #fbe9e7;
+  }
+  
+  .delete-method-btn:disabled {
+    background-color: #f8f8f8;
+    border-color: #cccccc;
+    color: #999999;
+    cursor: not-allowed;
+  }
+  
+  .add-payment-form {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-top: 2rem;
+    overflow: hidden;
+  }
+  
+  .form-header {
+    background-color: #0A2541;
+    color: white;
+    padding: 1rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .form-header h2 {
+    margin: 0;
+  }
+  
+  .close-form-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    padding: 0;
+  }
+  
+  .payment-type-selector {
+    display: flex;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  
+  .type-btn {
+    flex: 1;
+    padding: 1rem;
+    border: none;
+    background-color: #f8f8f8;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.2s;
+  }
+  
+  .type-btn.active {
+    background-color: white;
+    font-weight: 500;
+    box-shadow: inset 0 -2px 0 #0A2541;
+  }
+  
+  .type-btn:hover:not(.active) {
+    background-color: #f1f1f1;
+  }
+  
+  .add-payment-form form {
+    padding: 1.5rem;
+  }
+  
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+  }
+  
+  .form-group input[type="text"],
+  .form-group input[type="email"],
+  .form-group select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: border-color 0.2s;
+  }
+  
+  .form-group input:focus,
+  .form-group select:focus {
+    border-color: #0A2541;
+    outline: none;
+  }
+  
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1rem;
+  }
+  
+  .checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .checkbox-group input {
+    margin: 0;
+  }
+  
+  .checkbox-group label {
+    margin: 0;
+  }
+  
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+  
+  .form-actions button {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.2s;
+  }
+  
+  .cancel-button {
+    background-color: #e0e0e0;
+    color: #333;
+  }
+  
+  .cancel-button:hover {
+    background-color: #c7c7c7;
+  }
+  
+  .save-button {
+    background-color: #0A2541;
+    color: white;
+  }
+  
+  .save-button:hover {
+    background-color: #153b63;
+  }
+  
+  .save-button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+  }
+  
+  @media (max-width: 768px) {
+    .payment-container {
+      padding: 1rem;
+    }
+    
+    .page-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    
+    .return-home-btn {
+      margin-top: 1rem;
+    }
+    
+    .methods-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+    
+    .form-row {
+      grid-template-columns: 1fr;
+    }
+    
+    .form-actions {
+      flex-direction: column;
+    }
+    
+    .form-actions button {
+      width: 100%;
+    }
+  }

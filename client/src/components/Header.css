@@ -1,35 +1,81 @@
-/* src/components/Header.css */
-
+/* Enhanced Premium Header Styling */
 .header-container {
-    background-color: #ccc; /* Gray banner */
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  background-color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 4%;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  z-index: 10;
+  position: relative;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+}
+
+.header-car-icon {
+  color: #990000;
+  margin-right: 0.75rem;
+  transition: transform 0.3s ease;
+}
+
+.header-car-icon:hover {
+  transform: scale(1.1);
+}
+
+.header-title {
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: #0A2541;
+  letter-spacing: -0.5px;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.header-right p {
+  font-weight: 500;
+  color: #4b5563;
+  background-color: #f9fafb;
+  padding: 0.5rem 1rem;
+  border-radius: 30px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  border: 1px solid #f3f4f6;
+}
+
+.header-user-icon {
+  cursor: pointer;
+  background-color: #990000;
+  color: white;
+  padding: 8px;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(153, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
+.header-user-icon:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 8px rgba(153, 0, 0, 0.3);
+}
+
+/* Responsive styling */
+@media (max-width: 768px) {
+  .header-container {
     padding: 1rem;
   }
   
-  .header-left {
-    display: flex;
-    align-items: center;
+  .header-right p {
+    font-size: 0.9rem;
   }
-  
-  .header-car-icon {
-    color: #990000; /* Red accent */
-    margin-right: 0.5rem;
+}
+
+@media (max-width: 480px) {
+  .header-right p {
+    display: none;
   }
-  
-  .header-title {
-    font-weight: bold;
-    font-size: 1.25rem;
-  }
-  
-  .header-right {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-  }
-  
-  .header-user-icon {
-    cursor: pointer;
-  }
-  
+}
