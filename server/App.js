@@ -26,6 +26,9 @@ app.use('/api/map', mapRoutes); // Public endpoints
 app.use('/api/reservation', authenticateJWT, reservationRoutes);
 app.use('/api/payment', authenticateJWT, paymentRoutes);
 
+const parkingRoutes = require('./routes/parkingRoutes');
+app.use('/api/map', parkingRoutes);
+
 app.use(express.static('build'));
 
 app.get('*', (req, res) => {
