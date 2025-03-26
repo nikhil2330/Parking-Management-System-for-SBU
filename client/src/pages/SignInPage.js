@@ -1,13 +1,14 @@
-// src/pages/SignInPage.js (Professional)
+// client/src/pages/SignInPage.js (Professional)
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import campusImage from '../assets/fall-2023-sunset.jpg';
-import ApiService from '../services/api';
+import AuthService from '../services/AuthService';
 import './premium-signin.css';
 
 function SignInPage() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState("Signing you in...");
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
@@ -16,9 +17,9 @@ function SignInPage() {
 
   // Add subtle animations after page loads
   useEffect(() => {
-    // Just to ensure animations start after component mounts fully
     const timer = setTimeout(() => {
-      document.querySelector('.campus-content').style.opacity = 1;
+      const el = document.querySelector('.campus-content');
+      if (el) el.style.opacity = 1;
     }, 100);
     return () => clearTimeout(timer);
   }, []);
@@ -27,26 +28,20 @@ function SignInPage() {
     e.preventDefault();
     setIsLoading(true);
     setLoadingMessage("Preparing registration form...");
-    
     setTimeout(() => {
       navigate('/create');
     }, 800);
   };
 
-  const [loadingMessage, setLoadingMessage] = useState("Signing you in...");
-
   const handleSignIn = async (e) => {
     e.preventDefault();
-    
-    // Reset error
     setError(null);
-    
+
     // Basic validation
     if (!email.trim()) {
       setError('Please enter your email address');
       return;
     }
-    
     if (!password.trim()) {
       setError('Please enter your password');
       return;
@@ -54,29 +49,27 @@ function SignInPage() {
 
     setIsLoading(true);
     setLoadingMessage("Signing you in...");
-    
+
     try {
-      // Call the login API
-      const result = await ApiService.auth.login({ email, password });
-      
-      // If successful, redirect to home page
+      // Call the login API using AuthService.loginUser
+      const result = await AuthService.loginUser({ email, password });
+
       if (result.success) {
         setLoadingMessage("Success! Redirecting to dashboard...");
+        // Optionally store the token in localStorage if rememberMe is checked
+        localStorage.setItem('token', result.token);
+        localStorage.setItem('p4sbuUsername', result.username || 'User');
         // Add a small delay for better UX
         setTimeout(() => {
           navigate('/home');
         }, 1200);
       } else {
-        // Handle any other errors returned from the API
         setError(result.message || 'Sign in failed. Please check your credentials and try again.');
-      }
-    } catch (error) {
-      // Handle any API errors
-      setError(error.message || 'Sign in failed. Please try again.');
-    } finally {
-      if (error) {
         setIsLoading(false);
       }
+    } catch (error) {
+      setError(error.message || 'Sign in failed. Please try again.');
+      setIsLoading(false);
     }
   };
 
@@ -103,16 +96,15 @@ function SignInPage() {
       <div className="campus-showcase">
         <img src={campusImage} alt="Stony Brook University Campus" className="campus-image" />
         <div className="image-overlay"></div>
-        
         <div className="campus-content" style={{ opacity: 0 }}>
           <div className="campus-badge">
             <span className="badge-icon">🏛️</span>
             <span className="badge-text">STONY BROOK UNIVERSITY</span>
           </div>
-          
           <h1 className="campus-headline">Smarter Parking<br />for Campus Life</h1>
-          <p className="campus-subheadline">Find, reserve and pay for parking spaces across campus with our intuitive digital platform.</p>
-          
+          <p className="campus-subheadline">
+            Find, reserve and pay for parking spaces across campus with our intuitive digital platform.
+          </p>
           <div className="campus-features">
             <div className="feature-item">
               <div className="feature-icon">🚗</div>
@@ -142,7 +134,6 @@ function SignInPage() {
         <div className="floating-shape shape1"></div>
         <div className="floating-shape shape2"></div>
         <div className="floating-shape shape3"></div>
-        
         <div className="signin-header">
           <div className="university-logo">
             <svg className="logo-icon" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
@@ -153,11 +144,9 @@ function SignInPage() {
             <span className="logo-text">P4SBU</span>
           </div>
         </div>
-        
         <div className="form-content">
           <h1 className="welcomeline">Welcome Back!</h1>
           <p className="signin-subheading">Sign in to manage your parking reservations</p>
-          
           <div className="form-container">
             {error && (
               <div className="error-message">
@@ -165,7 +154,6 @@ function SignInPage() {
                 <span>{error}</span>
               </div>
             )}
-            
             <form onSubmit={handleSignIn}>
               <div className="input-group">
                 <label htmlFor="email" className="input-label">Email Address</label>
@@ -179,7 +167,6 @@ function SignInPage() {
                   autoComplete="email"
                 />
               </div>
-              
               <div className="input-group">
                 <label htmlFor="password" className="input-label">Password</label>
                 <input
@@ -195,7 +182,6 @@ function SignInPage() {
                   {showPassword ? "👁️" : "👁️‍🗨️"}
                 </div>
               </div>
-              
               <div className="signin-options">
                 <div className="remember-option">
                   <input
@@ -207,27 +193,20 @@ function SignInPage() {
                   />
                   <label htmlFor="remember" className="remember-label">Remember me</label>
                 </div>
-                
                 <a href="#forgot-password" className="forgot-link">Forgot password?</a>
               </div>
-              
-              <button type="submit" className="signin-btn">
-                Sign In
-              </button>
+              <button type="submit" className="signin-btn">Sign In</button>
             </form>
-            
             <div className="divider">
               <div className="divider-line"></div>
               <div className="divider-text">OR</div>
               <div className="divider-line"></div>
             </div>
-            
             <div className="social-options">
               <button className="social-btn" title="Sign in with Google">G</button>
               <button className="social-btn" title="Sign in with Microsoft">M</button>
               <button className="social-btn" title="Sign in with Apple">A</button>
             </div>
-            
             <div className="signup-prompt">
               <p>Don't have an account yet?</p>
               <a href="#signup" className="signup-link" onClick={handleCreateAccountClick}>
@@ -236,7 +215,6 @@ function SignInPage() {
             </div>
           </div>
         </div>
-        
         <div className="bottom-accent"></div>
       </div>
     </div>
