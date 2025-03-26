@@ -1,6 +1,7 @@
+// client/src/components/CreateAccountPage.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import ApiService from '../services/api';
+import AuthService from '../services/AuthService';
 import './premium-createaccount.css';
 
 function CreateAccountPage() {
@@ -8,7 +9,7 @@ function CreateAccountPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState('Processing your information...');
   const [success, setSuccess] = useState(false);
-  const [currentStep, setCurrentStep] = useState(1); // For visual progress tracking
+  const [currentStep, setCurrentStep] = useState(1);
   
   // Form fields state
   const [username, setUsername] = useState('');
@@ -22,198 +23,106 @@ function CreateAccountPage() {
   const [address, setAddress] = useState('');
   
   // Password strength state
-  const [passwordStrength, setPasswordStrength] = useState({
-    score: 0,
-    label: ''
-  });
+  const [passwordStrength, setPasswordStrength] = useState({ score: 0, label: '' });
   
   // Errors state
   const [errors, setErrors] = useState({});
   const [apiError, setApiError] = useState(null);
   
-  // Regex patterns
+  // Regex patterns for email and password validation
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   const passwordRegex = /^(?=.*[0-9])(?=.*[^a-zA-Z0-9]).{8,}$/;
   
-  // Add subtle animations after page loads
+  // Trigger subtle animations on mount
   useEffect(() => {
-    // Just to ensure animations start after component mounts fully
     const timer = setTimeout(() => {
-      const elements = document.querySelectorAll('.form-grid, .form-title, .form-subtitle');
-      elements.forEach(el => {
+      document.querySelectorAll('.form-grid, .form-title, .form-subtitle').forEach(el => {
         el.style.opacity = 1;
       });
     }, 100);
     return () => clearTimeout(timer);
   }, []);
   
-  // Calculate password strength whenever password changes
+  // Calculate password strength
   useEffect(() => {
     if (!password) {
       setPasswordStrength({ score: 0, label: '' });
       return;
     }
-    
     let score = 0;
     let label = '';
-    
-    // Length check
     if (password.length >= 8) score += 1;
     if (password.length >= 12) score += 1;
-    
-    // Complexity checks
     if (/[0-9]/.test(password)) score += 1;
     if (/[^a-zA-Z0-9]/.test(password)) score += 1;
     if (/[A-Z]/.test(password) && /[a-z]/.test(password)) score += 1;
-    
-    // Set label based on score
     if (score <= 1) label = 'Weak';
     else if (score <= 3) label = 'Medium';
     else if (score <= 4) label = 'Strong';
     else label = 'Very Strong';
-    
     setPasswordStrength({ score, label });
   }, [password]);
   
   const getPasswordStrengthClass = () => {
-    if (!passwordStrength.label) return '';
-    return `strength-${passwordStrength.label.toLowerCase().replace(' ', '-')}`;
+    return passwordStrength.label ? `strength-${passwordStrength.label.toLowerCase().replace(' ', '-')}` : '';
   };
   
   const handleGoToSignIn = (e) => {
     e.preventDefault();
     setIsLoading(true);
     setLoadingMessage('Redirecting to sign in...');
-    
-    setTimeout(() => {
-      navigate('/');
-    }, 800);
+    setTimeout(() => { navigate('/'); }, 800);
   };
   
   const handleCreateAccount = async (e) => {
     e.preventDefault();
-    
-    // Reset errors
     setErrors({});
     setApiError(null);
     
     const newErrors = {};
+    if (!username.trim()) newErrors.username = 'Username is required';
+    else if (username.trim().length < 5) newErrors.username = 'Username must be at least 5 characters';
     
-    // Validate username
-    if (!username.trim()) {
-      newErrors.username = 'Username is required';
-    } else if (username.trim().length < 5) {
-      newErrors.username = 'Username must be at least 5 characters';
-    }
+    if (!email.trim()) newErrors.email = 'Email address is required';
+    else if (!emailRegex.test(email)) newErrors.email = 'Please enter a valid email address';
     
-    // Validate email
-    if (!email.trim()) {
-      newErrors.email = 'Email address is required';
-    } else if (!emailRegex.test(email)) {
-      newErrors.email = 'Please enter a valid email address';
-    }
+    if (!password) newErrors.password = 'Password is required';
+    else if (!passwordRegex.test(password)) newErrors.password = 'Password must be at least 8 characters and include a number and special character';
     
-    // Validate password
-    if (!password) {
-      newErrors.password = 'Password is required';
-    } else if (!passwordRegex.test(password)) {
-      newErrors.password = 'Password must be at least 8 characters and include a number and special character';
-    }
+    if (password !== confirmPassword) newErrors.confirmPassword = 'Passwords do not match';
     
-    // Validate password confirmation
-    if (password !== confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match';
-    }
+    if (sbuId.trim() && !/^[0-9]{9}$/.test(sbuId)) newErrors.sbuId = 'SBU ID must be exactly 9 digits';
     
-    // Validate SBU ID (optional)
-    if (sbuId.trim() && !/^[0-9]{9}$/.test(sbuId)) {
-      newErrors.sbuId = 'SBU ID must be exactly 9 digits';
-    }
-    
-    // Validate required fields
-    if (!driversLicense.trim()) {
-      newErrors.driversLicense = "Driver's license is required";
-    }
-    
-    if (!vehicleInfo.trim()) {
-      newErrors.vehicleInfo = 'Vehicle information is required';
-    }
-    
-    if (!contactInfo.trim()) {
-      newErrors.contactInfo = 'Contact information is required';
-    }
-    
-    if (!address.trim()) {
-      newErrors.address = 'Address is required';
-    }
+    if (!driversLicense.trim()) newErrors.driversLicense = "Driver's license is required";
+    if (!vehicleInfo.trim()) newErrors.vehicleInfo = 'Vehicle information is required';
+    if (!contactInfo.trim()) newErrors.contactInfo = 'Contact information is required';
+    if (!address.trim()) newErrors.address = 'Address is required';
     
     setErrors(newErrors);
     
-    // If there are no validation errors, proceed with API call
     if (Object.keys(newErrors).length === 0) {
       setIsLoading(true);
       setLoadingMessage('Creating your account...');
-      
       try {
-        // Prepare the user data for registration
         const userData = {
           username,
           email,
           password,
-          sbuId: sbuId || null, // Convert empty string to null
+          sbuId: sbuId || null,
           driversLicense,
           vehicleInfo,
           contactInfo,
           address
         };
-
-        // For the demo, simulate steps and store in localStorage
-        await simulateProgress();
-        localStorage.setItem('p4sbuUsername', username);
-        localStorage.setItem('p4sbuUserEmail', email);
-        localStorage.setItem('p4sbuUserProfile', JSON.stringify({
-          username,
-          email,
-          sbuId: sbuId || '',
-          driversLicense,
-          vehicleInfo,
-          contactInfo,
-          address
-        }));
-        
-        // Show success state
+        // Call the registration endpoint
+        await AuthService.registerUser(userData);
         setSuccess(true);
-        
-        // Redirect to sign-in page after 2 seconds
-        setTimeout(() => {
-          navigate('/');
-        }, 2500);
-        
+        setTimeout(() => { navigate('/'); }, 2500);
       } catch (error) {
-        // Handle any API errors
         setApiError(error.message || 'Registration failed. Please try again.');
         setIsLoading(false);
       }
     }
-  };
-  
-  // Simulate a multi-step progress for visual feedback
-  const simulateProgress = async () => {
-    setCurrentStep(1);
-    setLoadingMessage('Validating your information...');
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
-    setCurrentStep(2);
-    setLoadingMessage('Creating your user profile...');
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    setCurrentStep(3);
-    setLoadingMessage('Setting up your account...');
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
-    setCurrentStep(4);
-    setLoadingMessage('Almost there...');
-    await new Promise(resolve => setTimeout(resolve, 600));
   };
   
   if (success) {
@@ -222,7 +131,6 @@ function CreateAccountPage() {
         <div className="bg-pattern"></div>
         <div className="floating-accent accent-1"></div>
         <div className="floating-accent accent-2"></div>
-        
         <div className="success-container">
           <div className="success-header"></div>
           <div className="success-icon"></div>
@@ -256,14 +164,11 @@ function CreateAccountPage() {
       <div className="bg-pattern"></div>
       <div className="floating-accent accent-1"></div>
       <div className="floating-accent accent-2"></div>
-      
       <div className="floating-shape shape-1"></div>
       <div className="floating-shape shape-2"></div>
       <div className="floating-shape shape-3"></div>
-      
       <div className="account-card">
         <div className="card-decoration"></div>
-        
         <div className="card-content">
           <div className="form-header">
             <div className="university-logo">
@@ -274,7 +179,6 @@ function CreateAccountPage() {
               </svg>
               <span className="logo-text">P4SBU</span>
             </div>
-            
             <h1 className="form-title">Create Your Account!</h1>
             <p className="form-subtitle">Join the Stony Brook parking community</p>
           </div>
