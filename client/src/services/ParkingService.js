@@ -20,6 +20,7 @@ const ParkingService = {
     const response = await axios.get(`http://localhost:8000/api/map/parking-lots/${lotId}/details`);
     return response.data;
   },
+
 };
 
 export default ParkingService;

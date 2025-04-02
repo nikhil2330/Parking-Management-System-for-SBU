@@ -1,6 +1,6 @@
 // controllers/parkingController.js
 const ParkingSpot = require('../models/ParkingSpot');
-const wayfindingService = require('../services/wayfindingService');
+const wayfindingService = require('../services/wayFindingService');
 
 exports.getClosestSpots = async (req, res) => {
   try {
