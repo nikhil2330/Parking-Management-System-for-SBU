@@ -11,6 +11,9 @@ const reservationRoutes = require('./routes/reservationRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const parkingRoutes = require('./routes/parkingRoutes');
 const authenticateJWT = require('./middleware/authenticateJWT');
+const searchRoutes = require('./routes/searchRoutes');
+// ... your other middleware and routes
+
 
 const app = express();
 
@@ -25,6 +28,7 @@ app.use('/api/map', mapRoutes); // Public endpoints
 app.use('/api/reservation', authenticateJWT, reservationRoutes);
 app.use('/api/payment', authenticateJWT, paymentRoutes);
 app.use('/api/parking', parkingRoutes);
+app.use('/api/search', searchRoutes);
 
 if (process.env.NODE_ENV === 'production') {
   // In production, serve the React build.

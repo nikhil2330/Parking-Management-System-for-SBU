@@ -75,7 +75,6 @@
   z-index: 10;
 }
 
-/* Main content layout */
 .search-container {
   display: flex;
   flex: 1;
@@ -85,6 +84,7 @@
   margin: 0 auto;
   width: 100%;
   position: relative;
+  min-height: 0; 
 }
 
 /* Sidebar filter panel */
@@ -254,11 +254,15 @@
   flex-direction: column;
   gap: 1.5rem;
   max-width: 1200px;
+  width: 100%;
+  min-height: 0;
+
 }
 
 /* Search bar styling */
 .search-bar-container {
   width: 100%;
+  
   background-color: var(--white);
   border-radius: 16px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
@@ -270,6 +274,41 @@
 
 .search-bar-wrapper {
   position: relative;
+}
+
+/* Typical “dropdown” style below the search input */
+.suggestions {
+  position: absolute;
+  top: 100%;          /* just below the .premium-search-bar */
+  left: 0;
+  width: 100%;        /* match the parent container width */
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  z-index: 9999;      /* keep it above other elements (like the map) */
+  max-height: 300px;  /* limit how tall the dropdown can get */
+  overflow-y: auto;   /* scroll if too many suggestions */
+  padding: 0.5rem 0;
+}
+
+/* Each suggestion item */
+.suggestion-item {
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  font-size: 1rem;
+  border-bottom: 1px solid #eee;
+}
+
+.suggestion-item:last-child {
+  border-bottom: none;
+}
+
+/* Hover effect */
+.suggestion-item:hover {
+  background-color: #f3f3f3;
 }
 
 .premium-search-bar {
@@ -323,17 +362,137 @@
 /* Map and results layout */
 .results-map-container {
   display: flex;
-  gap: 1.5rem;
   flex: 1;
+  width: 100%;
+  max-height: 660px;
+  overflow: hidden;
+  position: relative;
+  transition: all 0.5s ease-in-out;
+  min-height: 0;
+  /* No gap here so that when results are hidden the map aligns with the page edge */
 }
 
-.results-list {
+.results-panel {
   width: 400px;
-  flex-shrink: 0;
+  height: 100%;           /* Make it span the available height */
+  max-height: 100%;       /* Prevent it from growing beyond its container */
+  overflow-x: hidden;
+  overflow-y: auto;       /* Allow vertical scrolling for excess content */
+  background-color: var(--white);
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  position: relative;     /* So that inner overlays (like loading) are confined */
+  transition: width 0.5s ease-in-out;
+}
+
+/* When collapsed, results panel becomes 0 width */
+.results-panel.collapsed {
+  width: 0;
+}
+
+.results-content {
+  /* Put your “spot-card” listings here. 
+     If you want them hidden while collapsed, 
+     you can conditionally render them in React 
+     or fade them out with CSS transitions. */
+  padding: 1rem;
+}
+
+/* Loading overlay for results panel */
+.results-loading {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.8); /* semi-transparent overlay */
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s ease-out;
+  z-index: 10;
 }
+
+/* The spinner element */
+.results-loading .spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--gray-200);
+  border-top-color: var(--primary-red);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: 1rem;
+}
+
+/* Fade in animation for the overlay */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Spinner rotation animation */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+/* Map section */
+.map-container {
+  flex: 1;
+  position: relative; /* so the button can be absolutely positioned inside */
+  background-color: var(--white);
+  border-radius: 16px; /* full rounding on all corners for a “card” feel */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  min-height: 0;
+  overflow: hidden; 
+  transition: all 0.5s ease-in-out;
+  z-index: 1;
+}
+
+.collapse-button {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  background-color: var(--primary-red); /* red background */
+  color: var(--white);
+  border: none;
+  border-radius: 0 8px 8px 0; /* curved right edge */
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+  z-index: 1000;
+}
+
+.collapse-button:hover {
+  background-color: #7a0000; /* darker red on hover */
+}
+
+
+/* Disabled state (if no results) */
+.collapse-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+/* 
+.results-map-container.show-results .results-list {
+  width: 370px;
+}
+
+.results-map-container.show-results .map-container {
+  width: calc(100% - 400px - 1.5rem);
+} */
+
 
 /* Parking spot cards */
 .spot-card {
@@ -485,38 +644,16 @@
   box-shadow: 0 4px 6px rgba(153, 0, 0, 0.2);
 }
 
-/* Map section */
-.map-container {
-  flex: 1;
-  background-color: var(--white);
-  border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  overflow: hidden;
-  position: relative;
-  min-height: 600px;
-  animation: slideInRight 0.8s ease-out forwards;
-  opacity: 0;
-}
 
+/* 
 .map-wrapper {
   width: 100%;
   height: 100%;
   position: relative;
-}
+} */
 
-.map-overview {
-  width: 100%;
-  height: 100%;
-  position: relative;
-}
 
-.map-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.parking-lot-polygon {
+/* .parking-lot-polygon {
   position: absolute;
   top: 75%;
   left: 17%;
@@ -532,39 +669,15 @@
 .parking-lot-polygon:hover {
   background-color: rgba(153, 0, 0, 0.5);
   transform: translate(-50%, -50%) scale(1.1);
-}
+} */
 
-.zoomed-map-view {
+/* .zoomed-map-view {
   width: 100%;
   height: 100%;
   position: relative;
   background-color: var(--gray-50);
-}
+} */
 
-.back-button {
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  background-color: var(--primary-red);
-  color: var(--white);
-  border: none;
-  border-radius: 8px;
-  padding: 0.75rem 1.25rem;
-  cursor: pointer;
-  z-index: 10;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
-}
-
-.back-button:hover {
-  background-color: #7a0000;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
 
 .lot-svg {
   width: 100%;

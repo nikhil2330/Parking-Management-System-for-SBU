@@ -23,10 +23,10 @@ async function findClosestAvailableSpots(buildingId, availableSpotIds) {
     
     distances[startNodeId] = 0;
     pq.queue({ node: buildingNode, distance: 0 });
-    
+    const n =4
     const foundSpots = [];
 
-    while (pq.length && foundSpots.length < 10) {
+    while (pq.length && foundSpots.length < n) {
       const current = pq.dequeue();
       const currentNodeId = current.node.identity.toString();
       
@@ -39,7 +39,7 @@ async function findClosestAvailableSpots(buildingId, availableSpotIds) {
         const spotId = current.node.properties.id;
         if (availableSpotIds.has(spotId)) {
           foundSpots.push({ spotId, distance: current.distance });
-          if (foundSpots.length === 10) break;
+          if (foundSpots.length === n) break;
         } else {
           console.log(`Spot ${spotId} is NOT available.`);
         }
