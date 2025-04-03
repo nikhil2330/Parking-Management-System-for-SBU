@@ -1,9 +1,10 @@
 // client/src/services/AuthService.js
+
 import axios from 'axios';
 
-export const registerUser = async (userData) => {
+const registerUser = async (userData) => {
   try {
-    const response = await axios.post(`/api/auth/register`, userData);
+    const response = await axios.post('/api/auth/register', userData);
     return response.data;
   } catch (error) {
     const errMsg = error.response?.data?.message || error.message;
@@ -11,9 +12,9 @@ export const registerUser = async (userData) => {
   }
 };
 
-export const loginUser = async (credentials) => {
+const loginUser = async (credentials) => {
   try {
-    const response = await axios.post(`/api/auth/login`, credentials);
+    const response = await axios.post('/api/auth/login', credentials);
     return response.data;
   } catch (error) {
     const errMsg = error.response?.data?.message || error.message;
@@ -21,17 +22,11 @@ export const loginUser = async (credentials) => {
   }
 };
 
-export const logout = () => {
-  // Always clear token and any stored user data
+const logout = () => {
   localStorage.removeItem('token');
   localStorage.removeItem('p4sbuUsername');
   localStorage.removeItem('p4sbuUserProfile');
-  // Optionally, force a full reload to reset state
   window.location.href = '/';
 };
 
-export default {
-  registerUser,
-  loginUser,
-  logout,
-};
+export default { registerUser, loginUser, logout };
