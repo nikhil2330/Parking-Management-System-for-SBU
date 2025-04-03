@@ -1,10 +1,10 @@
 // client/src/components/LotView.js
 import React, { useState, useEffect, useRef } from 'react';
-import { fetchParkingLotDetails } from '../services/MapService';
+import ParkingService from '../services/ParkingService';
 import PanZoomControls from './PanZoomControls';
 import './LotView.css';
 
-const LotMapView = ({ lotId, onBack }) => {
+const LotMapView = ({ lotId, onBack, highlightedSpot }) => {
   const [lotDetails, setLotDetails] = useState(null);
   const [SvgComponent, setSvgComponent] = useState(null);
   const [scale, setScale] = useState(1);
@@ -15,7 +15,7 @@ const LotMapView = ({ lotId, onBack }) => {
   const containerRef = useRef(null);
 
   useEffect(() => {
-    fetchParkingLotDetails(lotId)
+    ParkingService.fetchParkingLotDetails(lotId)
       .then(data => setLotDetails(data))
       .catch(err => console.error("Error fetching lot details", err));
   }, [lotId]);
@@ -164,15 +164,16 @@ const LotMapView = ({ lotId, onBack }) => {
     if (svgElement) {
       const spotElements = svgElement.querySelectorAll('[data-vectornator-layer-name^="Spot"]');
       spotElements.forEach(spot => {
-        const layerName = spot.getAttribute('data-vectornator-layer-name'); // e.g. "Spot1"
+        const layerName = spot.getAttribute('data-vectornator-layer-name'); // e.g., "Spot1"
         const match = layerName.match(/Spot(\d+)/);
         if (match) {
           const num = parseInt(match[1], 10);
           const paddedNum = String(num).padStart(4, '0');
+          // Assuming lotId is available in the parent scope as a prop
           const spotId = `${lotId}-${paddedNum}`;
           const spotData = lotDetails.spots && lotDetails.spots.find(s => s.spotId === spotId);
           spot.style.cursor = "pointer";
-
+          // Set default fill colors
           if (spotData && spotData.status === "reserved") {
             spot.style.fill = "#ffcccc";
             spot.onmouseover = () => { spot.style.fill = "#cc6666"; };
@@ -182,14 +183,22 @@ const LotMapView = ({ lotId, onBack }) => {
             spot.onmouseover = () => { spot.style.fill = "#999999"; };
             spot.onmouseout = () => { spot.style.fill = "#c4ccd6"; };
           }
-          // On click, log the spot details to the console.
+          // If this spot is the highlighted spot, add a glowing class.
+          if (spotId === highlightedSpot) {
+            spot.classList.add("highlighted-spot");
+          } else {
+            spot.classList.remove("highlighted-spot");
+          }
+          // Optional: on click, update highlighted spot.
           spot.onclick = () => {
             console.log("Clicked spot", spotId, spotData);
+            // Update the highlighted spot so the glowing effect changes accordingly.
+            // setHighlightedSpot(spotId); // if you want the SVG to respond to clicks.
           };
         }
       });
     }
-  }, [SvgComponent, lotDetails, lotId]);
+  }, [SvgComponent, lotDetails, lotId, highlightedSpot]);
 
   if (!SvgComponent) {
     return <div>Loading SVG...</div>;

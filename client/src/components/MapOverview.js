@@ -2,7 +2,7 @@ import 'leaflet/dist/leaflet.css';
 
 import { useState, React, useEffect, useRef } from 'react';
 import { MapContainer, TileLayer, Polygon, useMap, useMapEvents  } from 'react-leaflet';
-import { fetchParkingLotsOverlay } from '../services/MapService';
+import ParkingService from '../services/ParkingService';
 import 'leaflet/dist/leaflet.css';
 
 const stonyBrookCenter = [40.912, -73.123]; 
@@ -58,7 +58,7 @@ const MapOverview = ({ onLotClick, center, onMapMove, resultsOpen, autoCenter   
   const [hoveredLotId, setHoveredLotId] = useState(null);
 
   useEffect(() => {
-    fetchParkingLotsOverlay()
+    ParkingService.fetchParkingOverlay()
     .then(data => {
       const uniqueLots = data.reduce((acc, lot) => {
         if (!acc.some(l => l.groupId === lot.groupId)) {

@@ -6,12 +6,10 @@ require('dotenv').config({ path: path.resolve(__dirname, '../config/.env') });
 
 const authRoutes = require('./routes/authRoutes');
 const userRoutes = require('./routes/userRoutes');
-const mapRoutes = require('./routes/mapRoutes');
 const reservationRoutes = require('./routes/reservationRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const parkingRoutes = require('./routes/parkingRoutes');
 const authenticateJWT = require('./middleware/authenticateJWT');
-const searchRoutes = require('./routes/searchRoutes');
 // ... your other middleware and routes
 
 
@@ -24,11 +22,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use('/api/auth', authRoutes);
 app.use('/api/users', authenticateJWT, userRoutes);
-app.use('/api/map', mapRoutes); // Public endpoints
 app.use('/api/reservation', authenticateJWT, reservationRoutes);
 app.use('/api/payment', authenticateJWT, paymentRoutes);
 app.use('/api/parking', parkingRoutes);
-app.use('/api/search', searchRoutes);
 
 if (process.env.NODE_ENV === 'production') {
   // In production, serve the React build.

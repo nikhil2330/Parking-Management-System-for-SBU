@@ -1,7 +1,7 @@
-// client/src/services/UserService.js
+// client\src\services\UserService.js
 import axios from 'axios';
 
-export const getProfile = async () => {
+const getProfile = async () => {
   try {
     const token = localStorage.getItem('token');
     const response = await axios.get('/api/users/profile', {
@@ -9,7 +9,6 @@ export const getProfile = async () => {
     });
     return response.data;
   } catch (error) {
-    // If unauthorized, clear token
     if (error.response && error.response.status === 401) {
       localStorage.removeItem('token');
       window.location.href = '/';
@@ -19,7 +18,7 @@ export const getProfile = async () => {
   }
 };
 
-export const updateProfile = async (profileData) => {
+const updateProfile = async (profileData) => {
   try {
     const token = localStorage.getItem('token');
     const response = await axios.put('/api/users/profile', profileData, {
@@ -32,7 +31,4 @@ export const updateProfile = async (profileData) => {
   }
 };
 
-export default {
-  getProfile,
-  updateProfile,
-};
+export default { getProfile, updateProfile };

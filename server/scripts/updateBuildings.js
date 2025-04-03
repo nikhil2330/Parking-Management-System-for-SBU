@@ -2,7 +2,11 @@ const mongoose = require('mongoose');
 const driver = require('../neo4j/neo4jDriver');
 const Building = require('../models/Building'); // Ensure the path is correct for your project
 
-const mongoURI = process.env.MONGO_URI || 'mongodb+srv://Nikhil:Lebron233021@parking1.08cpt.mongodb.net/P4SBU?retryWrites=true&w=majority';
+const path = require('path');
+require('dotenv').config({ path: '../config/.env' });
+
+
+const mongoURI = process.env.MONGO_URI
 mongoose.connect(mongoURI, {
   useNewUrlParser: true,
   useUnifiedTopology: true

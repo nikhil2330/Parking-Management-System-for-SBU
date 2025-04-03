@@ -8,27 +8,30 @@ import LotMapView from '../components/LotView';
 import { useNavigate, useLocation } from 'react-router-dom';
 import DetailedLotModal from '../components/DetailedLotModal';
 import SpotDetails from '../components/SpotDetails'; 
+import GoogleMapsService from '../services/GoogleMapService';
 import './premium-search-parking.css';
-import SearchService from '../services/SearchService';
 
 function SearchParkingPage() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [searchedBuilding, setSearchedBuilding] = useState(null);
   const [buildingSuggestions, setBuildingSuggestions] = useState([]);
+  const [highlightedSpot, setHighlightedSpot] = useState(null);
 
+  const [spotDetailsMap, setSpotDetailsMap] = useState({});
+  const [selectedBuildingCoordinates, setSelectedBuildingCoordinates] = useState(null);
+  const [directionsUrl, setDirectionsUrl] = useState(null);
   const [selectedLotId, setSelectedLotId] = useState(null);
   const location = useLocation();
   const [closestSpots, setClosestSpots] = useState([]);
-
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [showDetailedModal, setShowDetailedModal] = useState(false);
   const [selectedDetailSpot, setSelectedDetailSpot] = useState(null);
   const [selectedSpotForReservation, setSelectedSpotForReservation] = useState(null);
-  
-  const [showResults, setShowResults] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(true);
+  const [mapCenter, setMapCenter] = useState(undefined);
+  const [autoCenter, setAutoCenter] = useState(true);
 
   const [activeFilters, setActiveFilters] = useState({
     destination: '', 
@@ -40,8 +43,7 @@ function SearchParkingPage() {
     bikeRack: false,
     shuttleService: false
   });
-  const [mapCenter, setMapCenter] = useState(undefined);
-  const [autoCenter, setAutoCenter] = useState(true);
+
 
   useEffect(() => {
     if (!searchQuery.trim()) {
@@ -56,14 +58,20 @@ function SearchParkingPage() {
       return;
     }
     const delayDebounceFn = setTimeout(() => {
-      SearchService.searchBuildings(searchQuery)
-        .then((data) => setBuildingSuggestions(data))
+      ParkingService.searchBuildings(searchQuery)
+        .then((data) => {
+          setBuildingSuggestions(data)
+          console.log('Building suggestions:', data); 
+
+        })
         .catch((err) => console.error(err));
-    }, 300);
+    }, 100);
     return () => clearTimeout(delayDebounceFn);
   }, [searchQuery, searchedBuilding]);
 
   const performSearch = async (selectedBuilding = null) => {
+    console.log('Performing search with building:', searchedBuilding || selectedBuilding); // Log the building used for search
+
     setLoading(true);
     setIsCollapsed(false);
     setError(null);
@@ -110,10 +118,12 @@ function SearchParkingPage() {
       setMapCenter([buildingToUse.centroid.y, buildingToUse.centroid.x]);
     }
 
+
     try {
       const data = await ParkingService.fetchClosestSpots(buildingId);
+      console.log('Closest spots:', data.spots); // Log closest spots
+      setSelectedBuildingCoordinates([buildingToUse.centroid.y, buildingToUse.centroid.x]);
       setClosestSpots(data.spots);
-      setShowResults(true);
     } catch (err) {
       setError("Failed to load closest spots");
       console.error(err);
@@ -122,6 +132,7 @@ function SearchParkingPage() {
   };
 
   const handleSearch = (e) => {
+    console.log('Selected building:', e);
     e.preventDefault();
     setBuildingSuggestions([]);
     setAutoCenter(true);
@@ -129,6 +140,7 @@ function SearchParkingPage() {
   };
 
   const handleSuggestionSelect = (building) => {
+    console.log('Selected building:', building);
     setSearchQuery(building.name);
     setSearchedBuilding(building);
     setBuildingSuggestions([]);
@@ -163,9 +175,59 @@ function SearchParkingPage() {
 
   const handleReserveSpot = (spotInfo) => {
     setSelectedSpotForReservation(spotInfo);
-    navigate('/reservations', { state: { spotInfo } });
+    navigate('/reservations', { state: { spotInfo, searchedBuilding } });
   };
 
+  const handleRecenter = (lotCoordinates) => {
+    if (!lotCoordinates) return;
+    console.log("Recentering map to:", lotCoordinates);
+    setMapCenter(lotCoordinates);
+    setAutoCenter(true);
+  };
+
+  const handleGetDirections = (spot) => {
+    const details = spotDetailsMap[spot.spotId];
+    if (!details || !details.location) {
+      console.error("Missing spot location data");
+      return;
+    }
+    const originLat = details.location.coordinates[1];
+    const originLng = details.location.coordinates[0];
+    const origin = `${originLat},${originLng}`;
+    const destinationCoords = selectedBuildingCoordinates || (mapCenter ? mapCenter : null);
+    if (!destinationCoords) {
+      console.error("Destination coordinates not set.");
+      return;
+    }
+    const destination = `${destinationCoords[0]},${destinationCoords[1]}`;
+    
+    const embedUrl = GoogleMapsService.getDirectionsEmbedUrl(origin, destination, 'walking');
+    
+    setDirectionsUrl(embedUrl);
+  };
+
+  const handleViewSpot = (spotId) => {
+    const details = spotDetailsMap[spotId];
+    if (!details || !details.location) {
+      console.error("Missing spot location data for view");
+      return;
+    }
+    const spotCoords = [details.location.coordinates[1], details.location.coordinates[0]];
+    console.log("Centering on spot:", spotId, "at", spotCoords);
+    setMapCenter(spotCoords);
+    setAutoCenter(false);
+    setHighlightedSpot(spotId);
+    if (!selectedLotId || (details.lot && details.lot.lotId !== selectedLotId)) {
+      setSelectedLotId(details.lot.lotId);
+    }
+    
+    // Clear directions if present (for example, when in Google Embed mode)
+    if (directionsUrl) {
+      setDirectionsUrl(null);
+    }
+    // Optionally, if you maintain a zoom level state in LotMapView,
+    // you could trigger a smooth zoom in sequence here.
+  };
 
   const handleLotClick = (lotId) => {
     setSelectedLotId(lotId);
@@ -179,6 +241,17 @@ function SearchParkingPage() {
     navigate('/search-parking');
   };
 
+  useEffect(() => {
+    closestSpots.forEach(spot => {
+      if (!spotDetailsMap[spot.spotId]) {
+        ParkingService.fetchSpotDetails(spot.spotId)
+          .then(data => {
+            setSpotDetailsMap(prev => ({ ...prev, [spot.spotId]: data }));
+          })
+          .catch(err => console.error(`Error fetching details for ${spot.spotId}:`, err));
+      }
+    });
+  }, [closestSpots]);
 
   return (
     <div className="premium-search-page">
@@ -334,9 +407,20 @@ function SearchParkingPage() {
                   onChange={(e) => {
                     setSearchQuery(e.target.value);
                     setSearchedBuilding(null);
-                    
                   }}
-                  onBlur={() => setTimeout(() => setBuildingSuggestions([]), 200)}
+                  onBlur={() =>
+                    setTimeout(() => setBuildingSuggestions([]), 300)
+                  }
+                  onFocus={() => {
+                    if (!searchQuery.trim()) {
+                      ParkingService.searchBuildings("")
+                        .then((data) => {
+                          console.log("Building suggestions on focus:", data);
+                          setBuildingSuggestions(data);
+                        })
+                        .catch((err) => console.error(err));
+                    }
+                  }}
                 />
                 <button type="submit">
                   <svg
@@ -358,23 +442,25 @@ function SearchParkingPage() {
                 </button>
               </div>
               {buildingSuggestions.length > 0 && (
-            <div className="suggestions">
-              {buildingSuggestions.map((building, idx) => (
-                <div
-                  key={idx}
-                  className="suggestion-item"
-                  onClick={() => handleSuggestionSelect(building)}
-                >
-                  {building.name}
+                <div className="suggestions">
+                  {buildingSuggestions.map((building, idx) => (
+                    <div
+                      key={idx}
+                      className="suggestion-item"
+                      onClick={() => {
+                        handleSuggestionSelect(building);
+                        console.log("Suggestion clicked:", building);
+                      }}
+                    >
+                      {building.name}
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          )}
+              )}
             </form>
-            
           </div>
           {/* Floating Suggestions Overlay */}
-          
+
           {/* Results and Map */}
           <div className="results-map-container">
             {/* Results Panel */}
@@ -388,12 +474,20 @@ function SearchParkingPage() {
                 !isCollapsed && (
                   <div className="results-content">
                     {closestSpots.map((spot, index) => {
-                      const computedWalkTime = spot.distance / 84;
-                      const minWalkTime = Math.max(
-                        1,
-                        Math.floor(computedWalkTime)
-                      );
-                      const maxWalkTime = minWalkTime + 2;
+                      const [lotIdFromSpot, spotNumber] =
+                        spot.spotId.split("-");
+                      const details = spotDetailsMap[spot.spotId];
+                      // Use official lot name from fetched spot details; fallback to lotIdFromSpot if not available.
+                      const officialLotName =
+                        details && details.lot
+                          ? details.lot.officialLotName
+                          : lotIdFromSpot;
+
+                      // Walk time using 1.3 m/s:
+                      const baseWalkTime = spot.distance / 1.3 / 60; // minutes
+                      const minWalkTime = Math.max(1, Math.floor(baseWalkTime));
+                      const extraRange = Math.floor(spot.distance / 500); // Increase 1 minute per 500 m
+                      const maxWalkTime = minWalkTime + 2 + extraRange;
                       const roundedDistance = parseFloat(spot.distance).toFixed(
                         2
                       );
@@ -401,8 +495,23 @@ function SearchParkingPage() {
                       return (
                         <div key={index} className="spot-card">
                           <div className="spot-card-header">
-                            <h3 className="spot-card-title">{spot.spotId}</h3>
-                            <div className="spot-availability">Available</div>
+                            <h3 className="spot-card-title">
+                             Lot {officialLotName} Spot {spotNumber}
+                            </h3>
+                            <button
+                              className="spot-card-recenter"
+                              onClick={() =>
+                                {
+                                  handleRecenter([details.lot.centroid.x, details.lot.centroid.y,])
+                                }
+                              }
+                              title="Recenter to Lot"
+                            >
+                              <img
+                                src={require("../assets/point.png")}
+                                alt="Recenter"
+                              />
+                            </button>{" "}
                             <div className="spot-card-subtitle">
                               Distance: {roundedDistance} m
                             </div>
@@ -432,19 +541,41 @@ function SearchParkingPage() {
                               </span>
                             </div>
                           </div>
-                          <div className="spot-card-footer">
-                            <button
-                              className="spot-card-btn spot-view-btn"
-                              onClick={() => setSelectedDetailSpot(spot.spotId)}
-                            >
-                              View Details
-                            </button>
-                            <button
-                              className="spot-card-btn spot-reserve-btn"
-                              onClick={() => handleReserveSpot(spot)}
-                            >
-                              Reserve Spot
-                            </button>
+                          <div className="spot-card-footer three-col">
+                            <div className="footer-left-col">
+                              <button
+                                className="spot-card-btn spot-view-spot-btn"
+                                onClick={() => handleViewSpot(spot.spotId)}
+                              >
+                                Show Spot
+                              </button>
+                              <button
+                                className="spot-card-btn spot-view-details-btn"
+                                onClick={() =>
+                                  setSelectedDetailSpot(spot.spotId)
+                                }
+                              >
+                                View Details
+                              </button>
+                            </div>
+
+                            <div className="footer-middle-col">
+                              <button
+                                className="spot-card-btn spot-reserve-btn"
+                                onClick={() => handleReserveSpot(spot)}
+                              >
+                                Reserve
+                              </button>
+                            </div>
+
+                            <div className="footer-right-col">
+                              <button
+                                className="spot-card-btn spot-get-directions-btn"
+                                onClick={() => handleGetDirections(spot)}
+                              >
+                                Get Directions
+                              </button>
+                            </div>
                           </div>
                         </div>
                       );
@@ -470,14 +601,33 @@ function SearchParkingPage() {
               >
                 {isCollapsed ? ">>" : "<<"}
               </button>
-              {selectedLotId ? (
-                <LotMapView lotId={selectedLotId} onBack={handleBackFromLot} />
+              {directionsUrl ? (
+                <div className="directions-container">
+                  <button
+                    className="directions-back-btn"
+                    onClick={() => setDirectionsUrl(null)}
+                  >
+                    Back
+                  </button>
+                  <iframe
+                    title="Google Directions"
+                    src={directionsUrl}
+                    style={{ border: 0, width: "100%", height: "100%" }}
+                    allowFullScreen
+                  />
+                </div>
+              ) : selectedLotId ? (
+                <LotMapView
+                  lotId={selectedLotId}
+                  onBack={handleBackFromLot}
+                  highlightedSpot={highlightedSpot}
+                />
               ) : (
                 <MapOverview
                   onLotClick={handleLotClick}
                   center={mapCenter}
                   resultsOpen={!isCollapsed}
-                  autoCenter={autoCenter}  
+                  autoCenter={autoCenter}
                   onMapMove={handleMapMove}
                 />
               )}

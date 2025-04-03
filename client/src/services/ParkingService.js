@@ -1,26 +1,64 @@
 // client/src/services/ParkingService.js
 import axios from 'axios';
 
-
-const ParkingService = {
-  fetchClosestSpots: async (buildingId) => {
-    const response = await axios.get(`http://localhost:8000/api/parking/closest-spots`, {
+const fetchClosestSpots = async (buildingId) => {
+  try {
+    const response = await axios.get('/api/parking/closest-spots', {
       params: { buildingId }
     });
     return response.data;
-  },
-  
-  fetchSpotDetails: async (spotId) => {
-    const response = await axios.get(`http://localhost:8000/api/parking/spots/${spotId}/details`);
-    return response.data;
-  },
-
-  // Example: fetching parking lot overlay or details can be added similarly
-  fetchParkingLotDetails: async (lotId) => {
-    const response = await axios.get(`http://localhost:8000/api/map/parking-lots/${lotId}/details`);
-    return response.data;
-  },
-
+  } catch (error) {
+    const errMsg = error.response?.data?.error || error.message;
+    throw new Error(errMsg);
+  }
 };
 
-export default ParkingService;
+const fetchSpotDetails = async (spotId) => {
+  try {
+    const response = await axios.get(`/api/parking/spot/${spotId}/details`);
+    return response.data;
+  } catch (error) {
+    const errMsg = error.response?.data?.error || error.message;
+    throw new Error(errMsg);
+  }
+};
+
+const fetchParkingLotDetails = async (lotId) => {
+  try {
+    const response = await axios.get(`/api/parking/lot/${lotId}/details`);
+    return response.data;
+  } catch (error) {
+    const errMsg = error.response?.data?.error || error.message;
+    throw new Error(errMsg);
+  }
+};
+
+const fetchParkingOverlay = async () => {
+  try {
+    const response = await axios.get('/api/parking/overlay');
+    return response.data;
+  } catch (error) {
+    const errMsg = error.response?.data?.error || error.message;
+    throw new Error(errMsg);
+  }
+};
+
+const searchBuildings = async (query) => {
+  try {
+    const response = await axios.get('/api/parking/search/buildings', {
+      params: { query }
+    });
+    return response.data;
+  } catch (error) {
+    const errMsg = error.response?.data?.error || error.message;
+    throw new Error(errMsg);
+  }
+};
+
+export default {
+  fetchClosestSpots,
+  fetchSpotDetails,
+  fetchParkingLotDetails,
+  fetchParkingOverlay,
+  searchBuildings,
+};

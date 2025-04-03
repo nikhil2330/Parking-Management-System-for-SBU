@@ -29,8 +29,13 @@ const ParkingLotSchema = new Schema(
       stateAndSpecialServiceVehicles: { type: Number, default: 0 },
       evCharging: { type: Number, default: 0 }
     },
+    centroid: {
+      x: { type: Number, default: null },
+      y: { type: Number, default: null }
+    },
     timings: { type: String, default: "" },
     timeBoolean: { type: Boolean, default: false },
+    closestBuilding: { type: String, default: "Test Building" },
     spots: [{ type: Schema.Types.ObjectId, ref: 'ParkingSpot' }],
   },
   { timestamps: true }
