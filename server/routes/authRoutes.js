@@ -1,4 +1,5 @@
 // server/routes/authRoutes.js
+
 const express = require('express');
 const router = express.Router();
 const { check } = require('express-validator');
@@ -20,5 +21,14 @@ router.post('/login', [
   check('email', 'Please include a valid email').isEmail(),
   check('password', 'Password is required').exists()
 ], authController.login);
+
+// Duo callback route (called by Duo after authentication)
+router.get('/duo-callback', authController.duoCallback);
+
+// Verify OTP (for email-based 2FA)
+router.post('/verify-otp', authController.verifyOTP);
+
+// Resend OTP
+router.post('/resend-otp', authController.resendOTP);
 
 module.exports = router;

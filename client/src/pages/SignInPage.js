@@ -33,6 +33,7 @@ function SignInPage() {
     }, 800);
   };
 
+  //new signin function
   const handleSignIn = async (e) => {
     e.preventDefault();
     setError(null);
@@ -53,13 +54,20 @@ function SignInPage() {
     try {
       // Call the login API using AuthService.loginUser
       const result = await AuthService.loginUser({ email, password });
-
+      
+      // NEW: If the API response includes a redirect URL, send the user there.
+      if (result.redirect) {
+        // Duo flow active: let Duo handle the push and subsequent callback.
+        window.location.href = result.redirect;
+        return;
+      }
+      
+      // Otherwise, if we got a token, store it and navigate to your home/dashboard.
       if (result.success) {
         setLoadingMessage("Success! Redirecting to dashboard...");
-        // Optionally store the token in localStorage if rememberMe is checked
         localStorage.setItem('token', result.token);
         localStorage.setItem('p4sbuUsername', result.username || 'User');
-        // Add a small delay for better UX
+        // Delay for UX
         setTimeout(() => {
           navigate('/home');
         }, 1200);
@@ -72,6 +80,46 @@ function SignInPage() {
       setIsLoading(false);
     }
   };
+
+  // const handleSignIn = async (e) => {
+  //   e.preventDefault();
+  //   setError(null);
+
+  //   // Basic validation
+  //   if (!email.trim()) {
+  //     setError('Please enter your email address');
+  //     return;
+  //   }
+  //   if (!password.trim()) {
+  //     setError('Please enter your password');
+  //     return;
+  //   }
+
+  //   setIsLoading(true);
+  //   setLoadingMessage("Signing you in...");
+
+  //   try {
+  //     // Call the login API using AuthService.loginUser
+  //     const result = await AuthService.loginUser({ email, password });
+
+  //     if (result.success) {
+  //       setLoadingMessage("Success! Redirecting to dashboard...");
+  //       // Optionally store the token in localStorage if rememberMe is checked
+  //       localStorage.setItem('token', result.token);
+  //       localStorage.setItem('p4sbuUsername', result.username || 'User');
+  //       // Add a small delay for better UX
+  //       setTimeout(() => {
+  //         navigate('/home');
+  //       }, 1200);
+  //     } else {
+  //       setError(result.message || 'Sign in failed. Please check your credentials and try again.');
+  //       setIsLoading(false);
+  //     }
+  //   } catch (error) {
+  //     setError(error.message || 'Sign in failed. Please try again.');
+  //     setIsLoading(false);
+  //   }
+  // };
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
