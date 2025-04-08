@@ -72,7 +72,9 @@ exports.getSpotDetails = async (req, res) => {
         price: spot.lot.price,
         categories: spot.lot.categories,
         timings: spot.lot.timings,
-        centroid: spot.lot.centroid
+        centroid: spot.lot.centroid,
+        closestBuilding: spot.lot.closestBuilding
+
       } : null
     });
   } catch (err) {

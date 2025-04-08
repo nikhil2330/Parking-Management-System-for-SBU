@@ -1,10 +1,11 @@
 // client/src/services/ParkingService.js
 import axios from 'axios';
 
-const fetchClosestSpots = async (buildingId) => {
+const fetchClosestSpots = async (buildingId, config = {}) => {
   try {
     const response = await axios.get('/api/parking/closest-spots', {
-      params: { buildingId }
+      params: { buildingId },
+      ...config
     });
     return response.data;
   } catch (error) {
