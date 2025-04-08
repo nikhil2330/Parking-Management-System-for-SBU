@@ -1,12 +1,10 @@
 // client/src/pages/SearchParkingPage.js
 import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
-import ApiService from '../services/api';
 import ParkingService from '../services/ParkingService';
 import MapOverview from '../components/MapOverview';
 import LotMapView from '../components/LotView';
-import { useNavigate, useLocation } from 'react-router-dom';
-import DetailedLotModal from '../components/DetailedLotModal';
+import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import SpotDetails from '../components/SpotDetails'; 
 import GoogleMapsService from '../services/GoogleMapService';
 import './premium-search-parking.css';
@@ -17,7 +15,7 @@ function SearchParkingPage() {
   const [searchedBuilding, setSearchedBuilding] = useState(null);
   const [buildingSuggestions, setBuildingSuggestions] = useState([]);
   const [highlightedSpot, setHighlightedSpot] = useState(null);
-
+  const spotsAbortControllerRef = React.useRef(null);
   const [spotDetailsMap, setSpotDetailsMap] = useState({});
   const [selectedBuildingCoordinates, setSelectedBuildingCoordinates] = useState(null);
   const [directionsUrl, setDirectionsUrl] = useState(null);
@@ -26,12 +24,13 @@ function SearchParkingPage() {
   const [closestSpots, setClosestSpots] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [showDetailedModal, setShowDetailedModal] = useState(false);
   const [selectedDetailSpot, setSelectedDetailSpot] = useState(null);
   const [selectedSpotForReservation, setSelectedSpotForReservation] = useState(null);
   const [isCollapsed, setIsCollapsed] = useState(true);
   const [mapCenter, setMapCenter] = useState(undefined);
   const [autoCenter, setAutoCenter] = useState(true);
+  const [spotWalkTimes, setSpotWalkTimes] = useState({});
+
 
   const [activeFilters, setActiveFilters] = useState({
     destination: '', 
@@ -44,6 +43,22 @@ function SearchParkingPage() {
     shuttleService: false
   });
 
+  useEffect(() => {
+    // On first render, force the URL to reset to '/search-parking'
+    if (location.search) {
+      navigate('/search-parking', { replace: true });
+    }
+    // Also reset your state to default values if needed:
+    setSearchQuery('');
+    setSearchedBuilding(null);
+    setBuildingSuggestions([]);
+    setClosestSpots([]);
+    setSelectedLotId(null);
+    setHighlightedSpot(null);
+    setDirectionsUrl(null);
+    setMapCenter(undefined);
+    setAutoCenter(true);
+  }, []); 
 
   useEffect(() => {
     if (!searchQuery.trim()) {
@@ -71,7 +86,7 @@ function SearchParkingPage() {
 
   const performSearch = async (selectedBuilding = null) => {
     console.log('Performing search with building:', searchedBuilding || selectedBuilding); // Log the building used for search
-
+    setClosestSpots([])
     setLoading(true);
     setIsCollapsed(false);
     setError(null);
@@ -118,25 +133,62 @@ function SearchParkingPage() {
       setMapCenter([buildingToUse.centroid.y, buildingToUse.centroid.x]);
     }
 
+    if (spotsAbortControllerRef.current) {
+      spotsAbortControllerRef.current.abort();
+    }
+    const controller = new AbortController();
+    spotsAbortControllerRef.current = controller;
+
 
     try {
-      const data = await ParkingService.fetchClosestSpots(buildingId);
+      navigate(
+        getSearchParkingUrl({
+          buildingId: buildingToUse.buildingID,
+          lotId: selectedLotId || undefined, // Include lotId if present
+        })
+      );
+      const data = await ParkingService.fetchClosestSpots(buildingId, { signal: controller.signal });
       console.log('Closest spots:', data.spots); // Log closest spots
       setSelectedBuildingCoordinates([buildingToUse.centroid.y, buildingToUse.centroid.x]);
       setClosestSpots(data.spots);
     } catch (err) {
-      setError("Failed to load closest spots");
-      console.error(err);
+      if (err.name === 'AbortError') {
+        console.log('Request aborted for current search.');
+        // Do not update error or loading state here.
+        return;
+      } else {
+        setError("Failed to load closest spots");
+        console.error(err);
+      }
+    } finally {
+      if (spotsAbortControllerRef.current === controller) {
+        setLoading(false);
+      }
     }
-    setLoading(false);
   };
+  useEffect(() => {
+    // Only run when closestSpots changes
+    if (closestSpots.length > 0) {
+      const computedWalkTimes = {};
+      closestSpots.forEach(spot => {
+        // Calculate walk time based on the spot's distance (in meters)
+        const baseWalkTime = spot.distance / 1.3 / 60; // in minutes
+        const minWalkTime = Math.max(1, Math.floor(baseWalkTime));
+        const extraRange = Math.floor(spot.distance / 300);
+        const maxWalkTime = minWalkTime + 2 + extraRange;
+        
+        computedWalkTimes[spot.spotId] = { min: minWalkTime, max: maxWalkTime };
+      });
+      setSpotWalkTimes(computedWalkTimes);
+    }
+  }, [closestSpots]);
 
   const handleSearch = (e) => {
     console.log('Selected building:', e);
     e.preventDefault();
     setBuildingSuggestions([]);
     setAutoCenter(true);
-    performSearch(); // No parameter, so use current state
+    performSearch(); 
   };
 
   const handleSuggestionSelect = (building) => {
@@ -146,6 +198,8 @@ function SearchParkingPage() {
     setBuildingSuggestions([]);
     setAutoCenter(true);
     performSearch(building);
+
+
   };
 
   const handleMapMove = (newCenter) => {
@@ -186,6 +240,18 @@ function SearchParkingPage() {
   };
 
   const handleGetDirections = (spot) => {
+    console.log(spot.spotId, getSearchParkingUrl({
+      buildingId: searchedBuilding?.buildingID,
+      spotId: spot.spotId, // include spotId in the URL
+      mode: "directions",
+    }))
+    navigate(
+      getSearchParkingUrl({
+        buildingId: searchedBuilding?.buildingID,
+        spotId: spot.spotId, // include spotId in the URL
+        mode: "directions",
+      })
+    );
     const details = spotDetailsMap[spot.spotId];
     if (!details || !details.location) {
       console.error("Missing spot location data");
@@ -206,6 +272,12 @@ function SearchParkingPage() {
     setDirectionsUrl(embedUrl);
   };
 
+  useEffect(() => {
+    if (!searchedBuilding) {
+      setHighlightedSpot(null);
+    }
+  }, [searchedBuilding]);
+
   const handleViewSpot = (spotId) => {
     const details = spotDetailsMap[spotId];
     if (!details || !details.location) {
@@ -216,10 +288,16 @@ function SearchParkingPage() {
     console.log("Centering on spot:", spotId, "at", spotCoords);
     setMapCenter(spotCoords);
     setAutoCenter(false);
-    setHighlightedSpot(spotId);
+    if (searchedBuilding) {
+      setHighlightedSpot(spotId);
+    } else {
+      setHighlightedSpot(null);
+    }
     if (!selectedLotId || (details.lot && details.lot.lotId !== selectedLotId)) {
       setSelectedLotId(details.lot.lotId);
     }
+
+    setIsCollapsed(true);
     
     // Clear directions if present (for example, when in Google Embed mode)
     if (directionsUrl) {
@@ -229,16 +307,70 @@ function SearchParkingPage() {
     // you could trigger a smooth zoom in sequence here.
   };
 
+  const getSearchParkingUrl = (params = {}) => {
+    const orderedParams = [];
+    if (params.buildingId) {
+      orderedParams.push(`buildingId=${encodeURIComponent(params.buildingId)}`);
+    }
+    if (params.lotId) {
+      orderedParams.push(`lotId=${encodeURIComponent(params.lotId)}`);
+    }
+    if (params.spotId) {
+      orderedParams.push(`spotId=${encodeURIComponent(params.spotId)}`);
+    }
+    if (params.mode) {
+      orderedParams.push(`mode=${encodeURIComponent(params.mode)}`);
+    }
+    // Append any additional parameters
+    Object.entries(params).forEach(([key, value]) => {
+      if (!['buildingId', 'lotId', 'spotId', 'mode'].includes(key) && value) {
+        orderedParams.push(`${encodeURIComponent(key)}=${encodeURIComponent(value)}`);
+      }
+    });
+    return orderedParams.length ? `/search-parking?${orderedParams.join('&')}` : '/search-parking';
+  };
+  
+
   const handleLotClick = (lotId) => {
     setSelectedLotId(lotId);
-    navigate(`/search-parking?lotId=${lotId}`);
+    navigate(getSearchParkingUrl({
+      buildingId: searchedBuilding ? searchedBuilding.buildingID : "",
+      lotId
+    }));
   };
 
   const handleBackFromLot = () => {
     setSelectedLotId(null);
     setAutoCenter(false);
+    setDirectionsUrl(null);
+    setHighlightedSpot(null);
+    navigate(getSearchParkingUrl({
+      buildingId: searchedBuilding?.buildingID
+    }));
+  };
 
-    navigate('/search-parking');
+  const handleCancelSearch = () => {
+    setLoading(false)
+    // Abort ongoing closest spots request.
+    if (spotsAbortControllerRef.current) {
+      spotsAbortControllerRef.current.abort();
+      spotsAbortControllerRef.current = null;
+    }
+    // Clear search query, suggestions, and results.
+    setSearchQuery("");
+    setBuildingSuggestions([]);
+    setClosestSpots([]);
+    setSearchedBuilding(null); 
+    setHighlightedSpot(null)
+    // setIsCollapsed(true); // Collapse results panel
+    // Optionally, remove focus from the input:
+    // document.activeElement.blur();
+    if (selectedLotId) {
+      // If lot map view is active, remove buildingId but preserve lotId.
+      navigate(getSearchParkingUrl({ lotId: selectedLotId }));
+    } else {
+      navigate(getSearchParkingUrl());
+    }
   };
 
   useEffect(() => {
@@ -400,29 +532,59 @@ function SearchParkingPage() {
           <div className="search-bar-container">
             <form className="search-bar-wrapper" onSubmit={handleSearch}>
               <div className="premium-search-bar">
-                <input
-                  type="text"
-                  placeholder="Search by building name or destination..."
-                  value={searchQuery}
-                  onChange={(e) => {
-                    setSearchQuery(e.target.value);
-                    setSearchedBuilding(null);
-                  }}
-                  onBlur={() =>
-                    setTimeout(() => setBuildingSuggestions([]), 300)
-                  }
-                  onFocus={() => {
-                    if (!searchQuery.trim()) {
-                      ParkingService.searchBuildings("")
-                        .then((data) => {
-                          console.log("Building suggestions on focus:", data);
-                          setBuildingSuggestions(data);
-                        })
-                        .catch((err) => console.error(err));
+                <div className="search-input-wrapper">
+                  <input
+                    type="text"
+                    placeholder="Search by building name or destination..."
+                    value={searchQuery}
+                    onChange={(e) => {
+                      setSearchQuery(e.target.value);
+                      setSearchedBuilding(null);
+                    }}
+                    onBlur={() =>
+                      setTimeout(() => setBuildingSuggestions([]), 300)
                     }
-                  }}
-                />
-                <button type="submit">
+                    onFocus={() => {
+                      if (!searchQuery.trim()) {
+                        ParkingService.searchBuildings("")
+                          .then((data) => {
+                            console.log("Building suggestions on focus:", data);
+                            setBuildingSuggestions(data);
+                          })
+                          .catch((err) => console.error(err));
+                      }
+                    }}
+                  />
+                  {searchQuery && (
+                    <button
+                      type="button"
+                      className="cancel-search-btn"
+                      onClick={() => {
+                        handleCancelSearch();
+                      }}
+                    >
+                      <svg viewBox="0 0 24 24">
+                        <line
+                          x1="18"
+                          y1="6"
+                          x2="6"
+                          y2="18"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                        />
+                        <line
+                          x1="6"
+                          y1="6"
+                          x2="18"
+                          y2="18"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                        />
+                      </svg>
+                    </button>
+                  )}
+                </div>
+                <button type="submit" className="search-submit-btn">
                   <svg
                     className="search-icon"
                     xmlns="http://www.w3.org/2000/svg"
@@ -459,6 +621,7 @@ function SearchParkingPage() {
               )}
             </form>
           </div>
+
           {/* Floating Suggestions Overlay */}
 
           {/* Results and Map */}
@@ -473,113 +636,202 @@ function SearchParkingPage() {
               ) : (
                 !isCollapsed && (
                   <div className="results-content">
-                    {closestSpots.map((spot, index) => {
-                      const [lotIdFromSpot, spotNumber] =
-                        spot.spotId.split("-");
-                      const details = spotDetailsMap[spot.spotId];
-                      // Use official lot name from fetched spot details; fallback to lotIdFromSpot if not available.
-                      const officialLotName =
-                        details && details.lot
-                          ? details.lot.officialLotName
-                          : lotIdFromSpot;
+                    {closestSpots.length > 0 ? (
+                      closestSpots.map((spot, index) => {
+                        const [lotIdFromSpot, spotNumber] =
+                          spot.spotId.split("-");
+                        const details = spotDetailsMap[spot.spotId];
+                        // Use official lot name from fetched spot details; fallback to lotIdFromSpot if not available.
+                        const officialLotName =
+                          details && details.lot
+                            ? details.lot.officialLotName
+                            : lotIdFromSpot;
 
-                      // Walk time using 1.3 m/s:
-                      const baseWalkTime = spot.distance / 1.3 / 60; // minutes
-                      const minWalkTime = Math.max(1, Math.floor(baseWalkTime));
-                      const extraRange = Math.floor(spot.distance / 500); // Increase 1 minute per 500 m
-                      const maxWalkTime = minWalkTime + 2 + extraRange;
-                      const roundedDistance = parseFloat(spot.distance).toFixed(
-                        2
-                      );
+                        // Walk time using 1.3 m/s:
+                        const roundedDistance = parseFloat(
+                          spot.distance
+                        ).toFixed(2);
 
-                      return (
-                        <div key={index} className="spot-card">
-                          <div className="spot-card-header">
-                            <h3 className="spot-card-title">
-                             Lot {officialLotName} Spot {spotNumber}
-                            </h3>
-                            <button
-                              className="spot-card-recenter"
-                              onClick={() =>
-                                {
-                                  handleRecenter([details.lot.centroid.x, details.lot.centroid.y,])
-                                }
-                              }
-                              title="Recenter to Lot"
-                            >
-                              <img
-                                src={require("../assets/point.png")}
-                                alt="Recenter"
-                              />
-                            </button>{" "}
-                            <div className="spot-card-subtitle">
-                              Distance: {roundedDistance} m
+                        return (
+                          <div key={index} className="spot-card">
+                            <div className="spot-card-header">
+                              <h3 className="spot-card-title">
+                                Lot {officialLotName} Spot {spotNumber}
+                              </h3>
+                              <div className="spot-card-controls">
+                                <button
+                                  className="spot-card-recenter"
+                                  onClick={() =>
+                                    handleRecenter([
+                                      details.lot.centroid.x,
+                                      details.lot.centroid.y,
+                                    ])
+                                  }
+                                  title="Recenter to Lot"
+                                >
+                                  <img
+                                    src={require("../assets/point.png")}
+                                    alt="Recenter"
+                                  />
+                                </button>
+                                <button
+                                  className="spot-card-show-spot-btn"
+                                  onClick={() => {
+                                    navigate(
+                                      getSearchParkingUrl({
+                                        buildingId:
+                                          searchedBuilding?.buildingID,
+                                        lotId: details.lot.lotId,
+                                        highlightedSpot: spot.spotId,
+                                      })
+                                    );
+                                    handleViewSpot(spot.spotId);
+                                  }}
+                                  title="Show Spot"
+                                >
+                                  <img
+                                    src={require("../assets/focus.png")}
+                                    alt="Show Spot"
+                                  />
+                                </button>
+                              </div>
+                              <div className="spot-card-subtitle">
+                                Distance: {roundedDistance} m
+                              </div>
+                            </div>
+                            <div className="spot-card-body">
+                              <div className="spot-detail">
+                                <svg
+                                  className="spot-detail-icon"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  width="24"
+                                  height="24"
+                                  viewBox="0 0 24 24"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  strokeWidth="2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                >
+                                  <circle cx="12" cy="12" r="10"></circle>
+                                  <polyline points="12 6 12 12 16 14"></polyline>
+                                </svg>
+                                <span className="spot-detail-label">
+                                  Walk Time:
+                                </span>
+                                <span className="spot-detail-value">
+                                  {spotWalkTimes[spot.spotId]?.min}-{spotWalkTimes[spot.spotId]?.max} minutes
+                                </span>
+                              </div>
+                            </div>
+                            <div className="spot-card-footer three-col">
+                              <div className="footer-left-col">
+                                <button
+                                  className="spot-card-btn spot-view-details-btn"
+                                  onClick={() => {
+                                    // Example: /spot-details?buildingId=...&lotId=...&spotId=...
+                                    navigate(
+                                      getSearchParkingUrl({
+                                        buildingId:
+                                          searchedBuilding?.buildingID,
+                                        lotId: details.lot.lotId,
+                                        spotId: spot.spotId,
+                                        mode: "info",
+                                      })
+                                    );
+
+                                    setSelectedDetailSpot(spot.spotId);
+                                  }}
+                                >
+                                  {/* Using the same icon from SpotDetails (an SVG) */}
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="18"
+                                    height="18"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                  >
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                  </svg>
+                                  View Details
+                                </button>
+                              </div>
+
+                              <div className="footer-middle-col">
+                                <button
+                                  className="spot-card-btn spot-reserve-btn"
+                                  onClick={() => handleReserveSpot(spot)}
+                                >
+                                  {/* Using your existing icon (if any) for reserve */}
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="18"
+                                    height="18"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                  >
+                                    <rect
+                                      x="9"
+                                      y="9"
+                                      width="13"
+                                      height="13"
+                                      rx="2"
+                                      ry="2"
+                                    ></rect>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                  </svg>
+                                  Reserve
+                                </button>
+                              </div>
+
+                              <div className="footer-right-col">
+                                <button
+                                  className="spot-card-btn spot-get-directions-btn"
+                                  onClick={() => {
+                                    handleGetDirections(spot);
+                                  }}
+                                >
+                                  {/* For get directions, use an asset icon */}
+                                  <img
+                                    src={require("../assets/get-directions.png")}
+                                    alt="Get Directions"
+                                  />
+                                  Get Directions
+                                </button>
+                              </div>
                             </div>
                           </div>
-                          <div className="spot-card-body">
-                            <div className="spot-detail">
-                              <svg
-                                className="spot-detail-icon"
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="24"
-                                height="24"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                strokeWidth="2"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              >
-                                <circle cx="12" cy="12" r="10"></circle>
-                                <polyline points="12 6 12 12 16 14"></polyline>
-                              </svg>
-                              <span className="spot-detail-label">
-                                Walk Time:
-                              </span>
-                              <span className="spot-detail-value">
-                                {minWalkTime}-{maxWalkTime} minutes
-                              </span>
-                            </div>
-                          </div>
-                          <div className="spot-card-footer three-col">
-                            <div className="footer-left-col">
-                              <button
-                                className="spot-card-btn spot-view-spot-btn"
-                                onClick={() => handleViewSpot(spot.spotId)}
-                              >
-                                Show Spot
-                              </button>
-                              <button
-                                className="spot-card-btn spot-view-details-btn"
-                                onClick={() =>
-                                  setSelectedDetailSpot(spot.spotId)
-                                }
-                              >
-                                View Details
-                              </button>
-                            </div>
-
-                            <div className="footer-middle-col">
-                              <button
-                                className="spot-card-btn spot-reserve-btn"
-                                onClick={() => handleReserveSpot(spot)}
-                              >
-                                Reserve
-                              </button>
-                            </div>
-
-                            <div className="footer-right-col">
-                              <button
-                                className="spot-card-btn spot-get-directions-btn"
-                                onClick={() => handleGetDirections(spot)}
-                              >
-                                Get Directions
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
+                        );
+                      })
+                    ) : (
+                      <div className="no-results-message">
+                        {/* Example SVG icon for no results – replace with your own if needed */}
+                        <svg viewBox="0 0 24 24">
+                          <circle cx="12" cy="12" r="10" />
+                          <line
+                            x1="12"
+                            y1="7"
+                            x2="12"
+                            y2="13"
+                            stroke="white"
+                            strokeWidth="2"
+                          />
+                          <circle cx="12" cy="16" r="1" fill="white" />
+                        </svg>
+                        {searchedBuilding === null
+                          ? "No buildings searched"
+                          : "No spots found"}
+                      </div>
+                    )}
                   </div>
                 )
               )}
@@ -589,15 +841,10 @@ function SearchParkingPage() {
             <div className="map-container">
               <button
                 className="collapse-button"
-                onClick={() => setIsCollapsed(!isCollapsed)}
-                disabled={closestSpots.length === 0}
-                title={
-                  closestSpots.length === 0
-                    ? "No Results"
-                    : isCollapsed
-                    ? "Show Results"
-                    : "Hide Results"
-                }
+                onClick={() => {
+                  console.log("Toggle clicked, autoCenter:", autoCenter);
+                  setIsCollapsed(!isCollapsed)}}
+                title={isCollapsed ? "Show Results" : "Hide Results"}
               >
                 {isCollapsed ? ">>" : "<<"}
               </button>
@@ -605,7 +852,16 @@ function SearchParkingPage() {
                 <div className="directions-container">
                   <button
                     className="directions-back-btn"
-                    onClick={() => setDirectionsUrl(null)}
+                    onClick={() => {
+                      setDirectionsUrl(null);
+                      setSelectedLotId(null);
+                      setHighlightedSpot(null);
+                      navigate(
+                        getSearchParkingUrl({
+                          buildingId: searchedBuilding?.buildingID,
+                        })
+                      );
+                    }}
                   >
                     Back
                   </button>
@@ -635,163 +891,44 @@ function SearchParkingPage() {
           </div>
         </div>
       </div>
-
-      {/* Detailed Lot Modal */}
-      {showDetailedModal && (
-        <div
-          className="modal-backdrop"
-          onClick={(e) => {
-            if (e.target.className === "modal-backdrop")
-              setShowDetailedModal(false);
-          }}
-        >
-          <div className="modal-content">
-            <div className="modal-header">
-              <h2 className="modal-title">Detailed Parking Lot View</h2>
-              <button
-                className="close-button"
-                onClick={() => setShowDetailedModal(false)}
-              >
-                ×
-              </button>
-            </div>
-            <div className="modal-body">
-              <div className="lot-info">
-                <h3 className="lot-info-title">Lot Information</h3>
-                <div className="lot-info-grid">
-                  <div className="lot-info-item">
-                    <div className="lot-info-icon">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="20"
-                        height="20"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                        <circle cx="12" cy="10" r="3"></circle>
-                      </svg>
-                    </div>
-                    <div className="lot-info-text">
-                      <span className="lot-info-label">Location</span>
-                      <span className="lot-info-value">Main Campus</span>
-                    </div>
-                  </div>
-                  <div className="lot-info-item">
-                    <div className="lot-info-icon">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="20"
-                        height="20"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <polyline points="12 6 12 12 16 14"></polyline>
-                      </svg>
-                    </div>
-                    <div className="lot-info-text">
-                      <span className="lot-info-label">Hours</span>
-                      <span className="lot-info-value">24/7</span>
-                    </div>
-                  </div>
-                  <div className="lot-info-item">
-                    <div className="lot-info-icon">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="20"
-                        height="20"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <line x1="12" y1="1" x2="12" y2="23"></line>
-                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-                      </svg>
-                    </div>
-                    <div className="lot-info-text">
-                      <span className="lot-info-label">Rate</span>
-                      <span className="lot-info-value">$2.50/hour</span>
-                    </div>
-                  </div>
-                  <div className="lot-info-item">
-                    <div className="lot-info-icon">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="20"
-                        height="20"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                      </svg>
-                    </div>
-                    <div className="lot-info-text">
-                      <span className="lot-info-label">Type</span>
-                      <span className="lot-info-value">Covered</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <DetailedLotModal
-                onClose={() => setShowDetailedModal(false)}
-                onReserve={handleReserveSpot}
-                embedded={true}
-              />
-            </div>
-            <div className="lot-actions">
-              <button
-                className="lot-action-btn cancel-btn"
-                onClick={() => setShowDetailedModal(false)}
-              >
-                Close
-              </button>
-              <button
-                className="lot-action-btn reserve-btn"
-                onClick={() => {
-                  handleReserveSpot({
-                    spotId: "ML001",
-                    lotName: "Main Library Lot",
-                  });
-                  setShowDetailedModal(false);
-                }}
-              >
-                Reserve a Spot
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Spot detail Modal */}
       {selectedDetailSpot && (
         <div
           className="modal-backdrop"
           onClick={(e) => {
-            if (e.target.className === "modal-backdrop")
+            if (e.target.className === "modal-backdrop") {
               setSelectedDetailSpot(null);
+              navigate(
+                getSearchParkingUrl({
+                  buildingId: searchedBuilding?.buildingID,
+                  lotId: selectedLotId || undefined,
+                })
+              );
+            }
           }}
         >
           <div className="modal-content">
             <SpotDetails
               spotId={selectedDetailSpot}
-              onClose={() => setSelectedDetailSpot(null)}
+              onClose={() => {
+                setSelectedDetailSpot(null);
+                navigate(
+                  getSearchParkingUrl({
+                    buildingId: searchedBuilding?.buildingID,
+                    lotId: selectedLotId || undefined,
+                  })
+                );
+              }}
               onReserve={handleReserveSpot}
+              onGetDirections={(spotData) => {
+                handleGetDirections(spotData);
+                console.log(spotData.spotId);
+                setIsCollapsed(true);
+              }}
+              minWalkTime={spotWalkTimes[selectedDetailSpot]?.min}
+              maxWalkTime={spotWalkTimes[selectedDetailSpot]?.max}
+              // minWalkTime={selectedWalkTimes.minWalkTime}
+              // maxWalkTime={selectedWalkTimes.maxWalkTime}
             />
           </div>
         </div>
