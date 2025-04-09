@@ -26,15 +26,43 @@ function App() {
       {/* Duo callback route */}
       <Route path="/duo-callback" element={<DuoCallback />} />
       
-      {/* Protected routes */}
-      <Route
-        path="/home"
-        element={
+       {/* Protected routes */}
+       <Route path="/home" element={
           <ProtectedRoute>
             <HomePage />
           </ProtectedRoute>
-        }
-      />
+        } />
+        
+        <Route path="/search-parking" element={
+          <ProtectedRoute>
+            <SearchParkingPage />
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/reservations" element={
+          <ProtectedRoute>
+            <ReservationsPage />
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/payment-methods" element={
+          <ProtectedRoute>
+            <PaymentMethodsPage />
+          </ProtectedRoute>
+        } />
+        
+        {/* Fix for the ModifyReservationPage route to include the :id parameter */}
+        <Route path="/modify-reservation/:id" element={
+          <ProtectedRoute>
+            <ModifyReservationPage />
+          </ProtectedRoute>
+        } />
+        
+        <Route path="/claim-offer" element={
+          <ProtectedRoute>
+            <ClaimOfferPage />
+          </ProtectedRoute>
+        } />
       
       {/* Fallback route */}
       <Route path="*" element={<Navigate to="/" replace />} />
