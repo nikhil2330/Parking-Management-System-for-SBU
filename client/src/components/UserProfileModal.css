@@ -213,6 +213,20 @@
   border: none;
 }
 
+.remove-vehicle-button {
+  background-color: var(--white);
+  color: var(--gray-700);
+  border: 1px solid var(--gray-300);
+  margin-top: 8px;
+}
+
+.add-vehicle-button{
+  background-color: var(--white);
+  color: var(--gray-700);
+  border: 1px solid var(--gray-300);
+  margin-top: 8px;
+}
+
 .cancel-button {
   background-color: var(--white);
   color: var(--gray-700);
