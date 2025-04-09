@@ -7,6 +7,11 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import SignInPage from './pages/SignInPage';
 import CreateAccountPage from './pages/CreateAccountPage';
 import HomePage from './pages/HomePage';
+import SearchParkingPage from './pages/SearchParkingPage';
+import ReservationsPage from './pages/ReservationsPage';
+import PaymentMethodsPage from './pages/PaymentMethodsPage';
+import ModifyReservationPage from './pages/ModifyReservationPage';
+import ClaimOfferPage from './pages/ClaimOfferPage';
 import DuoCallback from './pages/DuoCallback';
 // Import any other pages as needed
 
