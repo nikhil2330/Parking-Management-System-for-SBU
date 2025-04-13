@@ -199,7 +199,6 @@ function SearchParkingPage() {
     setAutoCenter(true);
     performSearch(building);
 
-
   };
 
   const handleMapMove = (newCenter) => {
@@ -229,8 +228,10 @@ function SearchParkingPage() {
 
   const handleReserveSpot = (spotInfo) => {
     setSelectedSpotForReservation(spotInfo);
-    navigate('/reservations', { state: { spotInfo, searchedBuilding } });
-  };
+    navigate(`/reservations/${spotInfo.spotId}`, {
+      state: { spotInfo, searchedBuilding }
+    });
+    };
 
   const handleRecenter = (lotCoordinates) => {
     if (!lotCoordinates) return;
@@ -656,7 +657,7 @@ function SearchParkingPage() {
                           <div key={index} className="spot-card">
                             <div className="spot-card-header">
                               <h3 className="spot-card-title">
-                                Lot {officialLotName} Spot {spotNumber}
+                              {officialLotName.substring(0,3).toLowerCase() === "lot" ? "" : "Lot"} {officialLotName} Spot {spotNumber}
                               </h3>
                               <div className="spot-card-controls">
                                 <button

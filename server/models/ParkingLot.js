@@ -1,6 +1,13 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
+
+const OccupancyRecordSchema = new Schema({
+  timestamp: { type: Date, default: Date.now },
+  available: { type: Number, required: true }, 
+  occupied: { type: Number, required: true }
+}, { _id: false });
+
 const ParkingLotSchema = new Schema(
   {
     lotId: { type: String, required: true, unique: true },
@@ -37,6 +44,7 @@ const ParkingLotSchema = new Schema(
     timeBoolean: { type: Boolean, default: false },
     closestBuilding: { type: String, default: "Test Building" },
     spots: [{ type: Schema.Types.ObjectId, ref: 'ParkingSpot' }],
+    occupancyHistory: [OccupancyRecordSchema],
   },
   { timestamps: true }
 );

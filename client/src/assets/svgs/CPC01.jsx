@@ -211,8 +211,8 @@ const CPC01 = (props) => (
           fontSize={18.068}
           transform="rotate(.353 -82540.095 89081.366)"
         >
-          <tspan x={0.28} y={18} textLength={89.348} >Computing</tspan>
-          <tspan x={17.843} y={40} textLength={54.223} >Center </tspan>
+          <tspan x={0.28} y={18} textLength={89.348} />
+          <tspan x={17.843} y={40} textLength={54.223} />
         </text>
       </g>
       <g data-vectornator-layer-name="ParkingLot16A">
