@@ -2,6 +2,8 @@ const ParkingLot = require('../models/ParkingLot');
 const ParkingSpot = require('../models/ParkingSpot');
 const Building = require('../models/Building');
 const wayfindingService = require('../services/wayFindingService');
+const { getPopularTimes } = require('../services/forecastingService');
+
 
 // ----------------------------------------------------------------------
 // Get overlay data for all parking lots (for map overlays).
@@ -89,22 +91,19 @@ exports.getSpotDetails = async (req, res) => {
 exports.getParkingLotDetails = async (req, res) => {
   try {
     const { lotId } = req.params;
-    const lot = await ParkingLot.findOne({ lotId });
-    if (!lot) return res.status(404).json({ error: "Lot not found" });
-    
-    // Retrieve every spot associated with the lot (without filtering fields)
-    const spots = await ParkingSpot.find({ lot: lot._id });
-    
-    const result = {
-      ...lot.toObject(),
-      spots
-    };
-    res.json(result);
+    // Find lots where either lotId matches or groupId matches
+    const lots = await ParkingLot.find({ $or: [ { lotId }, { groupId: lotId } ] });
+    if (!lots || lots.length === 0) return res.status(404).json({ error: "Lot not found" });
+    const lotObjectIds = lots.map(lot => lot._id);
+    // Get all spots for these lots
+    const spots = await ParkingSpot.find({ lot: { $in: lotObjectIds } });
+    res.json({ lots, spots });
   } catch (error) {
     console.error("Error fetching parking lot details:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 };
+
 
 // ----------------------------------------------------------------------
 // Search for buildings based on a query string.
@@ -125,3 +124,15 @@ exports.searchBuildings = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+
+exports.getPopularTimesController = async (req, res) => {
+  try {
+    const { lotId } = req.params;
+    const popularTimes = await getPopularTimes(lotId);
+    return res.json(popularTimes);
+  } catch (error) {
+    console.error('Error fetching popular times:', error);
+    return res.status(500).json({ error: error.message });
+  }
+}
