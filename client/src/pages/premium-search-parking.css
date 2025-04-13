@@ -75,7 +75,6 @@
   z-index: 10;
 }
 
-/* Main content layout */
 .search-container {
   display: flex;
   flex: 1;
@@ -85,6 +84,7 @@
   margin: 0 auto;
   width: 100%;
   position: relative;
+  min-height: 0; 
 }
 
 /* Sidebar filter panel */
@@ -254,11 +254,15 @@
   flex-direction: column;
   gap: 1.5rem;
   max-width: 1200px;
+  width: 100%;
+  min-height: 0;
+
 }
 
 /* Search bar styling */
 .search-bar-container {
   width: 100%;
+  
   background-color: var(--white);
   border-radius: 16px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
@@ -269,10 +273,125 @@
 }
 
 .search-bar-wrapper {
-  position: relative;
+  display: flex;
+  align-items: center; /* Vertically center items */
+  width: 100%;
 }
 
-.premium-search-bar {
+/* Typical “dropdown” style below the search input */
+.suggestions {
+  position: absolute;
+  top: 100%;          /* just below the .premium-search-bar */
+  left: 0;
+  width: 100%;        /* match the parent container width */
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  z-index: 9999;      /* keep it above other elements (like the map) */
+  max-height: 300px;  /* limit how tall the dropdown can get */
+  overflow-y: auto;   /* scroll if too many suggestions */
+  padding: 0.5rem 0;
+}
+
+/* Each suggestion item */
+.suggestion-item {
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  font-size: 1rem;
+  border-bottom: 1px solid #eee;
+}
+
+.suggestion-item:last-child {
+  border-bottom: none;
+}
+
+/* Hover effect */
+.suggestion-item:hover {
+  background-color: #f3f3f3;
+}
+/* Recenter Button in Spot Card Header (replaces "Available" text) */
+.spot-card-controls {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem; /* space between buttons */
+  z-index: 2;
+}
+
+/* Recenter button remains unchanged, for example: */
+.spot-card-recenter {
+  background-color: var(--gray-200);
+  border: none;
+  padding: 0.3rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.spot-card-recenter img {
+  width: 20px;
+  height: 20px;
+}
+
+.spot-card-recenter:hover {
+  background-color: var(--gray-300);
+}
+.spot-card-recenter img,
+.spot-card-show-spot-btn img {
+  display: block;
+}
+/* New Show Spot button, styled similarly */
+.spot-card-show-spot-btn {
+  background-color: var(--gray-200);
+  border: none;
+  padding: 0.3rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.spot-card-show-spot-btn img {
+  width: 20px;
+  height: 20px;
+} 
+
+.spot-card-show-spot-btn:hover {
+  background-color: var(--gray-300);
+}
+
+
+.directions-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.directions-back-btn {
+  position: absolute;
+  top: 20px;
+  right: 10px;
+  z-index: 10;
+  background-color: var(--primary-red);
+  color: var(--white);
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.directions-back-btn:hover {
+  background-color: #7a0000;
+}
+
+
+.premium-search-bar  {
   width: 100%;
   display: flex;
   align-items: center;
@@ -283,22 +402,31 @@
   transition: all 0.3s ease;
 }
 
+
 .premium-search-bar:focus-within {
   border-color: var(--primary-dark);
   box-shadow: 0 0 0 4px rgba(10, 37, 65, 0.1);
 }
 
-.premium-search-bar input {
+
+
+.search-input-wrapper {
+  position: relative;
   flex: 1;
+}
+
+/* Adjust the input within this wrapper */
+.search-input-wrapper input {
+  width: 100%;
+  padding: 1rem 2.5rem 1rem 1.25rem; /* extra right padding to leave room for the cancel “X” */
   border: none;
-  padding: 1rem 1.25rem;
   font-size: 1rem;
   outline: none;
   background: transparent;
   color: var(--gray-800);
 }
 
-.premium-search-bar button {
+.premium-search-bar button[type="submit"] {
   background-color: var(--primary-red);
   color: var(--white);
   border: none;
@@ -311,7 +439,7 @@
   transition: background-color 0.3s ease;
 }
 
-.premium-search-bar button:hover {
+.premium-search-bar button[type="submit"]:hover {
   background-color: #7a0000;
 }
 
@@ -320,20 +448,178 @@
   height: 18px;
 }
 
+.cancel-search-btn {
+  position: absolute;
+  right: 0.75rem;           /* Adjust this value if needed */
+  top: 50%;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.1); /* faint, subtle circle */
+  color: #666;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.cancel-search-btn:hover {
+  background-color: rgba(0, 0, 0, 0.2);
+  color: #333;
+}
+
+.cancel-search-btn svg {
+  width: 12px;
+  height: 12px;
+  stroke: currentColor;
+}
+
 /* Map and results layout */
 .results-map-container {
   display: flex;
-  gap: 1.5rem;
   flex: 1;
+  width: 100%;
+  max-height: 660px;
+  overflow: hidden;
+  position: relative;
+  transition: all 0.5s ease-in-out;
+  min-height: 0;
+  /* No gap here so that when results are hidden the map aligns with the page edge */
 }
 
-.results-list {
+.results-panel {
   width: 400px;
-  flex-shrink: 0;
+  height: 100%;           /* Make it span the available height */
+  max-height: 100%;       /* Prevent it from growing beyond its container */
+  overflow-x: hidden;
+  overflow-y: auto;       /* Allow vertical scrolling for excess content */
+  background-color: var(--white);
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  position: relative;     /* So that inner overlays (like loading) are confined */
+  transition: width 0.5s ease-in-out;
+}
+
+/* When collapsed, results panel becomes 0 width */
+.results-panel.collapsed {
+  width: 0;
+}
+
+.results-content {
+  /* Put your “spot-card” listings here. 
+     If you want them hidden while collapsed, 
+     you can conditionally render them in React 
+     or fade them out with CSS transitions. */
+  padding: 1rem;
+}
+
+/* Loading overlay for results panel */
+.results-loading {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.8); /* semi-transparent overlay */
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s ease-out;
+  z-index: 1;
 }
+
+/* The spinner element */
+.results-loading .spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--gray-200);
+  border-top-color: var(--primary-red);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: 1rem;
+}
+
+/* Fade in animation for the overlay */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Spinner rotation animation */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+/* Map section */
+.map-container {
+  flex: 1;
+  position: relative; /* so the button can be absolutely positioned inside */
+  background-color: var(--white);
+  border-radius: 16px; /* full rounding on all corners for a “card” feel */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  min-height: 0;
+  overflow: hidden; 
+  transition: all 0.5s ease-in-out;
+  z-index: 1;
+}
+
+
+.lot-map-view-container {
+  width: 100%;
+  max-width: 100vw;      /* Prevent the container from exceeding the viewport */
+  overflow-x: hidden;    /* Hide any horizontal overflow */
+  box-sizing: border-box;
+}
+
+
+.collapse-button {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  background-color: var(--primary-red); /* red background */
+  color: var(--white);
+  border: none;
+  border-radius: 0 8px 8px 0; /* curved right edge */
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+  z-index: 1000;
+}
+
+.collapse-button:hover {
+  background-color: #7a0000; /* darker red on hover */
+}
+
+
+/* Disabled state (if no results) */
+.collapse-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+/* 
+.results-map-container.show-results .results-list {
+  width: 370px;
+}
+
+.results-map-container.show-results .map-container {
+  width: calc(100% - 400px - 1.5rem);
+} */
+
 
 /* Parking spot cards */
 .spot-card {
@@ -459,64 +745,24 @@
   gap: 0.5rem;
 }
 
-.spot-view-btn {
-  background-color: var(--white);
-  color: var(--primary-dark);
-  border: 1px solid var(--gray-300);
-  flex: 1;
+.spot-card-btn svg,
+.spot-card-btn img {
+  width: 18px;
+  height: 18px;
+  display: block;
 }
 
-.spot-view-btn:hover {
-  background-color: var(--gray-100);
-  border-color: var(--gray-400);
-}
 
-.spot-reserve-btn {
-  background-color: var(--primary-red);
-  color: var(--white);
-  border: none;
-  box-shadow: 0 2px 4px rgba(153, 0, 0, 0.1);
-  flex: 1.5;
-}
 
-.spot-reserve-btn:hover {
-  background-color: #7a0000;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 6px rgba(153, 0, 0, 0.2);
-}
-
-/* Map section */
-.map-container {
-  flex: 1;
-  background-color: var(--white);
-  border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  overflow: hidden;
-  position: relative;
-  min-height: 600px;
-  animation: slideInRight 0.8s ease-out forwards;
-  opacity: 0;
-}
-
+/* 
 .map-wrapper {
   width: 100%;
   height: 100%;
   position: relative;
-}
+} */
 
-.map-overview {
-  width: 100%;
-  height: 100%;
-  position: relative;
-}
 
-.map-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.parking-lot-polygon {
+/* .parking-lot-polygon {
   position: absolute;
   top: 75%;
   left: 17%;
@@ -532,39 +778,15 @@
 .parking-lot-polygon:hover {
   background-color: rgba(153, 0, 0, 0.5);
   transform: translate(-50%, -50%) scale(1.1);
-}
+} */
 
-.zoomed-map-view {
+/* .zoomed-map-view {
   width: 100%;
   height: 100%;
   position: relative;
   background-color: var(--gray-50);
-}
+} */
 
-.back-button {
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  background-color: var(--primary-red);
-  color: var(--white);
-  border: none;
-  border-radius: 8px;
-  padding: 0.75rem 1.25rem;
-  cursor: pointer;
-  z-index: 10;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
-}
-
-.back-button:hover {
-  background-color: #7a0000;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
 
 .lot-svg {
   width: 100%;
@@ -839,4 +1061,174 @@
   .filter-actions {
     flex-direction: column;
   }
+}
+
+
+/* --- Three-Column Layout for Spot Card Footer (Revised) --- */
+.spot-card-footer.three-col {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  column-gap: 0.5rem;
+  align-items: stretch; /* stretch columns to the same height */
+  padding: 0.75rem 1rem;
+}
+
+/* Left Column: Two stacked buttons */
+.footer-left-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+/* Middle & Right Columns: Single centered buttons */
+.footer-middle-col,
+.footer-right-col {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Base styling for all footer buttons */
+.spot-card-footer.three-col .spot-card-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.3rem 0.75rem;
+  font-size: 0.75rem; /* smaller text for left column buttons */
+  border-radius: 6px;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  min-height: 38px;    /* enforce consistent height */
+  min-width: 100px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Left Column Buttons: Subtle blue styling */
+
+
+.spot-view-details-btn {
+  background-color: #237fe0; /* slightly darker blue */
+  color: var(--white);
+  border: none;
+}
+.spot-view-details-btn:hover {
+  background-color: #0b325a;
+  transform: translateY(-1px);
+}
+
+.spot-back-btn {
+  background-color: #237fe0; /* Blue background */
+  color: var(--white);
+  border: none;
+  padding: 0.75rem 1.25rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.spot-back-btn:hover {
+  background-color: #0b325a;
+  transform: translateY(-1px);
+}
+
+/* Middle Column: Reserve Button (red) */
+.spot-reserve-btn {
+  background-color: var(--primary-red);
+  color: var(--white);
+  border: none;
+  min-height: 38px;
+}
+.spot-reserve-btn:hover {
+  background-color: #7a0000;
+  transform: translateY(-1px);
+}
+
+/* Right Column: Get Directions Button (green) */
+.spot-get-directions-btn {
+  background-color: #198754;
+  color: #fff;
+  border: none;
+  min-height: 38px;
+}
+.spot-get-directions-btn:hover {
+  background-color: #157347;
+  transform: translateY(-1px);
+}
+
+
+.no-results-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 2rem;
+  text-align: center;
+  color: var(--gray-500);
+  font-size: 1.1rem;
+}
+
+.no-results-message svg {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 1rem;
+  fill: var(--gray-300);
+}
+
+.detail-columns {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.detail-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.spot-detail-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.spot-detail-row .icon {
+  flex-shrink: 0;
+}
+
+.spot-detail-row .label {
+  font-weight: 600;
+  color: var(--gray-700);
+  min-width: 110px;
+}
+
+.spot-detail-row .value {
+  color: var(--gray-800);
+}
+
+/* Categories Section: Badges with a Light Red Theme */
+.spot-categories {
+  margin-top: 1.5rem;
+}
+
+.categories-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.category-badge {
+  background-color: #ffe5e5; /* Light red background */
+  color: var(--primary-red); /* Use your red theme */
+  padding: 0.3rem 0.6rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
 }

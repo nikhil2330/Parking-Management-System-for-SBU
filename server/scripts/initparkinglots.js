@@ -1,7 +1,7 @@
 const csv = require('csvtojson');
 const mongoose = require('mongoose');
 const path = require('path');
-require('dotenv').config({ path: './config/.env' });
+require('dotenv').config({ path: '../config/.env' });
 const ParkingLot = require('../models/ParkingLot'); 
 
 const mongoURI = process.env.MONGO_URI;
@@ -29,7 +29,7 @@ function parseBoundingBox(str) {
   }
 
 // Path to your CSV file (adjust filename/path as needed)
-const csvFilePath = path.join(__dirname, '/data/parking_data.csv');
+const csvFilePath = path.join(__dirname, '../data/parking_data.csv');
 
 csv()
   .fromFile(csvFilePath)
