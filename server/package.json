@@ -20,7 +20,9 @@
     "express-validator": "^7.2.1",
     "js-priority-queue": "^0.1.5",
     "jsonwebtoken": "^9.0.2",
+    "mongodb": "^6.15.0",
     "mongoose": "^8.12.1",
-    "neo4j-driver": "^5.28.1"
+    "neo4j-driver": "^5.28.1",
+    "path": "^0.12.7"
   }
 }
