@@ -1,81 +1,251 @@
-/* Enhanced Premium Header Styling */
+/* Updated Header CSS with fixed spacing between Pay and Help buttons */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 .header-container {
-  background-color: white;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  background: var(--white);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
   padding: 1rem 4%;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-  z-index: 10;
   position: relative;
+  z-index: 100;
+  font-family: 'Inter', sans-serif;
+  border-bottom: 1px solid var(--gray-100);
 }
 
+/* ---------- brand ---------- */
 .header-left {
   display: flex;
   align-items: center;
-}
-
-.header-car-icon {
-  color: #990000;
-  margin-right: 0.75rem;
+  cursor: pointer;
+  position: relative;
   transition: transform 0.3s ease;
 }
 
-.header-car-icon:hover {
-  transform: scale(1.1);
+.header-left:hover {
+  transform: translateY(-2px);
+}
+
+.header-car-icon {
+  color: var(--primary-red);
+  margin-right: 0.5rem;
+  filter: drop-shadow(0 2px 4px rgba(153, 0, 0, 0.2));
 }
 
 .header-title {
   font-weight: 700;
   font-size: 1.5rem;
-  color: #0A2541;
-  letter-spacing: -0.5px;
+  color: var(--primary-dark);
+  background: linear-gradient(90deg, var(--primary-dark) 0%, var(--primary-red) 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
 }
 
+/* ---------- Improved Greeting section ---------- */
+.header-greeting {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-right: auto;
+  margin-left: 2rem;
+  position: relative;
+}
+
+.greeting-text {
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: var(--gray-700);
+}
+
+.username {
+  font-weight: 600;
+  color: var(--primary-dark);
+}
+
+.reservation-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  background: linear-gradient(to right, var(--blue-50), #e6f0ff);
+  border: 1px solid #d1e3ff;
+  color: var(--info-blue);
+  padding: 0.3rem 0.8rem;
+  border-radius: 999px;
+  font-weight: 500;
+  box-shadow: 0 2px 6px rgba(59, 130, 246, 0.08);
+  transition: all 0.3s ease;
+}
+
+.reservation-badge:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(59, 130, 246, 0.12);
+}
+
+.reservation-icon {
+  font-size: 0.9rem;
+}
+
+/* ---------- quick‑access nav (pill buttons) ---------- */
+.header-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  font-weight: 600;
+  margin-right: 1.5rem; /* Added margin to create space between nav and help button */
+}
+
+.header-link {
+  padding: 0.5rem 1rem;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  background: var(--gray-50);
+  color: var(--gray-700);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+  border: 1px solid var(--gray-100);
+}
+
+.header-link:hover {
+  background: var(--primary-red);
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(153, 0, 0, 0.2);
+}
+
+.header-link-icon {
+  font-size: 0.85rem;
+}
+
+/* ---------- user / theme ---------- */
 .header-right {
   display: flex;
   align-items: center;
-  gap: 1.25rem;
+  gap: 1.2rem; /* Increased gap between elements */
 }
 
-.header-right p {
-  font-weight: 500;
-  color: #4b5563;
-  background-color: #f9fafb;
-  padding: 0.5rem 1rem;
-  border-radius: 30px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-  border: 1px solid #f3f4f6;
+/* Improved help button */
+.help-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background-color: var(--gray-50);
+  color: var(--gray-600);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 1px solid var(--gray-100);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.help-button:hover {
+  background-color: var(--gray-100);
+  color: var(--primary-red);
+  transform: translateY(-3px) rotate(10deg);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
 }
 
 .header-user-icon {
-  cursor: pointer;
-  background-color: #990000;
+  background: linear-gradient(135deg, var(--primary-red), #d10000);
   color: white;
-  padding: 8px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
-  box-shadow: 0 2px 4px rgba(153, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 
+    0 4px 10px rgba(153, 0, 0, 0.2),
+    0 0 0 2px rgba(255, 255, 255, 0.1);
+  cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .header-user-icon:hover {
-  transform: scale(1.1);
-  box-shadow: 0 4px 8px rgba(153, 0, 0, 0.3);
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 
+    0 6px 15px rgba(153, 0, 0, 0.3),
+    0 0 0 3px rgba(255, 255, 255, 0.15);
 }
 
-/* Responsive styling */
-@media (max-width: 768px) {
-  .header-container {
-    padding: 1rem;
+/* === Theme toggle (moon / sun) ===================================== */
+.theme-toggle-btn {
+  /* reset */
+  appearance: none;
+  border: none;
+  outline: none;
+  background: transparent;
+
+  /* size / shape */
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  font-size: 1.25rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  
+  /* prettier styling */
+  background-color: var(--gray-50);
+  border: 1px solid var(--gray-100);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+.theme-toggle-btn:hover,
+.theme-toggle-btn:focus-visible {
+  background: var(--gray-100);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+}
+
+.dark .theme-toggle-btn:hover,
+.dark .theme-toggle-btn:focus-visible {
+  background: var(--gray-700);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* ---------- responsive ---------- */
+@media (max-width: 1080px) {
+  .header-greeting {
+    margin-left: 1rem;
   }
   
-  .header-right p {
-    font-size: 0.9rem;
+  .header-link {
+    padding: 0.45rem 0.8rem;
+  }
+}
+
+@media (max-width: 900px) {
+  .header-greeting {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .header-nav {
+    display: none;          /* hide quick links on small screens */
+    margin-right: 0;        /* reset margin when hidden */
+  }
+  
+  .header-right {
+    margin-left: auto;
   }
 }
 
 @media (max-width: 480px) {
-  .header-right p {
-    display: none;
+  .header-container {
+    padding: 0.8rem 5%;
   }
 }
