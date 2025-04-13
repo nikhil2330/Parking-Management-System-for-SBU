@@ -1,45 +1,76 @@
-// src/components/Header.js
-import React, { useState } from 'react';
-import { FaCar } from 'react-icons/fa';  // Car icon
-import { FiUser } from 'react-icons/fi'; // User icon
+import React, { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { FaCar, FaSearch, FaCalendarAlt, FaCreditCard } from 'react-icons/fa';
+import { FiUser, FiHelpCircle } from 'react-icons/fi';
 import UserProfileModal from './UserProfileModal';
+import ThemeToggle from './ThemeToggle';
 import './Header.css';
 
 function Header() {
+  const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
 
-  // Read the user's chosen username from localStorage
+  /* username & greeting */
   const userName = localStorage.getItem('p4sbuUsername') || 'User';
-
-  const handleUserIconClick = () => {
-    setShowModal(true);
-  };
-  const handleCloseModal = () => {
-    setShowModal(false);
-  };
+  const greeting = useMemo(() => {
+    const h = new Date().getHours();
+    if (h < 12) return 'Good morning';
+    if (h < 18) return 'Good afternoon';
+    return 'Good evening';
+  }, []);
 
   return (
     <header className="header-container">
-      {/* Left side: Car icon + title */}
-      <div className="header-left">
+      {/* brand */}
+      <div className="header-left" onClick={() => navigate('/home')}>
         <FaCar className="header-car-icon" size={24} />
         <span className="header-title">P4SBU</span>
       </div>
 
-      {/* Right side: Greeting + user icon */}
-      <div className="header-right">
-        {/* Replaced "Alex" with the user's stored name */}
-        <p>Welcome, {userName}! You have 2 active reservations.</p>
-        <FiUser
-          className="header-user-icon"
-          size={24}
-          onClick={handleUserIconClick}
-          title="Edit Profile"
-        />
+      {/* Greeting with reservation counter */}
+      <div className="header-greeting">
+        <div className="greeting-text">
+          <span>{greeting}, </span>
+          <span className="username">{userName}!</span>
+        </div>
+        <div className="reservation-badge">
+          <FaCalendarAlt className="reservation-icon" />
+          <span>2 active reservations</span>
+        </div>
       </div>
 
-      {/* Modal pops up if showModal === true */}
-      {showModal && <UserProfileModal onClose={handleCloseModal} />}
+      {/* quick‑access nav */}
+      <nav className="header-nav">
+        <span className="header-link" onClick={() => navigate('/search-parking')}>
+          <FaSearch className="header-link-icon" />
+          <span>Search</span>
+        </span>
+        <span className="header-link" onClick={() => navigate('/reservations')}>
+          <FaCalendarAlt className="header-link-icon" />
+          <span>Reserve</span>
+        </span>
+        <span className="header-link" onClick={() => navigate('/payment-methods')}>
+          <FaCreditCard className="header-link-icon" />
+          <span>Pay</span>
+        </span>
+      </nav>
+
+      {/* user & theme */}
+      <div className="header-right">
+        <div className="help-button" title="Help / Support">
+          <FiHelpCircle size={24} />
+        </div>
+        <ThemeToggle />
+        <div 
+          className="header-user-icon"
+          title="Edit profile"
+          onClick={() => setShowModal(true)}
+        >
+          <FiUser size={20} />
+        </div>
+      </div>
+
+      {showModal && <UserProfileModal onClose={() => setShowModal(false)} />}
     </header>
   );
 }
