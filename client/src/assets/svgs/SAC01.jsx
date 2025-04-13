@@ -1,0 +1,3902 @@
+import * as React from "react";
+const SAC01 = (props) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    xmlSpace="preserve"
+    width={1000}
+    height={593}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    strokeMiterlimit={10}
+    clipRule="evenodd"
+    viewBox="0 0 1000 593"
+    {...props}
+  >
+    <clipPath id="SAC01_svg__a">
+      <path d="M0 0h1000v593H0z" />
+    </clipPath>
+    <g
+      strokeLinecap="butt"
+      clipPath="url(#SAC01_svg__a)"
+      data-vectornator-layer-name="Layer 1"
+    >
+      <g data-vectornator-layer-name="Group 5">
+        <path
+          fill="#d9d9d9"
+          stroke="#768596"
+          strokeLinejoin="miter"
+          strokeWidth={5}
+          d="m913.544 133.555-3.914 35.015-9.077 37.174 24.298 4.771-28.689 180.009-21.435-3.968-29.366 159.514-525.602-80.972 3.478-16.68-21.161-3.558-1.153 15.857-151.246-24.556 13.179-111.474 37.302-161.08 32.228-89.928 12.9-26.744 2.682-14.989 1.745-5.55z"
+          data-vectornator-layer-name="Curve 14"
+        />
+        <path
+          fill="#d9d9d9"
+          stroke="#768596"
+          strokeWidth={2}
+          d="m1006.44 193.892-19.311.426-98.949-29.697-621.651-99.095-5.553-3.586-65.655-9.465L219.836-9.14l-49.629 3.024 15.152 12.593-17.009 47.352-61.639 249.974L80.214 487.48l2.474 115.965 25.766-1.38-4.756-115.268 25.175-169.789 52.734 7.556-11.671 78.797 672.891 104.713 14.084-93.681 73.914 13.72 37.05 29.053 17.786 38.31-129.252 103.731 40.277.383 36.446-31.38 7.71 10.328-26.57 22.249 27.398 7.469L1003 562.46l2.82-32.18-57.117 42.634-7.958-9.467 69.355-51.731-4.68-24.587-9.966 4.729-22.271-41.423-37.832-30.488-77.196-13.924 34.234-230.499 91.849 26.338 21.652.944z"
+          data-vectornator-layer-name="Curve 17"
+        />
+        <path
+          fill="none"
+          stroke="#768596"
+          strokeWidth={2}
+          d="m190.811 66.42 68.174 9.924 6.121-3.918L883.66 173.77l-12.934 88.895-642.398-109.307-4.43-4.792-50.881-8.269z"
+          data-vectornator-layer-name="Curve 15"
+        />
+        <path
+          fill="none"
+          stroke="#768596"
+          strokeWidth={2}
+          d="m169.437 156.79 40.136 5.663-26.447 146.654-54.253-9.856z"
+          data-vectornator-layer-name="Curve 16"
+        />
+        <path
+          fill="#d9d9d9"
+          stroke="#768596"
+          strokeWidth={2}
+          d="m181.837 396.175 652.715 100.867 10.655-65.931-651.18-106.639z"
+          data-vectornator-layer-name="Curve 19"
+        />
+        <path
+          fill="#d9d9d9"
+          stroke="#768596"
+          strokeWidth={2}
+          d="m195.066 315.003 13.48-72.154 649.585 101.253-11.53 78.402z"
+          data-vectornator-layer-name="Curve 20"
+        />
+        <path
+          fill="#d9d9d9"
+          stroke="#768596"
+          strokeWidth={2}
+          d="m210.239 232.418 10.344-67.951 648.986 106.908-10.115 65.089z"
+          data-vectornator-layer-name="Curve 21"
+        />
+        <g fill="none" stroke="#fff" data-vectornator-layer-name="Group 7">
+          <path
+            d="m159.454 434.991 12.56-11.823"
+            data-vectornator-layer-name="Line 2"
+          />
+          <path
+            d="m153.035 433.668 20.758-20.412"
+            data-vectornator-layer-name="Line 3"
+          />
+          <path
+            d="m154.104 423.775 14.057-12.26"
+            data-vectornator-layer-name="Line 4"
+          />
+          <path
+            d="m170.822 432.398-4.519 3.705"
+            data-vectornator-layer-name="Line 5"
+          />
+          <path
+            d="m154.918 416.099 7.023-5.639"
+            data-vectornator-layer-name="Line 6"
+          />
+          <path
+            d="m155.804 409.727 17.989 2.661-3.857 24.221-16.901-2.919z"
+            data-vectornator-layer-name="Rectangle 1"
+          />
+        </g>
+      </g>
+      <g data-vectornator-layer-name="Grass">
+        <path
+          fill="#cdeab0"
+          stroke="#cdeab0"
+          d="m128.243 330.991 4.209-3.173 4.34.8-18.244 120.221-7.822.614z"
+          data-vectornator-layer-name="Curve 6"
+        />
+        <path
+          fill="#cdeab0"
+          stroke="#cdeab0"
+          d="m158.496 332.91-4.368-3.914-4.756 12.297-12.857 91.415 10.322 2.142z"
+          data-vectornator-layer-name="Curve 7"
+        />
+        <path
+          fill="#cdeab0"
+          stroke="#cdeab0"
+          d="m167.174 170.583 6.306-4.448 2.2.481-.354 10.974-24.951 102.433-5.728 8.063-6.642-8.002z"
+          data-vectornator-layer-name="Curve 8"
+        />
+        <path
+          fill="#cdeab0"
+          stroke="#cdeab0"
+          d="m197.39 171.754-8.276-3.479-29.679 125.228 10.055-3.555z"
+          data-vectornator-layer-name="Curve 9"
+        />
+        <path
+          fill="#cdeab0"
+          stroke="#cdeab0"
+          d="m181.992 129.655 17.537-53.542-9.627.698-10.165 43.71z"
+          data-vectornator-layer-name="Curve 10"
+        />
+        <path
+          fill="#cdeab0"
+          stroke="#cdeab0"
+          d="m195.066 136.4 18.226-60.368 14.426.197 4.831 2.751-.109 24.183 628.286 99.268 3.327-21.801 6.657-.495-8.343 60.817-7.701-.318 3.433-21.821-646.108-104.578-6.174 22.914z"
+          data-vectornator-layer-name="Curve 11"
+        />
+        <path
+          fill="#cdeab0"
+          stroke="#cdeab0"
+          d="m217.688.403-10.554 26.201 4.765 9.553L228.108-.292z"
+          data-vectornator-layer-name="Curve 12"
+        />
+        <path
+          fill="#acd19e"
+          stroke="#acd19e"
+          d="m0 553.683 37.621-53.099 36.622-29.519 19.666-181.376.397-63.838 32.993-54.839 24.521-71.781-9.809-74.457L136.826 0 68.447-.639 30.104 27.004 0 14.028z"
+          data-vectornator-layer-name="Curve 2"
+        />
+        <path
+          fill="#acd19e"
+          stroke="#acd19e"
+          d="M1000 0v56.587l-13.583 79.9-70.56.173-667.304-108.4L267.678.435z"
+          data-vectornator-layer-name="Curve 1"
+        />
+        <path
+          fill="#cdeab0"
+          stroke="#cdeab0"
+          d="m3.203 593.824 60.318-87.142 10.256-6.627.109 66.626 7.18 25.982z"
+          data-vectornator-layer-name="Curve 5"
+        />
+      </g>
+      <g data-vectornator-layer-name="SAC01">
+        <path
+          fill="#c4ccd6"
+          stroke="#85d4ff"
+          d="m893.584 386.686-24.682-4.004 1.828-11.284 24.682 4.004z"
+          data-vectornator-layer-name="Spot553"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#85d4ff"
+          d="m895.458 375.397-24.715-4.122 1.945-11.616 24.715 4.122z"
+          data-vectornator-layer-name="Spot552"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#85d4ff"
+          d="m898.402 357.717-24.686-3.979 1.815-11.286 24.686 3.98z"
+          data-vectornator-layer-name="Spot551"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#85d4ff"
+          d="m900.263 346.427-24.719-4.097 1.932-11.619 24.719 4.097z"
+          data-vectornator-layer-name="Spot550"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#85d4ff"
+          d="m902.916 328.903-24.835-4.091 1.869-11.348 24.835 4.091z"
+          data-vectornator-layer-name="Spot549"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#85d4ff"
+          d="m904.832 317.55-24.868-4.209 1.988-11.683 24.868 4.209z"
+          data-vectornator-layer-name="Spot548"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#85d4ff"
+          d="M907.572 299.356 882.9 295.29l1.858-11.279 24.671 4.066z"
+          data-vectornator-layer-name="Spot547"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#85d4ff"
+          d="m909.475 288.072-24.704-4.184 1.976-11.612 24.704 4.184z"
+          data-vectornator-layer-name="Spot546"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#85d4ff"
+          d="m912.541 269.369-24.735-4.203 1.84-10.803 24.735 4.202z"
+          data-vectornator-layer-name="Spot545"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m914.413 257.67-24.573-4.175 1.854-10.881 24.572 4.174z"
+          data-vectornator-layer-name="Spot544"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m916.344 246.872-24.666-4.142 1.946-11.548 24.666 4.142z"
+          data-vectornator-layer-name="Spot543"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m918.327 235.297-24.671-4.066 1.857-11.28 24.672 4.066z"
+          data-vectornator-layer-name="Spot542"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m920.23 224.012-24.703-4.183 1.975-11.612 24.704 4.184z"
+          data-vectornator-layer-name="Spot541"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#85d4ff"
+          d="m908.503 136.893-4.262 23.846-12.091-1.909 4.262-23.847z"
+          data-vectornator-layer-name="Spot540"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#85d4ff"
+          d="m890.154 133.972-4.183 23.852-11.81-1.823 4.183-23.852z"
+          data-vectornator-layer-name="Spot539"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#85d4ff"
+          d="m878.339 132.105-4.306 23.883-12.158-1.939 4.305-23.883z"
+          data-vectornator-layer-name="Spot538"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#85d4ff"
+          d="m859.988 129.335-4.318 23.873-11.8-1.883 4.318-23.873z"
+          data-vectornator-layer-name="Spot537"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m847.155 127.228-4.318 23.873-11.8-1.883 4.318-23.873z"
+          data-vectornator-layer-name="Spot536"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m835.325 125.347-4.262 23.846-12.091-1.909 4.262-23.847z"
+          data-vectornator-layer-name="Spot535"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m823.204 123.401-4.182 23.852-11.81-1.823 4.182-23.852z"
+          data-vectornator-layer-name="Spot534"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m811.389 121.533-4.305 23.883-12.159-1.938 4.306-23.883z"
+          data-vectornator-layer-name="Spot533"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m799.426 119.618-4.25 23.779-12.09-1.909 4.251-23.779z"
+          data-vectornator-layer-name="Spot532"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m787.306 117.673-2.216 12.634-1.967 11.218-11.81-1.824 4.183-23.852z"
+          data-vectornator-layer-name="Spot531"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m775.161 115.411-3.812 24.293-11.824-1.892 4.134-24.261z"
+          data-vectornator-layer-name="Spot530"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m763.765 113.599-4.178 24.226-11.776-1.848 4.178-24.226z"
+          data-vectornator-layer-name="Spot529"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m751.96 111.753-4.123 24.198-12.066-1.873 4.123-24.198z"
+          data-vectornator-layer-name="Spot528"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m739.864 109.843-4.043 24.204-11.785-1.788 4.043-24.203z"
+          data-vectornator-layer-name="Spot527"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m728.074 108.011-4.166 24.235-12.133-1.902 4.166-24.235z"
+          data-vectornator-layer-name="Spot526"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m715.938 106.088-4.178 24.226-11.775-1.848 4.178-24.226z"
+          data-vectornator-layer-name="Spot525"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m704.067 104.247-4.178 24.226-11.776-1.849 4.178-24.225z"
+          data-vectornator-layer-name="Spot524"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m692.262 102.401-4.123 24.198-12.066-1.873 4.123-24.198z"
+          data-vectornator-layer-name="Spot523"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m680.167 100.491-4.044 24.203-11.785-1.787 4.043-24.204z"
+          data-vectornator-layer-name="Spot522"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m668.376 98.658-4.166 24.236-12.133-1.902 4.166-24.236z"
+          data-vectornator-layer-name="Spot521"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m656.438 96.78-4.111 24.129-12.064-1.874 4.111-24.13z"
+          data-vectornator-layer-name="Spot520"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m644.343 94.87-2.142 12.82-1.902 11.383-11.785-1.788 4.044-24.203z"
+          data-vectornator-layer-name="Spot519"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m632.553 93.037-4.166 24.236-12.133-1.903 4.166-24.235z"
+          data-vectornator-layer-name="Spot518"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m620.325 91.163-4.066 24.219-11.799-2.011 4.387-24.184z"
+          data-vectornator-layer-name="Spot517"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m608.953 89.236-4.431 24.149-11.751-1.966 4.431-24.149z"
+          data-vectornator-layer-name="Spot516"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m597.172 87.272-4.375 24.122-12.041-1.994 4.376-24.122z"
+          data-vectornator-layer-name="Spot515"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m585.102 85.24-4.296 24.129-11.761-1.906 4.296-24.128z"
+          data-vectornator-layer-name="Spot514"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m573.336 83.29-4.418 24.159-12.108-2.023 4.419-24.16z"
+          data-vectornator-layer-name="Spot513"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m561.226 81.246-4.431 24.149-11.751-1.966 4.431-24.15z"
+          data-vectornator-layer-name="Spot512"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m549.379 79.286-4.431 24.149-11.751-1.966 4.431-24.15z"
+          data-vectornator-layer-name="Spot511"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m537.598 77.321-4.375 24.122-12.041-1.994 4.376-24.122z"
+          data-vectornator-layer-name="Spot510"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m525.529 75.29-4.296 24.128-11.762-1.905 4.296-24.129z"
+          data-vectornator-layer-name="Spot509"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m513.416 73.282-3.736 23.966-11.864-1.862 4.059-23.933z"
+          data-vectornator-layer-name="Spot508"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m501.982 71.5-4.103 23.9-11.816-1.818 4.103-23.9z"
+          data-vectornator-layer-name="Spot507"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m490.137 69.684-4.048 23.873-12.106-1.842 4.047-23.873z"
+          data-vectornator-layer-name="Spot506"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m478.001 67.806-3.968 23.878-11.825-1.758 3.968-23.878z"
+          data-vectornator-layer-name="Spot505"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m466.171 66.004-4.091 23.91-12.174-1.871 4.091-23.91z"
+          data-vectornator-layer-name="Spot504"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m453.994 64.113-4.103 23.9-11.815-1.818 4.103-23.9z"
+          data-vectornator-layer-name="Spot503"
+        />
+        <g fill="none" stroke="#85d4ff" data-vectornator-layer-name="Group 13">
+          <path
+            d="m890.459 132.627-4.868 27.777"
+            data-vectornator-layer-name="Line 1"
+          />
+          <path
+            d="m896.45 133.604-4.868 27.777"
+            data-vectornator-layer-name="Line 3"
+          />
+          <path
+            d="m885.289 159.842 6.779 1.157"
+            data-vectornator-layer-name="Line 2"
+          />
+          <path
+            d="m860.522 127.689-5.282 27.7"
+            data-vectornator-layer-name="Line 1"
+          />
+          <path
+            d="m866.501 128.758-5.282 27.7"
+            data-vectornator-layer-name="Line 3"
+          />
+          <path
+            d="m854.947 154.823 6.764 1.26"
+            data-vectornator-layer-name="Line 2"
+          />
+          <path
+            d="m896.535 134.731-7.216 4.045"
+            data-vectornator-layer-name="Line 4"
+          />
+          <path
+            d="m866.136 130.082-6.664 3.463"
+            data-vectornator-layer-name="Line 8"
+          />
+          <path
+            d="m862.14 150.627-6.55 3.883"
+            data-vectornator-layer-name="Line 9"
+          />
+          <path
+            d="m864.874 136.815-6.673 3.619"
+            data-vectornator-layer-name="Line 10"
+          />
+          <path
+            d="m863.399 143.788-6.755 3.863"
+            data-vectornator-layer-name="Line 11"
+          />
+          <path
+            d="m895.332 140.757-6.822 3.961"
+            data-vectornator-layer-name="Line 5"
+          />
+          <path
+            d="m894.125 147.699-7.042 4.079"
+            data-vectornator-layer-name="Line 6"
+          />
+          <path
+            d="m892.52 155.258-6.993 4.384"
+            data-vectornator-layer-name="Line 7"
+          />
+        </g>
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m247.121 81.145-4.107 23.662-11.71-1.82 4.107-23.662z"
+          data-vectornator-layer-name="Spot502"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m259.14 83.087-4.186 23.657-11.989-1.907 4.185-23.656z"
+          data-vectornator-layer-name="Spot501"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m270.87 84.966-4.241 23.682-11.701-1.879 4.241-23.683z"
+          data-vectornator-layer-name="Spot500"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m282.667 86.84-4.241 23.682-11.701-1.88 4.241-23.682z"
+          data-vectornator-layer-name="Spot499"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m294.726 88.794-4.229 23.693-12.056-1.935 4.229-23.693z"
+          data-vectornator-layer-name="Spot498"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m306.442 90.659-4.107 23.662-11.711-1.821 4.107-23.662z"
+          data-vectornator-layer-name="Spot497"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m318.46 92.6-4.186 23.657-11.989-1.906 4.186-23.656z"
+          data-vectornator-layer-name="Spot496"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m330.191 94.48-4.241 23.682-11.701-1.88 4.241-23.683z"
+          data-vectornator-layer-name="Spot495"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m341.514 96.321-3.877 23.751-11.749-1.924 4.197-23.716z"
+          data-vectornator-layer-name="Spot494"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m353.689 98.11-3.977 23.766-12.08-1.816 3.976-23.766z"
+          data-vectornator-layer-name="Spot493"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m365.428 99.858-2.042 12.572-1.813 11.163-11.734-1.705 3.856-23.734z"
+          data-vectornator-layer-name="Spot492"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m377.471 101.681-3.923 23.663-12.012-1.788 3.923-23.662z"
+          data-vectornator-layer-name="Spot491"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m389.357 103.475-3.976 23.767-12.081-1.816 3.977-23.766z"
+          data-vectornator-layer-name="Spot490"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m401.097 105.224-3.856 23.734-11.733-1.704 3.855-23.735z"
+          data-vectornator-layer-name="Spot489"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m413.14 107.047-3.935 23.73-12.013-1.788 3.934-23.729z"
+          data-vectornator-layer-name="Spot488"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m424.894 108.81-3.989 23.756-11.725-1.764 3.989-23.756z"
+          data-vectornator-layer-name="Spot487"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m436.714 110.567-3.989 23.756L421 132.559l3.989-23.756z"
+          data-vectornator-layer-name="Spot486"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m448.797 112.402-3.977 23.767-12.08-1.816 3.977-23.767z"
+          data-vectornator-layer-name="Spot485"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m460.536 114.151-3.855 23.734-11.734-1.704 3.856-23.735z"
+          data-vectornator-layer-name="Spot484"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m472.579 115.974-3.934 23.73-12.013-1.788 3.934-23.729z"
+          data-vectornator-layer-name="Spot483"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m484.333 117.736-3.989 23.757-11.724-1.764 3.989-23.757z"
+          data-vectornator-layer-name="Spot482"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m495.68 119.467-3.624 23.82-11.774-1.807 3.945-23.79z"
+          data-vectornator-layer-name="Spot481"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m507.7 121.418-4.18 23.985-11.671-1.852 4.18-23.984z"
+          data-vectornator-layer-name="Spot480"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m519.678 123.394-4.259 23.978-11.949-1.938 4.259-23.979z"
+          data-vectornator-layer-name="Spot479"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m531.369 125.304-4.314 24.006-11.661-1.912 4.313-24.006z"
+          data-vectornator-layer-name="Spot478"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m543.125 127.21-4.313 24.005-11.662-1.912 4.314-24.005z"
+          data-vectornator-layer-name="Spot477"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m555.143 129.198-4.301 24.016-12.016-1.968 4.302-24.016z"
+          data-vectornator-layer-name="Spot476"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m566.819 131.094-4.18 23.985-11.671-1.852 4.18-23.985z"
+          data-vectornator-layer-name="Spot475"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m578.797 133.069-4.258 23.979-11.949-1.938 4.258-23.979z"
+          data-vectornator-layer-name="Spot474"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m590.488 134.98-4.314 24.005-11.661-1.912 4.313-24.005z"
+          data-vectornator-layer-name="Spot473"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m601.773 136.853-3.951 24.075-11.709-1.956 4.27-24.04z"
+          data-vectornator-layer-name="Spot472"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m613.907 138.672-4.051 24.091-12.04-1.847 4.051-24.091z"
+          data-vectornator-layer-name="Spot471"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m625.607 140.451-2.082 12.744-1.847 11.315-11.695-1.734 3.929-24.059z"
+          data-vectornator-layer-name="Spot470"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m637.609 142.306-3.996 23.985-11.972-1.818 3.996-23.985z"
+          data-vectornator-layer-name="Spot469"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m649.456 144.131-4.051 24.091-12.04-1.847 4.051-24.091z"
+          data-vectornator-layer-name="Spot468"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m661.156 145.91-3.93 24.058-11.694-1.734 3.929-24.058z"
+          data-vectornator-layer-name="Spot467"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m673.158 147.765-4.008 24.053L657.177 170l4.008-24.054z"
+          data-vectornator-layer-name="Spot466"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m684.873 149.557-4.063 24.081-11.685-1.794 4.062-24.081z"
+          data-vectornator-layer-name="Spot465"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m696.653 151.345-4.062 24.08-11.686-1.794 4.063-24.081z"
+          data-vectornator-layer-name="Spot464"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m708.696 153.212-4.05 24.091-12.04-1.847 4.05-24.091z"
+          data-vectornator-layer-name="Spot463"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m720.396 154.991-3.929 24.058-11.695-1.734 3.929-24.059z"
+          data-vectornator-layer-name="Spot462"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m732.398 156.845-4.007 24.054-11.974-1.819 4.008-24.053z"
+          data-vectornator-layer-name="Spot461"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m744.113 158.638-4.063 24.081-11.685-1.795 4.063-24.08z"
+          data-vectornator-layer-name="Spot460"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m755.421 160.398-3.699 24.146-11.733-1.838 4.018-24.115z"
+          data-vectornator-layer-name="Spot459"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m767.475 162.602-2.155 12.559-1.913 11.151-11.72-1.77 4.068-23.71z"
+          data-vectornator-layer-name="Spot458"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m779.502 164.492-4.135 23.638-11.997-1.855 4.135-23.637z"
+          data-vectornator-layer-name="Spot457"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m791.374 166.352-4.19 23.742-12.066-1.883 4.19-23.741z"
+          data-vectornator-layer-name="Spot456"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m803.098 168.166-4.068 23.71-11.719-1.77 4.068-23.709z"
+          data-vectornator-layer-name="Spot455"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m815.126 170.057-4.147 23.704-11.998-1.854 4.147-23.705z"
+          data-vectornator-layer-name="Spot454"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#85d4ff"
+          d="m827.844 172.008-4.203 23.731-11.709-1.83 4.202-23.731z"
+          data-vectornator-layer-name="Spot453"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#85d4ff"
+          d="m846.053 174.694-4.19 23.741-12.065-1.883 4.19-23.741z"
+          data-vectornator-layer-name="Spot452"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#85d4ff"
+          d="m857.778 176.508-4.068 23.71-11.72-1.77 4.068-23.71z"
+          data-vectornator-layer-name="Spot451"
+        />
+        <g fill="none" stroke="#85d4ff" data-vectornator-layer-name="Group 13">
+          <path
+            d="m829.512 197.185 4.739-27.597"
+            data-vectornator-layer-name="Line 1"
+          />
+          <path
+            d="m823.672 196.217 4.738-27.597"
+            data-vectornator-layer-name="Line 3"
+          />
+          <path
+            d="M834.545 170.147 827.937 169m37.034 5.615-6.736-1.07"
+            data-vectornator-layer-name="Line 2"
+          />
+          <path
+            d="m854.207 200.809 4.505-27.649"
+            data-vectornator-layer-name="Line 3"
+          />
+          <path
+            d="m860.16 201.709 4.505-27.649"
+            data-vectornator-layer-name="Line 1"
+          />
+          <path
+            d="m854.207 200.498 6.773-3.847"
+            data-vectornator-layer-name="Line 4"
+          />
+          <path
+            d="m823.818 195.722 6.612-4.147"
+            data-vectornator-layer-name="Line 2"
+          />
+          <path
+            d="m824.992 188.86 7.109-4.579"
+            data-vectornator-layer-name="Line 3"
+          />
+          <path
+            d="m825.954 182.127 7.036-4.415"
+            data-vectornator-layer-name="Line 4"
+          />
+          <path
+            d="m826.999 175.099 6.862-4.291"
+            data-vectornator-layer-name="Line 5"
+          />
+          <path
+            d="m855.528 193.233 6.655-3.452"
+            data-vectornator-layer-name="Line 6"
+          />
+          <path
+            d="m856.625 186.483 6.954-4.403"
+            data-vectornator-layer-name="Line 7"
+          />
+          <path
+            d="m864.558 175.099-6.733 3.81"
+            data-vectornator-layer-name="Line 8"
+          />
+        </g>
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m856.409 220.795-3.575 23.733-11.226-1.782 3.88-23.704z"
+          data-vectornator-layer-name="Spot450"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m845.395 218.997-3.695 23.739-11.217-1.837 4.001-23.708z"
+          data-vectornator-layer-name="Spot449"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m834.584 217.238-4.042 23.674-11.172-1.794 4.043-23.674z"
+          data-vectornator-layer-name="Spot448"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m823.385 215.445-3.99 23.648-11.447-1.818 3.99-23.648z"
+          data-vectornator-layer-name="Spot447"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m811.91 213.591-3.915 23.653-11.18-1.735 3.914-23.652z"
+          data-vectornator-layer-name="Spot446"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m800.724 211.813-4.031 23.684-11.51-1.846 4.031-23.685z"
+          data-vectornator-layer-name="Spot445"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m789.211 209.946-4.042 23.675-11.172-1.794 4.043-23.675z"
+          data-vectornator-layer-name="Spot444"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m777.949 208.159-4.043 23.674-11.171-1.794 4.042-23.674z"
+          data-vectornator-layer-name="Spot443"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m766.749 206.367-3.99 23.647-11.447-1.818 3.99-23.648z"
+          data-vectornator-layer-name="Spot442"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m755.274 204.512-3.914 23.653-11.181-1.734 3.915-23.653z"
+          data-vectornator-layer-name="Spot441"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m744.089 202.734-4.031 23.684-11.511-1.846 4.031-23.685z"
+          data-vectornator-layer-name="Spot440"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m732.763 200.909-3.979 23.581-11.445-1.818 3.979-23.581z"
+          data-vectornator-layer-name="Spot439"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m721.288 199.055-2.073 12.529-1.841 11.124-11.181-1.735 3.915-23.652z"
+          data-vectornator-layer-name="Spot438"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m709.869 197.265-3.695 23.74-11.218-1.837 4.001-23.708z"
+          data-vectornator-layer-name="Spot437"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m699.058 195.506-4.043 23.675-11.171-1.794 4.042-23.675z"
+          data-vectornator-layer-name="Spot436"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m687.858 193.714-3.99 23.647-11.447-1.818 3.99-23.647z"
+          data-vectornator-layer-name="Spot435"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m676.383 191.86-3.914 23.652-11.181-1.734 3.915-23.653z"
+          data-vectornator-layer-name="Spot434"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m665.198 190.081-4.031 23.684-11.511-1.846 4.031-23.685z"
+          data-vectornator-layer-name="Spot433"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m653.685 188.215-4.043 23.674-11.171-1.794 4.042-23.674z"
+          data-vectornator-layer-name="Spot432"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m642.422 186.427-4.043 23.675-11.171-1.794 4.042-23.675z"
+          data-vectornator-layer-name="Spot431"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m631.222 184.635-3.99 23.648-11.446-1.819 3.989-23.647z"
+          data-vectornator-layer-name="Spot430"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m619.748 182.781-3.915 23.653-11.181-1.735 3.915-23.653z"
+          data-vectornator-layer-name="Spot429"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m608.562 181.002-4.031 23.685-11.51-1.847 4.03-23.684z"
+          data-vectornator-layer-name="Spot428"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m597.236 179.178-3.978 23.581-11.446-1.819 3.979-23.581z"
+          data-vectornator-layer-name="Spot427"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m585.762 177.324-2.074 12.528-1.841 11.125-11.181-1.735 3.915-23.653z"
+          data-vectornator-layer-name="Spot426"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m574.576 175.545-4.031 23.685-11.51-1.847 4.03-23.685z"
+          data-vectornator-layer-name="Spot425"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m562.975 173.726-3.935 23.668-11.193-1.953 4.24-23.634z"
+          data-vectornator-layer-name="Spot424"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m552.187 171.855-4.282 23.6-11.148-1.91 4.283-23.599z"
+          data-vectornator-layer-name="Spot423"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m541.011 169.947-4.229 23.574-11.423-1.937 4.23-23.574z"
+          data-vectornator-layer-name="Spot422"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m529.561 167.974-4.154 23.58-11.158-1.85 4.154-23.58z"
+          data-vectornator-layer-name="Spot421"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m518.399 166.08-4.271 23.61-11.486-1.965 4.271-23.61z"
+          data-vectornator-layer-name="Spot420"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m506.91 164.095-4.282 23.6-11.148-1.91 4.283-23.599z"
+          data-vectornator-layer-name="Spot419"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m495.671 162.192-4.282 23.599-11.148-1.909 4.282-23.6z"
+          data-vectornator-layer-name="Spot418"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m484.495 160.283-4.229 23.574-11.423-1.936 4.229-23.574z"
+          data-vectornator-layer-name="Spot417"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m473.045 158.311-4.154 23.58-11.158-1.851 4.154-23.579z"
+          data-vectornator-layer-name="Spot416"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m462.02 156.47-3.477 23.764-11.233-1.763 3.783-23.735z"
+          data-vectornator-layer-name="Spot415"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m451.194 154.782-3.825 23.702-11.187-1.721 3.825-23.702z"
+          data-vectornator-layer-name="Spot414"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m439.979 153.063-3.773 23.675-11.462-1.743 3.772-23.675z"
+          data-vectornator-layer-name="Spot413"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m428.488 151.284-3.697 23.68-11.195-1.661 3.697-23.68z"
+          data-vectornator-layer-name="Spot412"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m417.287 149.579-3.813 23.712-11.526-1.77 3.813-23.712z"
+          data-vectornator-layer-name="Spot411"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m405.759 147.789-3.825 23.702-11.187-1.721 3.825-23.702z"
+          data-vectornator-layer-name="Spot410"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m394.481 146.076-3.825 23.702-11.187-1.721 3.825-23.702z"
+          data-vectornator-layer-name="Spot409"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m383.266 144.357-3.773 23.675-11.462-1.743 3.772-23.675z"
+          data-vectornator-layer-name="Spot408"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m371.775 142.578-3.697 23.68-11.195-1.661 3.697-23.68z"
+          data-vectornator-layer-name="Spot407"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m360.574 140.873-3.813 23.712-11.526-1.77 3.813-23.712z"
+          data-vectornator-layer-name="Spot406"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m349.233 139.124-3.762 23.608-11.461-1.743 3.762-23.608z"
+          data-vectornator-layer-name="Spot405"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m337.743 137.345-1.959 12.543-1.738 11.137-11.196-1.661 3.697-23.68z"
+          data-vectornator-layer-name="Spot404"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m326.542 135.64-3.813 23.712-11.526-1.771 3.813-23.712z"
+          data-vectornator-layer-name="Spot403"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m314.926 133.897-3.718 23.695-11.21-1.879 4.023-23.663z"
+          data-vectornator-layer-name="Spot402"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m304.122 132.097-4.065 23.629-11.164-1.836 4.065-23.629z"
+          data-vectornator-layer-name="Spot401"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m292.929 130.263-4.012 23.602-11.439-1.861 4.012-23.602z"
+          data-vectornator-layer-name="Spot400"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m281.462 128.366-3.937 23.608-11.173-1.777 3.937-23.608z"
+          data-vectornator-layer-name="Spot399"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m270.284 126.545-4.053 23.639-11.504-1.89 4.054-23.639z"
+          data-vectornator-layer-name="Spot398"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m258.778 124.635-4.065 23.629-11.164-1.836 4.065-23.629z"
+          data-vectornator-layer-name="Spot397"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m247.523 122.806-4.065 23.629-11.164-1.836 4.065-23.629z"
+          data-vectornator-layer-name="Spot396"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m236.331 120.971-4.013 23.603-11.439-1.861 4.012-23.603z"
+          data-vectornator-layer-name="Spot395"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m224.863 119.074-3.937 23.608-11.173-1.777 3.937-23.608z"
+          data-vectornator-layer-name="Spot394"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m235.736 175.589-4.042 23.756-11.287-1.819 4.042-23.757z"
+          data-vectornator-layer-name="Spot393"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m247.32 177.53-4.118 23.751-11.556-1.905 4.118-23.751z"
+          data-vectornator-layer-name="Spot392"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m258.626 179.407-4.172 23.777-11.277-1.878 4.171-23.778z"
+          data-vectornator-layer-name="Spot391"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m269.995 181.28-4.171 23.777-11.277-1.879 4.171-23.777z"
+          data-vectornator-layer-name="Spot390"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m281.618 183.234-4.16 23.787-11.62-1.934 4.16-23.787z"
+          data-vectornator-layer-name="Spot389"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m292.909 185.097-4.041 23.756-11.288-1.819 4.042-23.756z"
+          data-vectornator-layer-name="Spot388"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m304.493 187.038-4.118 23.751-11.556-1.905 4.118-23.751z"
+          data-vectornator-layer-name="Spot387"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m315.799 188.916-4.171 23.777-11.278-1.879 4.171-23.777z"
+          data-vectornator-layer-name="Spot386"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m326.713 190.757-3.821 23.845-11.324-1.922 4.129-23.812z"
+          data-vectornator-layer-name="Spot385"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m338.447 192.543-3.917 23.862-11.643-1.814 3.916-23.862z"
+          data-vectornator-layer-name="Spot384"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m349.762 194.29-2.013 12.622-1.786 11.208-11.31-1.703 3.799-23.829z"
+          data-vectornator-layer-name="Spot383"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m361.37 196.112-3.865 23.757-11.578-1.786 3.865-23.757z"
+          data-vectornator-layer-name="Spot382"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m372.826 197.905-3.917 23.861-11.643-1.814 3.916-23.861z"
+          data-vectornator-layer-name="Spot381"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m384.141 199.652-3.8 23.829-11.309-1.703 3.799-23.829z"
+          data-vectornator-layer-name="Spot380"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m395.748 201.474-3.875 23.824-11.579-1.786 3.875-23.824z"
+          data-vectornator-layer-name="Spot379"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m407.077 203.235-3.928 23.851-11.301-1.763 3.929-23.851z"
+          data-vectornator-layer-name="Spot378"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m418.47 204.99-3.928 23.851-11.301-1.762 3.929-23.851z"
+          data-vectornator-layer-name="Spot377"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m430.117 206.824-3.917 23.862-11.644-1.815 3.917-23.861z"
+          data-vectornator-layer-name="Spot376"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m441.431 208.571-3.799 23.829-11.31-1.702 3.8-23.83z"
+          data-vectornator-layer-name="Spot375"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m453.039 210.393-3.876 23.824-11.579-1.785 3.876-23.825z"
+          data-vectornator-layer-name="Spot374"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m464.368 212.154-3.929 23.851-11.3-1.762 3.928-23.852z"
+          data-vectornator-layer-name="Spot373"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m475.304 213.883-3.577 23.915-11.347-1.805 3.886-23.886z"
+          data-vectornator-layer-name="Spot372"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m486.818 215.8-4.194 23.738-11.276-1.865 4.194-23.738z"
+          data-vectornator-layer-name="Spot371"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m498.39 217.788-4.27 23.732-11.544-1.952 4.27-23.732z"
+          data-vectornator-layer-name="Spot370"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m509.685 219.711-4.324 23.758-11.266-1.924 4.323-23.758z"
+          data-vectornator-layer-name="Spot369"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m521.043 221.629-4.323 23.758-11.266-1.924 4.323-23.758z"
+          data-vectornator-layer-name="Spot368"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m532.654 223.63-4.312 23.768-11.608-1.98 4.311-23.769z"
+          data-vectornator-layer-name="Spot367"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m543.934 225.539-4.193 23.738-11.277-1.865 4.194-23.738z"
+          data-vectornator-layer-name="Spot366"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m555.506 227.526-4.27 23.732-11.544-1.951 4.27-23.732z"
+          data-vectornator-layer-name="Spot365"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m566.801 229.449-4.323 23.759-11.267-1.925 4.324-23.758z"
+          data-vectornator-layer-name="Spot364"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m577.703 231.335-3.972 23.827-11.313-1.968 4.282-23.793z"
+          data-vectornator-layer-name="Spot363"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m589.427 233.168-4.069 23.844-11.633-1.861 4.069-23.844z"
+          data-vectornator-layer-name="Spot362"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m600.732 234.961-2.094 12.613-1.858 11.199-11.299-1.749 3.951-23.812z"
+          data-vectornator-layer-name="Spot361"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m612.328 236.829-4.016 23.74-11.567-1.833 4.016-23.739z"
+          data-vectornator-layer-name="Spot360"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m623.774 238.668-4.069 23.844-11.633-1.861 4.069-23.844z"
+          data-vectornator-layer-name="Spot359"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m635.079 240.461-3.952 23.811-11.3-1.748 3.952-23.812z"
+          data-vectornator-layer-name="Spot358"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m646.675 242.329-4.028 23.807-11.568-1.833 4.028-23.806z"
+          data-vectornator-layer-name="Spot357"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m657.994 244.136-4.081 23.833-11.291-1.808 4.082-23.833z"
+          data-vectornator-layer-name="Spot356"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m669.376 245.937-4.081 23.834-11.29-1.809 4.081-23.833z"
+          data-vectornator-layer-name="Spot355"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m681.011 247.818-4.069 23.844-11.633-1.861 4.069-23.844z"
+          data-vectornator-layer-name="Spot354"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m692.316 249.611-3.952 23.811-11.3-1.748 3.952-23.812z"
+          data-vectornator-layer-name="Spot353"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m703.912 251.479-4.028 23.807-11.568-1.833 4.028-23.806z"
+          data-vectornator-layer-name="Spot352"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m715.231 253.286-4.081 23.833-11.29-1.808 4.081-23.833z"
+          data-vectornator-layer-name="Spot351"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m726.157 255.059-3.73 23.899-11.337-1.852 4.039-23.867z"
+          data-vectornator-layer-name="Spot350"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m737.697 256.863-2.093 12.613-1.858 11.199-11.3-1.749 3.952-23.812z"
+          data-vectornator-layer-name="Spot349"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m749.294 258.731-4.017 23.74-11.567-1.833 4.017-23.739z"
+          data-vectornator-layer-name="Spot348"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m760.74 260.57-4.07 23.844-11.632-1.861 4.069-23.844z"
+          data-vectornator-layer-name="Spot347"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m772.044 262.363-3.952 23.811-11.299-1.748 3.952-23.812z"
+          data-vectornator-layer-name="Spot346"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m783.641 264.231-4.028 23.807-11.569-1.833 4.028-23.806z"
+          data-vectornator-layer-name="Spot345"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m794.959 266.038-4.081 23.833-11.29-1.808 4.081-23.833z"
+          data-vectornator-layer-name="Spot344"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m806.342 267.839-4.081 23.834-11.291-1.809 4.081-23.833z"
+          data-vectornator-layer-name="Spot343"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m817.977 269.72-4.069 23.844-11.633-1.861 4.069-23.844z"
+          data-vectornator-layer-name="Spot342"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m829.281 271.513-3.952 23.811-11.299-1.748 3.952-23.812z"
+          data-vectornator-layer-name="Spot341"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m840.878 273.381-4.028 23.807-11.569-1.833 4.028-23.806z"
+          data-vectornator-layer-name="Spot340"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m852.196 275.188-4.081 23.833-11.29-1.808 4.081-23.833z"
+          data-vectornator-layer-name="Spot339"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m863.122 276.961-3.73 23.899-11.336-1.852 4.039-23.867z"
+          data-vectornator-layer-name="Spot338"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m859.354 301.163-3.737 23.962-11.35-1.856 4.045-23.93z"
+          data-vectornator-layer-name="Spot337"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m848.414 299.386-4.088 23.896-11.304-1.812 4.088-23.896z"
+          data-vectornator-layer-name="Spot336"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m837.081 297.576-4.035 23.869-11.583-1.837 4.035-23.869z"
+          data-vectornator-layer-name="Spot335"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m825.47 295.703-3.959 23.874-11.313-1.752 3.958-23.875z"
+          data-vectornator-layer-name="Spot334"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m814.151 293.906-4.076 23.907-11.647-1.866 4.076-23.906z"
+          data-vectornator-layer-name="Spot333"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m802.501 292.021-4.088 23.896-11.304-1.812 4.088-23.896z"
+          data-vectornator-layer-name="Spot332"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m791.105 290.216-4.088 23.896-11.305-1.812 4.088-23.897z"
+          data-vectornator-layer-name="Spot331"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m779.772 288.405-4.035 23.869-11.583-1.836 4.035-23.87z"
+          data-vectornator-layer-name="Spot330"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m768.161 286.532-3.959 23.875-11.313-1.752 3.958-23.875z"
+          data-vectornator-layer-name="Spot329"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m756.842 284.736-4.076 23.906-11.648-1.865 4.076-23.907z"
+          data-vectornator-layer-name="Spot328"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m745.382 282.893-4.024 23.802-11.581-1.837 4.023-23.802z"
+          data-vectornator-layer-name="Spot327"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m733.77 281.02-2.096 12.646-1.862 11.229-11.314-1.753 3.959-23.874z"
+          data-vectornator-layer-name="Spot326"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m722.215 279.212-3.736 23.962-11.351-1.856 4.046-23.93z"
+          data-vectornator-layer-name="Spot325"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m711.275 277.435-4.087 23.896-11.305-1.812 4.088-23.896z"
+          data-vectornator-layer-name="Spot324"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m699.943 275.624-4.035 23.87-11.583-1.837 4.035-23.869z"
+          data-vectornator-layer-name="Spot323"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m688.331 273.752-3.958 23.874-11.314-1.752 3.959-23.875z"
+          data-vectornator-layer-name="Spot322"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m677.013 271.955-4.076 23.906-11.648-1.865 4.076-23.906z"
+          data-vectornator-layer-name="Spot321"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m665.363 270.07-4.088 23.896-11.304-1.812 4.087-23.896z"
+          data-vectornator-layer-name="Spot320"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m653.966 268.265-4.088 23.896-11.304-1.812 4.088-23.897z"
+          data-vectornator-layer-name="Spot319"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m642.633 266.454-4.034 23.869-11.583-1.836 4.034-23.87z"
+          data-vectornator-layer-name="Spot318"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m631.022 264.581-3.958 23.875-11.314-1.753 3.958-23.874z"
+          data-vectornator-layer-name="Spot317"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m619.703 262.784-4.076 23.907-11.647-1.865 4.076-23.907z"
+          data-vectornator-layer-name="Spot316"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m608.243 260.942-4.023 23.801-11.582-1.836 4.024-23.802z"
+          data-vectornator-layer-name="Spot315"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m596.632 259.069-2.097 12.646-1.861 11.228-11.314-1.752 3.958-23.874z"
+          data-vectornator-layer-name="Spot314"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m585.313 257.272-4.076 23.907-11.647-1.866 4.076-23.906z"
+          data-vectornator-layer-name="Spot313"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m573.575 255.434-3.98 23.891-11.326-1.973 4.288-23.855z"
+          data-vectornator-layer-name="Spot312"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m562.658 253.545-4.33 23.821-11.28-1.929 4.33-23.821z"
+          data-vectornator-layer-name="Spot311"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m551.349 251.618-4.276 23.794-11.559-1.956 4.277-23.794z"
+          data-vectornator-layer-name="Spot310"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m539.763 249.625-4.201 23.801-11.29-1.869 4.201-23.801z"
+          data-vectornator-layer-name="Spot309"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m528.468 247.712-4.319 23.831-11.623-1.985 4.319-23.831z"
+          data-vectornator-layer-name="Spot308"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m516.843 245.707-4.33 23.821-11.281-1.929 4.33-23.821z"
+          data-vectornator-layer-name="Spot307"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m505.47 243.784-4.33 23.821-11.281-1.928 4.331-23.821z"
+          data-vectornator-layer-name="Spot306"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m494.161 241.857-4.277 23.795-11.559-1.956 4.277-23.795z"
+          data-vectornator-layer-name="Spot305"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m482.575 239.865-4.201 23.8-11.291-1.869 4.201-23.8z"
+          data-vectornator-layer-name="Spot304"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m471.418 238.005-3.515 23.988-11.367-1.781 3.825-23.959z"
+          data-vectornator-layer-name="Spot303"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m460.463 236.3-3.867 23.924-11.32-1.738 3.867-23.924z"
+          data-vectornator-layer-name="Spot302"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m449.115 234.564-3.815 23.897-11.598-1.761 3.814-23.897z"
+          data-vectornator-layer-name="Spot301"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m437.488 232.767-3.738 23.902-11.329-1.678 3.738-23.902z"
+          data-vectornator-layer-name="Spot300"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m426.154 231.045-3.856 23.934-11.663-1.789 3.855-23.934z"
+          data-vectornator-layer-name="Spot299"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m414.488 229.236-3.868 23.924-11.32-1.738 3.868-23.924z"
+          data-vectornator-layer-name="Spot298"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m403.076 227.506-3.868 23.924-11.32-1.738 3.868-23.924z"
+          data-vectornator-layer-name="Spot297"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m391.727 225.769-3.814 23.897-11.599-1.76 3.815-23.897z"
+          data-vectornator-layer-name="Spot296"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m380.1 223.973-3.738 23.902-11.329-1.678 3.739-23.902z"
+          data-vectornator-layer-name="Spot295"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m368.766 222.251-3.855 23.934-11.664-1.789 3.856-23.934z"
+          data-vectornator-layer-name="Spot294"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m357.29 220.483-3.803 23.829-11.598-1.76 3.804-23.83z"
+          data-vectornator-layer-name="Spot293"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m345.663 218.686-1.98 12.661-1.758 11.241-11.329-1.678 3.739-23.902z"
+          data-vectornator-layer-name="Spot292"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m334.329 216.964-3.855 23.935-11.664-1.789 3.856-23.935z"
+          data-vectornator-layer-name="Spot291"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m322.575 215.203-3.759 23.918-11.344-1.898 4.068-23.885z"
+          data-vectornator-layer-name="Spot290"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m311.642 213.386-4.11 23.85-11.297-1.854 4.11-23.851z"
+          data-vectornator-layer-name="Spot289"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m300.317 211.533-4.058 23.824-11.575-1.88 4.057-23.824z"
+          data-vectornator-layer-name="Spot288"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m288.713 209.616-3.981 23.83-11.306-1.795 3.981-23.829z"
+          data-vectornator-layer-name="Spot287"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m277.402 207.777-4.099 23.861-11.64-1.909 4.099-23.861z"
+          data-vectornator-layer-name="Spot286"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m265.76 205.848-4.111 23.851-11.297-1.854 4.111-23.851z"
+          data-vectornator-layer-name="Spot285"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m254.37 204-4.11 23.851-11.297-1.854 4.11-23.851z"
+          data-vectornator-layer-name="Spot284"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m243.045 202.147-4.058 23.824-11.575-1.88 4.057-23.824z"
+          data-vectornator-layer-name="Spot283"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m231.441 200.231-3.981 23.83-11.306-1.795 3.981-23.83z"
+          data-vectornator-layer-name="Spot282"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m849.959 359.539-3.73 23.899-11.336-1.851 4.039-23.868z"
+          data-vectornator-layer-name="Spot281"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m839.034 357.766-4.082 23.834-11.29-1.808 4.081-23.834z"
+          data-vectornator-layer-name="Spot280"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m827.715 355.96-4.028 23.806-11.568-1.832 4.028-23.807z"
+          data-vectornator-layer-name="Spot279"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m816.118 354.091-3.951 23.812-11.3-1.748 3.952-23.812z"
+          data-vectornator-layer-name="Spot278"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m804.814 352.299-4.069 23.843-11.633-1.861 4.069-23.844z"
+          data-vectornator-layer-name="Spot277"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m793.179 350.418-4.081 23.833-11.29-1.808 4.081-23.834z"
+          data-vectornator-layer-name="Spot276"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m781.796 348.616-4.081 23.834-11.29-1.808 4.081-23.834z"
+          data-vectornator-layer-name="Spot275"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m770.478 346.81-4.028 23.806-11.568-1.832 4.028-23.807z"
+          data-vectornator-layer-name="Spot274"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m758.881 344.941-3.951 23.812-11.3-1.748 3.952-23.812z"
+          data-vectornator-layer-name="Spot273"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m747.577 343.149-4.069 23.843-11.633-1.861 4.069-23.844z"
+          data-vectornator-layer-name="Spot272"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m736.131 341.31-4.016 23.739-11.567-1.833 4.016-23.739z"
+          data-vectornator-layer-name="Spot271"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m724.535 339.441-2.094 12.613-1.858 11.199-11.3-1.748 3.952-23.812z"
+          data-vectornator-layer-name="Spot270"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m712.994 337.637-3.73 23.899-11.337-1.851 4.039-23.868z"
+          data-vectornator-layer-name="Spot269"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m702.068 335.864-4.081 23.834-11.29-1.808 4.081-23.834z"
+          data-vectornator-layer-name="Spot268"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m690.749 334.058-4.028 23.806-11.568-1.832 4.028-23.807z"
+          data-vectornator-layer-name="Spot267"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m679.153 332.189-3.952 23.812-11.299-1.748 3.951-23.812z"
+          data-vectornator-layer-name="Spot266"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m667.848 330.397-4.069 23.843-11.633-1.861 4.07-23.844z"
+          data-vectornator-layer-name="Spot265"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m656.213 328.516-4.081 23.833-11.29-1.808 4.081-23.834z"
+          data-vectornator-layer-name="Spot264"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m644.831 326.714-4.081 23.834-11.29-1.808 4.081-23.834z"
+          data-vectornator-layer-name="Spot263"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m633.512 324.908-4.028 23.806-11.568-1.832 4.028-23.807z"
+          data-vectornator-layer-name="Spot262"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m621.916 323.039-3.952 23.812-11.3-1.748 3.952-23.812z"
+          data-vectornator-layer-name="Spot261"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m610.611 321.247-4.069 23.843-11.633-1.861 4.069-23.843z"
+          data-vectornator-layer-name="Spot260"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m599.165 319.408-4.016 23.739-11.567-1.833 4.016-23.739z"
+          data-vectornator-layer-name="Spot259"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m587.569 317.539-2.093 12.613-1.859 11.199-11.299-1.748 3.952-23.812z"
+          data-vectornator-layer-name="Spot258"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m576.264 315.747-4.069 23.843-11.633-1.861 4.07-23.843z"
+          data-vectornator-layer-name="Spot257"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m564.541 313.913-3.973 23.827-11.312-1.968 4.281-23.792z"
+          data-vectornator-layer-name="Spot256"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m553.638 312.028-4.323 23.758-11.266-1.924 4.323-23.758z"
+          data-vectornator-layer-name="Spot255"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m542.343 310.105-4.269 23.732-11.545-1.952 4.27-23.732z"
+          data-vectornator-layer-name="Spot254"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m530.771 308.117-4.193 23.738-11.276-1.865 4.193-23.738z"
+          data-vectornator-layer-name="Spot253"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m519.491 306.208-4.312 23.769-11.608-1.981 4.311-23.769z"
+          data-vectornator-layer-name="Spot252"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m507.88 304.207-4.323 23.759-11.266-1.924 4.323-23.759z"
+          data-vectornator-layer-name="Spot251"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m496.522 302.289-4.323 23.758-11.267-1.924 4.324-23.758z"
+          data-vectornator-layer-name="Spot250"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m485.227 300.366-4.27 23.732-11.544-1.951 4.27-23.732z"
+          data-vectornator-layer-name="Spot249"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m473.655 298.378-4.194 23.738-11.276-1.864 4.194-23.738z"
+          data-vectornator-layer-name="Spot248"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m462.141 296.461-3.577 23.916-11.347-1.806 3.886-23.885z"
+          data-vectornator-layer-name="Spot247"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m451.205 294.732-3.928 23.852-11.301-1.763 3.928-23.851z"
+          data-vectornator-layer-name="Spot246"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="M439.876 292.972 436 316.796l-11.579-1.786 3.876-23.824z"
+          data-vectornator-layer-name="Spot245"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m428.269 291.15-3.8 23.829-11.309-1.703 3.799-23.829z"
+          data-vectornator-layer-name="Spot244"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m416.954 289.403-3.917 23.861-11.644-1.814 3.917-23.862z"
+          data-vectornator-layer-name="Spot243"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m405.307 287.569-3.928 23.851-11.301-1.763 3.929-23.851z"
+          data-vectornator-layer-name="Spot242"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m393.915 285.813-3.929 23.851-11.301-1.762 3.929-23.851z"
+          data-vectornator-layer-name="Spot241"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m382.586 284.052-3.876 23.824-11.579-1.785 3.875-23.825z"
+          data-vectornator-layer-name="Spot240"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m370.978 282.23-3.799 23.83-11.31-1.703 3.8-23.829z"
+          data-vectornator-layer-name="Spot239"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m359.663 280.483-3.917 23.862-11.643-1.814 3.916-23.862z"
+          data-vectornator-layer-name="Spot238"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m348.207 278.691-3.865 23.757-11.578-1.787 3.865-23.756z"
+          data-vectornator-layer-name="Spot237"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m336.599 276.869-2.012 12.622-1.787 11.207-11.31-1.703 3.8-23.829z"
+          data-vectornator-layer-name="Spot236"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m325.284 275.122-3.916 23.861-11.644-1.814 3.917-23.861z"
+          data-vectornator-layer-name="Spot235"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m313.55 273.335-3.821 23.845-11.323-1.922 4.129-23.812z"
+          data-vectornator-layer-name="Spot234"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m302.636 271.494-4.171 23.777-11.278-1.878 4.172-23.778z"
+          data-vectornator-layer-name="Spot233"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m291.33 269.617-4.118 23.75-11.555-1.905 4.118-23.75z"
+          data-vectornator-layer-name="Spot232"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m279.747 267.675-4.042 23.757-11.287-1.819 4.042-23.757z"
+          data-vectornator-layer-name="Spot231"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m268.455 265.812-4.16 23.787-11.62-1.933 4.16-23.788z"
+          data-vectornator-layer-name="Spot230"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m256.832 263.858-4.171 23.777-11.277-1.878 4.171-23.778z"
+          data-vectornator-layer-name="Spot229"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m245.463 261.986-4.171 23.777-11.278-1.879 4.171-23.777z"
+          data-vectornator-layer-name="Spot228"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m234.157 260.108-4.118 23.751-11.556-1.905 4.118-23.751z"
+          data-vectornator-layer-name="Spot227"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m222.573 258.167-4.042 23.756-11.287-1.819 4.042-23.756z"
+          data-vectornator-layer-name="Spot226"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m218.278 282.81-3.981 23.829-11.306-1.795 3.981-23.829z"
+          data-vectornator-layer-name="Spot225"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m229.882 284.726-4.057 23.824-11.576-1.88 4.058-23.824z"
+          data-vectornator-layer-name="Spot224"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m241.207 286.579-4.11 23.851-11.297-1.855 4.11-23.851z"
+          data-vectornator-layer-name="Spot223"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m252.597 288.427-4.111 23.851-11.297-1.855 4.111-23.851z"
+          data-vectornator-layer-name="Spot222"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m264.239 290.356-4.099 23.861-11.64-1.909 4.099-23.861z"
+          data-vectornator-layer-name="Spot221"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m275.55 292.195-3.981 23.829-11.306-1.795 3.981-23.829z"
+          data-vectornator-layer-name="Spot220"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m287.154 294.111-4.057 23.824-11.576-1.88 4.058-23.824z"
+          data-vectornator-layer-name="Spot219"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m298.479 295.964-4.11 23.851-11.297-1.855 4.11-23.85z"
+          data-vectornator-layer-name="Spot218"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m309.412 297.782-3.759 23.917-11.344-1.898 4.069-23.884z"
+          data-vectornator-layer-name="Spot217"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m321.166 299.543-3.855 23.934-11.664-1.789 3.856-23.934z"
+          data-vectornator-layer-name="Spot216"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m332.5 301.265-3.738 23.902-11.329-1.678 3.739-23.902z"
+          data-vectornator-layer-name="Spot215"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m344.127 303.061-3.803 23.83-11.598-1.761 3.804-23.829z"
+          data-vectornator-layer-name="Spot214"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m355.603 304.829-3.855 23.934-11.664-1.788 3.856-23.935z"
+          data-vectornator-layer-name="Spot213"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m366.937 306.551-3.738 23.902-11.328-1.678 3.738-23.902z"
+          data-vectornator-layer-name="Spot212"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m378.565 308.348-3.815 23.897-11.599-1.761 3.815-23.897z"
+          data-vectornator-layer-name="Spot211"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m389.913 310.084-3.868 23.924-11.319-1.738 3.867-23.924z"
+          data-vectornator-layer-name="Spot210"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m401.325 311.814-3.868 23.925-11.319-1.738 3.867-23.924z"
+          data-vectornator-layer-name="Spot209"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m412.991 313.623-3.856 23.935-11.663-1.789 3.856-23.935z"
+          data-vectornator-layer-name="Spot208"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m424.325 315.345-3.738 23.902-11.329-1.678 3.738-23.902z"
+          data-vectornator-layer-name="Spot207"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m435.952 317.142-3.814 23.897-11.599-1.761 3.815-23.897z"
+          data-vectornator-layer-name="Spot206"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m447.3 318.878-3.867 23.925-11.32-1.738 3.868-23.925z"
+          data-vectornator-layer-name="Spot205"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m458.255 320.583-3.515 23.988-11.367-1.781 3.825-23.958z"
+          data-vectornator-layer-name="Spot204"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m469.412 322.443-4.201 23.801-11.29-1.869 4.2-23.801z"
+          data-vectornator-layer-name="Spot203"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m480.998 324.435-4.277 23.795-11.558-1.956 4.277-23.795z"
+          data-vectornator-layer-name="Spot202"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m492.307 326.363-4.33 23.821-11.281-1.929 4.331-23.821z"
+          data-vectornator-layer-name="Spot201"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m503.68 328.285-4.33 23.821-11.281-1.928 4.33-23.821z"
+          data-vectornator-layer-name="Spot200"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m515.305 330.29-4.318 23.832-11.623-1.985 4.318-23.832z"
+          data-vectornator-layer-name="Spot199"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m526.6 332.204-4.201 23.8-11.29-1.868 4.201-23.801z"
+          data-vectornator-layer-name="Spot198"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m538.187 334.196-4.277 23.795-11.559-1.956 4.277-23.795z"
+          data-vectornator-layer-name="Spot197"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m549.495 336.123-4.33 23.821-11.28-1.928 4.33-23.821z"
+          data-vectornator-layer-name="Spot196"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m560.412 338.013-3.98 23.89-11.326-1.972 4.288-23.856z"
+          data-vectornator-layer-name="Spot195"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m572.15 339.851-4.076 23.906-11.647-1.865 4.076-23.907z"
+          data-vectornator-layer-name="Spot194"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m583.469 341.647-2.097 12.646-1.861 11.229-11.314-1.752 3.958-23.875z"
+          data-vectornator-layer-name="Spot193"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m595.08 343.52-4.023 23.802-11.582-1.837 4.024-23.802z"
+          data-vectornator-layer-name="Spot192"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m606.541 345.363-4.076 23.906-11.648-1.865 4.076-23.906z"
+          data-vectornator-layer-name="Spot191"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m617.859 347.159-3.958 23.875-11.314-1.752 3.959-23.875z"
+          data-vectornator-layer-name="Spot190"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m629.47 349.032-4.034 23.87-11.583-1.837 4.034-23.869z"
+          data-vectornator-layer-name="Spot189"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m640.803 350.843-4.088 23.896-11.304-1.812 4.088-23.896z"
+          data-vectornator-layer-name="Spot188"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m652.2 352.648-4.088 23.897-11.304-1.813 4.088-23.896z"
+          data-vectornator-layer-name="Spot187"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m663.85 354.533-4.076 23.907-11.648-1.865 4.076-23.907z"
+          data-vectornator-layer-name="Spot186"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m675.169 356.33-3.959 23.875-11.313-1.753 3.958-23.874z"
+          data-vectornator-layer-name="Spot185"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m686.78 358.203-4.035 23.869-11.583-1.836 4.035-23.87z"
+          data-vectornator-layer-name="Spot184"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m698.113 360.013-4.088 23.897-11.305-1.812 4.088-23.897z"
+          data-vectornator-layer-name="Spot183"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m709.052 361.79-3.736 23.962-11.351-1.855 4.046-23.931z"
+          data-vectornator-layer-name="Spot182"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m720.608 363.598-3.959 23.875-11.313-1.752 3.958-23.875z"
+          data-vectornator-layer-name="Spot181"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m732.219 365.471-4.023 23.802-11.582-1.837 4.023-23.802z"
+          data-vectornator-layer-name="Spot180"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m743.679 367.314-4.076 23.906-11.647-1.865 4.076-23.906z"
+          data-vectornator-layer-name="Spot179"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m754.998 369.111-3.959 23.874-11.313-1.752 3.958-23.875z"
+          data-vectornator-layer-name="Spot178"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m766.609 370.983-4.035 23.87-11.583-1.837 4.035-23.869z"
+          data-vectornator-layer-name="Spot177"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m777.942 372.794-4.088 23.896-11.304-1.812 4.087-23.896z"
+          data-vectornator-layer-name="Spot176"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m789.338 374.599-4.087 23.897-11.305-1.813 4.088-23.896z"
+          data-vectornator-layer-name="Spot175"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m800.988 376.484-4.076 23.907-11.647-1.865 4.076-23.907z"
+          data-vectornator-layer-name="Spot174"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m812.307 378.281-3.958 23.875-11.314-1.753 3.958-23.874z"
+          data-vectornator-layer-name="Spot173"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m823.918 380.154-4.034 23.869-11.583-1.836 4.034-23.87z"
+          data-vectornator-layer-name="Spo172"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m835.251 381.965-4.088 23.896-11.304-1.812 4.088-23.897z"
+          data-vectornator-layer-name="Spot171"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m846.191 383.741-3.737 23.962-11.35-1.855 4.045-23.931z"
+          data-vectornator-layer-name="Spot170"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m837.776 440.858-3.73 23.899-11.336-1.852 4.039-23.867z"
+          data-vectornator-layer-name="Spot169"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m826.851 439.085-4.082 23.833-11.29-1.808 4.081-23.833z"
+          data-vectornator-layer-name="Spot168"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m815.532 437.278-4.028 23.807-11.568-1.833 4.028-23.806z"
+          data-vectornator-layer-name="Spot167"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m803.935 435.41-3.951 23.811-11.3-1.748 3.952-23.812z"
+          data-vectornator-layer-name="Spot166"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m792.631 433.617-4.069 23.844-11.633-1.862 4.069-23.843z"
+          data-vectornator-layer-name="Spot165"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m780.996 431.736-4.081 23.833-11.29-1.808 4.081-23.833z"
+          data-vectornator-layer-name="Spot164"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m769.613 429.935-4.081 23.833-11.29-1.808 4.081-23.833z"
+          data-vectornator-layer-name="Spot163"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m758.295 428.128-4.028 23.807-11.568-1.833 4.027-23.806z"
+          data-vectornator-layer-name="Spot162"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m746.698 426.26-3.951 23.811-11.3-1.748 3.952-23.812z"
+          data-vectornator-layer-name="Spot161"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m735.394 424.467-4.069 23.844-11.633-1.861 4.069-23.844z"
+          data-vectornator-layer-name="Spot160"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m723.948 422.628-4.016 23.739-11.568-1.832 4.017-23.739z"
+          data-vectornator-layer-name="Spot159"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m712.352 420.76-3.952 23.811-11.3-1.748 3.952-23.812z"
+          data-vectornator-layer-name="Spot158"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m700.811 418.956-3.73 23.899-11.337-1.852 4.039-23.867z"
+          data-vectornator-layer-name="Spot157"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m689.885 417.183-4.081 23.833-11.29-1.808 4.081-23.833z"
+          data-vectornator-layer-name="Spot156"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m678.566 415.376-4.028 23.807-11.568-1.833 4.028-23.806z"
+          data-vectornator-layer-name="Spot155"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m666.97 413.508-3.952 23.811-11.299-1.748 3.951-23.812z"
+          data-vectornator-layer-name="Spot154"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m655.665 411.715-4.069 23.844-11.633-1.861 4.069-23.844z"
+          data-vectornator-layer-name="Spot153"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m644.03 409.834-4.081 23.833-11.29-1.808 4.081-23.833z"
+          data-vectornator-layer-name="Spot152"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m632.648 408.033-4.081 23.833-11.29-1.808 4.081-23.833z"
+          data-vectornator-layer-name="Spot151"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m621.329 406.226-4.028 23.807-11.568-1.833 4.028-23.806z"
+          data-vectornator-layer-name="Spot150"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m609.733 404.358-3.952 23.811-11.3-1.748 3.952-23.812z"
+          data-vectornator-layer-name="Spot149"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m598.428 402.565-4.069 23.844-11.633-1.861 4.069-23.844z"
+          data-vectornator-layer-name="Spot148"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m586.982 400.726-4.016 23.739-11.567-1.832 4.016-23.739z"
+          data-vectornator-layer-name="Spot147"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m575.386 398.858-3.952 23.811-11.299-1.748 3.951-23.812z"
+          data-vectornator-layer-name="Spot146"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m564.081 397.065-4.069 23.844-11.633-1.861 4.07-23.844z"
+          data-vectornator-layer-name="Spot145"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m552.358 395.231-3.973 23.828-11.312-1.968 4.281-23.793z"
+          data-vectornator-layer-name="Spot144"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m541.455 393.346-4.323 23.759-11.266-1.925 4.323-23.758z"
+          data-vectornator-layer-name="Spot143"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m530.16 391.423-4.269 23.732-11.545-1.951 4.27-23.732z"
+          data-vectornator-layer-name="Spot142"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m518.588 389.435-4.193 23.738-11.276-1.864 4.193-23.738z"
+          data-vectornator-layer-name="Spot141"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m507.308 387.527-4.312 23.768-11.608-1.981 4.311-23.768z"
+          data-vectornator-layer-name="Spot140"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m495.697 385.526-4.323 23.758-11.266-1.924 4.323-23.758z"
+          data-vectornator-layer-name="Spot139"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m484.339 383.608-4.323 23.758-11.267-1.924 4.323-23.759z"
+          data-vectornator-layer-name="Spot138"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m473.044 381.685-4.27 23.732-11.544-1.952 4.27-23.732z"
+          data-vectornator-layer-name="Spot137"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m449.958 377.78-3.577 23.915-11.347-1.805 3.886-23.886z"
+          data-vectornator-layer-name="Spot136"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m461.472 379.697-4.194 23.738-11.276-1.865 4.194-23.738z"
+          data-vectornator-layer-name="Spot135"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m439.022 376.051-3.929 23.851-11.3-1.762 3.928-23.852z"
+          data-vectornator-layer-name="Spot134"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m427.693 374.29-3.876 23.824-11.579-1.786 3.876-23.824z"
+          data-vectornator-layer-name="Spot133"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m416.086 372.468-3.8 23.829-11.31-1.703 3.8-23.829z"
+          data-vectornator-layer-name="Spot132"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m404.771 370.721-3.917 23.862-11.644-1.815 3.917-23.861z"
+          data-vectornator-layer-name="Spot131"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m393.124 368.887-3.928 23.851-11.301-1.762 3.929-23.852z"
+          data-vectornator-layer-name="Spot130"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m381.732 367.132-3.929 23.851-11.301-1.763 3.929-23.851z"
+          data-vectornator-layer-name="Spot129"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m370.403 365.371-3.876 23.824-11.579-1.786 3.875-23.824z"
+          data-vectornator-layer-name="Spot128"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m358.795 363.549-3.799 23.829-11.31-1.703 3.8-23.829z"
+          data-vectornator-layer-name="Spot127"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m347.48 361.802-3.917 23.861-11.643-1.814 3.916-23.861z"
+          data-vectornator-layer-name="Spot126"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m336.024 360.009-3.865 23.757-11.578-1.786 3.865-23.757z"
+          data-vectornator-layer-name="Spot125"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m324.416 358.187-3.799 23.829-11.31-1.702 3.8-23.83z"
+          data-vectornator-layer-name="Spot124"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m313.101 356.44-3.916 23.862-11.644-1.814 3.917-23.862z"
+          data-vectornator-layer-name="Spot123"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m301.367 354.654-3.821 23.845-11.323-1.923 4.129-23.811z"
+          data-vectornator-layer-name="Spot122"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m290.453 352.813-4.171 23.777-11.278-1.879 4.172-23.777z"
+          data-vectornator-layer-name="Spot121"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m279.147 350.935-4.118 23.751-11.555-1.905 4.118-23.751z"
+          data-vectornator-layer-name="Spot120"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m267.564 348.994-4.042 23.756-11.287-1.819 4.042-23.756z"
+          data-vectornator-layer-name="Spot119"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m256.272 347.13-4.16 23.788-11.62-1.934 4.16-23.787z"
+          data-vectornator-layer-name="Spot118"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m244.649 345.177-4.171 23.777-11.277-1.879 4.171-23.777z"
+          data-vectornator-layer-name="Spot117"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m233.28 343.304-4.172 23.777-11.277-1.878 4.171-23.778z"
+          data-vectornator-layer-name="Spot116"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m221.974 341.427-4.118 23.75-11.556-1.905 4.118-23.75z"
+          data-vectornator-layer-name="Spot115"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m210.39 339.485-4.042 23.757-11.287-1.819 4.042-23.757z"
+          data-vectornator-layer-name="Spot114"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m206.095 364.128-3.981 23.829-11.306-1.794 3.981-23.83z"
+          data-vectornator-layer-name="Spot113"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m217.699 366.044-4.057 23.824-11.576-1.88 4.057-23.824z"
+          data-vectornator-layer-name="Spot112"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m229.024 367.897-4.11 23.851-11.297-1.854 4.11-23.851z"
+          data-vectornator-layer-name="Spot111"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m240.414 369.745-4.111 23.851-11.297-1.855 4.111-23.85z"
+          data-vectornator-layer-name="Spot110"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m252.056 371.674-4.099 23.861-11.64-1.909 4.099-23.861z"
+          data-vectornator-layer-name="Spot109"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m263.367 373.513-3.981 23.83-11.306-1.795 3.981-23.83z"
+          data-vectornator-layer-name="Spot108"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m274.971 375.43-4.057 23.823-11.576-1.88 4.057-23.824z"
+          data-vectornator-layer-name="Spot107"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m286.296 377.283-4.11 23.85-11.297-1.854 4.11-23.851z"
+          data-vectornator-layer-name="Spot106"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m297.229 379.1-3.759 23.918-11.344-1.898 4.069-23.885z"
+          data-vectornator-layer-name="Spot105"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m308.983 380.861-3.855 23.934-11.664-1.788 3.856-23.935z"
+          data-vectornator-layer-name="Spot104"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m320.317 382.583-3.738 23.902-11.329-1.678 3.739-23.902z"
+          data-vectornator-layer-name="Spot103"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m331.944 384.38-3.803 23.829-11.598-1.76 3.804-23.83z"
+          data-vectornator-layer-name="Spot102"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m343.42 386.147-3.855 23.935-11.664-1.789 3.856-23.934z"
+          data-vectornator-layer-name="Spot101"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m354.754 387.87-3.738 23.901-11.328-1.677 3.738-23.902z"
+          data-vectornator-layer-name="Spot100"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m366.382 389.666-3.815 23.897-11.599-1.76 3.815-23.897z"
+          data-vectornator-layer-name="Spot99"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m377.73 391.403-3.868 23.924-11.319-1.738 3.867-23.924z"
+          data-vectornator-layer-name="Spot98"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m389.142 393.133-3.868 23.924-11.319-1.738 3.867-23.924z"
+          data-vectornator-layer-name="Spot97"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m400.808 394.942-3.856 23.934-11.663-1.789 3.856-23.934z"
+          data-vectornator-layer-name="Spot96"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m412.142 396.664-3.738 23.902-11.329-1.678 3.738-23.902z"
+          data-vectornator-layer-name="Spot95"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m423.769 398.461-3.814 23.897-11.599-1.761 3.815-23.897z"
+          data-vectornator-layer-name="Spot94"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m435.117 400.197-3.867 23.924-11.32-1.738 3.868-23.924z"
+          data-vectornator-layer-name="Spot93"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m446.072 401.902-3.515 23.987-11.367-1.781 3.825-23.958z"
+          data-vectornator-layer-name="Spot92"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m457.229 403.761-4.201 23.801-11.29-1.869 4.2-23.8z"
+          data-vectornator-layer-name="Spot91"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m468.815 405.754-4.277 23.795-11.558-1.956 4.276-23.795z"
+          data-vectornator-layer-name="Spot90"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m480.124 407.681-4.33 23.821-11.281-1.928 4.331-23.821z"
+          data-vectornator-layer-name="Spot89"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m491.497 409.604-4.33 23.821-11.281-1.929 4.33-23.821z"
+          data-vectornator-layer-name="Spot88"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m503.122 411.609-4.318 23.831-11.623-1.985 4.318-23.831z"
+          data-vectornator-layer-name="Spot87"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m514.417 413.522-4.201 23.801-11.29-1.869 4.201-23.801z"
+          data-vectornator-layer-name="Spot86"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m526.004 415.515-4.277 23.794-11.559-1.956 4.277-23.794z"
+          data-vectornator-layer-name="Spot85"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m537.312 417.442-4.33 23.821-11.28-1.929 4.33-23.821z"
+          data-vectornator-layer-name="Spot84"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m548.229 419.331-3.98 23.891-11.326-1.973 4.288-23.855z"
+          data-vectornator-layer-name="Spot83"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m559.967 421.169-4.076 23.907-11.647-1.866 4.076-23.906z"
+          data-vectornator-layer-name="Spot82"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m571.286 422.966-3.958 23.874-11.314-1.752 3.958-23.875z"
+          data-vectornator-layer-name="Spot81"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m582.897 424.839-4.023 23.801-11.582-1.836 4.024-23.802z"
+          data-vectornator-layer-name="Spot80"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m594.358 426.681-4.076 23.907-11.648-1.865 4.076-23.907z"
+          data-vectornator-layer-name="Spot79"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m605.676 428.478-3.958 23.875-11.314-1.753 3.959-23.874z"
+          data-vectornator-layer-name="Spot78"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m617.287 430.351-4.034 23.869-11.583-1.836 4.034-23.87z"
+          data-vectornator-layer-name="Spot77"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m628.62 432.161-4.088 23.897-11.304-1.812 4.088-23.897z"
+          data-vectornator-layer-name="Spot76"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m640.017 433.967-4.088 23.896-11.304-1.812 4.088-23.896z"
+          data-vectornator-layer-name="Spot75"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m651.667 435.852-4.076 23.906-11.648-1.865 4.076-23.906z"
+          data-vectornator-layer-name="Spot74"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m662.986 437.648-3.959 23.875-11.314-1.752 3.959-23.875z"
+          data-vectornator-layer-name="Spot73"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m674.597 439.521-4.035 23.87-11.583-1.837 4.035-23.869z"
+          data-vectornator-layer-name="Spot72"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m685.93 441.332-4.088 23.896-11.305-1.812 4.088-23.896z"
+          data-vectornator-layer-name="Spot71"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m696.869 443.109-3.736 23.962-11.351-1.856 4.046-23.93z"
+          data-vectornator-layer-name="Spot70"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m708.425 444.917-3.959 23.874-11.314-1.752 3.959-23.874z"
+          data-vectornator-layer-name="Spot69"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m720.036 446.79-4.023 23.801-11.582-1.836 4.023-23.802z"
+          data-vectornator-layer-name="Spot68"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m731.496 448.632-4.076 23.907-11.648-1.865 4.076-23.907z"
+          data-vectornator-layer-name="Spot67"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m742.815 450.429-3.959 23.875-11.313-1.753 3.958-23.874z"
+          data-vectornator-layer-name="Spot66"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m754.426 452.302-4.035 23.869-11.583-1.836 4.035-23.87z"
+          data-vectornator-layer-name="Spot65"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m765.759 454.113-4.088 23.896-11.304-1.812 4.087-23.897z"
+          data-vectornator-layer-name="Spot64"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m777.155 455.918-4.087 23.896-11.305-1.812 4.088-23.896z"
+          data-vectornator-layer-name="Spot63"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m788.805 457.803-4.076 23.906-11.647-1.865 4.076-23.906z"
+          data-vectornator-layer-name="Spot62"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m800.124 459.6-3.958 23.874-11.314-1.752 3.958-23.875z"
+          data-vectornator-layer-name="Spot61"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m811.735 461.472-4.034 23.87-11.583-1.837 4.034-23.869z"
+          data-vectornator-layer-name="Spot60"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m823.068 463.283-4.088 23.896-11.304-1.812 4.088-23.896z"
+          data-vectornator-layer-name="Spot59"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m834.008 465.06-3.737 23.962-11.35-1.856 4.045-23.93z"
+          data-vectornator-layer-name="Spot58"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m846.526 520.011-3.867 23.599-11.454-1.764 3.867-23.6z"
+          data-vectornator-layer-name="Spot57"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m835.043 518.211-3.803 23.671-11.188-1.682 3.802-23.671z"
+          data-vectornator-layer-name="Spot56"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m823.615 516.475-3.583 23.757-11.226-1.784 3.889-23.727z"
+          data-vectornator-layer-name="Spot55"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m812.795 514.767-3.93 23.694-11.18-1.741 3.931-23.694z"
+          data-vectornator-layer-name="Spot54"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m801.587 513.028-3.877 23.666-11.456-1.764 3.878-23.666z"
+          data-vectornator-layer-name="Spot53"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m790.104 511.228-3.802 23.672-11.189-1.682 3.802-23.671z"
+          data-vectornator-layer-name="Spot52"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m778.91 509.503-3.918 23.703-11.52-1.792 3.919-23.703z"
+          data-vectornator-layer-name="Spot51"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m767.388 507.691-3.93 23.693-11.18-1.741 3.93-23.693z"
+          data-vectornator-layer-name="Spot50"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m756.117 505.957-3.93 23.694-11.18-1.741 3.93-23.694z"
+          data-vectornator-layer-name="Spot49"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m744.909 504.218-3.877 23.666-11.456-1.763 3.878-23.667z"
+          data-vectornator-layer-name="Spot48"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m733.426 502.419-3.802 23.671-11.189-1.682 3.802-23.671z"
+          data-vectornator-layer-name="Spot47"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m722.232 500.693-3.919 23.703-11.519-1.792 3.919-23.703z"
+          data-vectornator-layer-name="Spot46"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m710.898 498.922-3.867 23.6-11.454-1.764 3.867-23.6z"
+          data-vectornator-layer-name="Spot45"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m699.414 497.123-3.802 23.671-11.189-1.682 3.803-23.671z"
+          data-vectornator-layer-name="Spot44"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m688.22 495.397-3.918 23.704-11.519-1.792 3.918-23.704z"
+          data-vectornator-layer-name="Spot43"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m676.611 493.633-3.823 23.687-11.202-1.9 4.128-23.654z"
+          data-vectornator-layer-name="Spot42"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m665.815 491.813-4.171 23.62-11.156-1.856 4.17-23.62z"
+          data-vectornator-layer-name="Spot41"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m654.63 489.958-4.118 23.594-11.432-1.882 4.118-23.594z"
+          data-vectornator-layer-name="Spot40"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m643.17 488.04-4.042 23.599-11.166-1.797 4.042-23.599z"
+          data-vectornator-layer-name="Spot39"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m631.999 486.199-4.158 23.63-11.496-1.911 4.158-23.63z"
+          data-vectornator-layer-name="Spot38"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m620.501 484.269-4.17 23.619-11.157-1.856 4.17-23.62z"
+          data-vectornator-layer-name="Spot37"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m609.253 482.418-4.17 23.62-11.157-1.856 4.17-23.62z"
+          data-vectornator-layer-name="Spot36"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m598.068 480.563-4.117 23.594-11.432-1.882 4.117-23.594z"
+          data-vectornator-layer-name="Spot35"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m586.609 478.645-4.042 23.599-11.167-1.797 4.042-23.599z"
+          data-vectornator-layer-name="Spot34"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m575.575 476.856-3.364 23.781-11.241-1.71 3.67-23.753z"
+          data-vectornator-layer-name="Spot33"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m564.741 475.22-3.712 23.72-11.195-1.668 3.712-23.72z"
+          data-vectornator-layer-name="Spot32"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m553.518 473.554-3.66 23.693-11.471-1.689 3.66-23.692z"
+          data-vectornator-layer-name="Spot31"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m542.019 471.83-3.585 23.697-11.203-1.608 3.585-23.697z"
+          data-vectornator-layer-name="Spot30"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m530.81 470.178-3.7 23.73-11.535-1.716 3.701-23.73z"
+          data-vectornator-layer-name="Spot29"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m519.273 468.443-3.712 23.72-11.195-1.668 3.712-23.72z"
+          data-vectornator-layer-name="Spot28"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m507.987 466.783-3.712 23.72-11.195-1.667 3.712-23.72z"
+          data-vectornator-layer-name="Spot27"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m496.764 465.118-3.66 23.692-11.47-1.688 3.66-23.693z"
+          data-vectornator-layer-name="Spot26"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m485.265 463.393-3.584 23.697-11.203-1.607 3.584-23.697z"
+          data-vectornator-layer-name="Spot25"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m474.057 461.742-3.701 23.73-11.534-1.716 3.7-23.73z"
+          data-vectornator-layer-name="Spot24"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m462.707 460.046-3.649 23.625-11.47-1.688 3.65-23.626z"
+          data-vectornator-layer-name="Spot23"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m451.208 458.322-3.584 23.697-11.203-1.608 3.584-23.697z"
+          data-vectornator-layer-name="Spot22"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m440 456.67-3.701 23.73-11.534-1.716 3.7-23.73z"
+          data-vectornator-layer-name="Spot21"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m428.375 454.982-3.605 23.713-11.219-1.826 3.911-23.682z"
+          data-vectornator-layer-name="Spot20"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m417.563 453.234-3.953 23.648-11.173-1.783 3.953-23.648z"
+          data-vectornator-layer-name="Spot19"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m406.362 451.452-3.9 23.622-11.448-1.807 3.9-23.622z"
+          data-vectornator-layer-name="Spot18"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m394.886 449.609-3.825 23.627-11.182-1.724 3.825-23.626z"
+          data-vectornator-layer-name="Spot17"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m383.699 447.842-3.941 23.658-11.512-1.835 3.941-23.658z"
+          data-vectornator-layer-name="Spot16"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m372.185 445.987-3.953 23.648-11.173-1.783 3.953-23.648z"
+          data-vectornator-layer-name="Spot15"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m360.921 444.211-3.953 23.648-11.173-1.783 3.953-23.648z"
+          data-vectornator-layer-name="Spot14"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m349.72 442.43-3.901 23.621-11.448-1.807 3.901-23.621z"
+          data-vectornator-layer-name="Spot13"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m338.244 440.587-3.825 23.626-11.182-1.723 3.825-23.627z"
+          data-vectornator-layer-name="Spot12"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m302.076 433.51-3.814 24.242-11.591-1.891 4.13-24.209z"
+          data-vectornator-layer-name="Spot11"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m290.705 431.605-3.939 24.247-11.581-1.947 4.254-24.214z"
+          data-vectornator-layer-name="Spot10"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m279.543 429.74-4.297 24.178-11.535-1.903 4.298-24.178z"
+          data-vectornator-layer-name="Spot9"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m267.979 427.839-4.243 24.151-11.819-1.929 4.244-24.152z"
+          data-vectornator-layer-name="Spot8"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m256.132 425.873-4.165 24.157-11.545-1.843 4.166-24.157z"
+          data-vectornator-layer-name="Spot7"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m244.583 423.985-4.286 24.189-11.884-1.958 4.285-24.189z"
+          data-vectornator-layer-name="Spot6"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m232.696 422.007-4.298 24.178-11.534-1.903 4.297-24.178z"
+          data-vectornator-layer-name="Spot5"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m221.067 420.11-4.298 24.179-11.534-1.903 4.297-24.178z"
+          data-vectornator-layer-name="Spot4"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m209.503 418.209-4.243 24.151-11.819-1.929 4.243-24.151z"
+          data-vectornator-layer-name="Spot3"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m197.656 416.243-4.165 24.157-11.545-1.842 4.165-24.157z"
+          data-vectornator-layer-name="Spot2"
+        />
+        <path
+          fill="#c4ccd6"
+          stroke="#fff"
+          d="m186.107 414.356-4.286 24.189-11.885-1.959 4.286-24.189z"
+          data-vectornator-layer-name="Spot1"
+        />
+        <g fill="none" stroke="#85d4ff" data-vectornator-layer-name="Group 1">
+          <path
+            d="m908.079 299.938-27.147-4.794"
+            data-vectornator-layer-name="Line 1"
+          />
+          <path
+            d="m907.153 305.923-27.147-4.794"
+            data-vectornator-layer-name="Line 3"
+          />
+          <path
+            d="m881.479 294.841-1.097 6.772"
+            data-vectornator-layer-name="Line 2"
+          />
+          <path
+            d="m906.7 305.719-3.861-6.683"
+            data-vectornator-layer-name="Line 4"
+          />
+          <path
+            d="m886.367 302.072-4.47-6.631"
+            data-vectornator-layer-name="Line 5"
+          />
+          <path
+            d="m900.522 304.509-4.057-6.727"
+            data-vectornator-layer-name="Line 6"
+          />
+          <path
+            d="m893.591 303.668-4.495-7.168"
+            data-vectornator-layer-name="Line 7"
+          />
+          <path
+            d="m912.714 270.531-26.956-5.056"
+            data-vectornator-layer-name="Line 1"
+          />
+          <path
+            d="m911.79 276.869-26.956-5.056"
+            data-vectornator-layer-name="Line 3"
+          />
+          <path
+            d="m886.302 265.155-1.095 7.17"
+            data-vectornator-layer-name="Line 2"
+          />
+          <path
+            d="m911.427 276.291-3.832-6.669"
+            data-vectornator-layer-name="Line 4"
+          />
+          <path
+            d="m891.329 272.953-4.828-7.016"
+            data-vectornator-layer-name="Line 5"
+          />
+          <path
+            d="m905.076 275.183-4.213-6.875"
+            data-vectornator-layer-name="Line 6"
+          />
+          <path
+            d="m897.83 274.166-4.46-7.442"
+            data-vectornator-layer-name="Line 7"
+          />
+          <path
+            d="m903.559 328.972-27.713-4.801"
+            data-vectornator-layer-name="Line 1"
+          />
+          <path
+            d="m902.616 334.957-27.714-4.801"
+            data-vectornator-layer-name="Line 3"
+          />
+          <path
+            d="m876.405 323.869-1.119 6.771"
+            data-vectornator-layer-name="Line 2"
+          />
+          <path
+            d="m902.214 334.662-3.901-6.503"
+            data-vectornator-layer-name="Line 4"
+          />
+          <path
+            d="m880.291 330.849-3.695-6.494"
+            data-vectornator-layer-name="Line 5"
+          />
+          <path
+            d="m895.108 333.64-3.779-6.584"
+            data-vectornator-layer-name="Line 6"
+          />
+          <path
+            d="m887.911 332.392-4.178-6.664"
+            data-vectornator-layer-name="Line 7"
+          />
+          <path
+            d="m898.668 357.923-27.779-4.801"
+            data-vectornator-layer-name="Line 1"
+          />
+          <path
+            d="m897.723 363.908-27.78-4.802"
+            data-vectornator-layer-name="Line 3"
+          />
+          <path
+            d="m871.449 352.819-1.121 6.771"
+            data-vectornator-layer-name="Line 2"
+          />
+          <path
+            d="m897.415 363.908-3.865-6.894"
+            data-vectornator-layer-name="Line 4"
+          />
+          <path
+            d="m876.215 360.386-4.35-7.013"
+            data-vectornator-layer-name="Line 5"
+          />
+          <path
+            d="m890.045 362.358-4.024-6.58"
+            data-vectornator-layer-name="Line 6"
+          />
+          <path
+            d="m882.543 361.161-3.605-6.468"
+            data-vectornator-layer-name="Line 7"
+          />
+        </g>
+      </g>
+      <g fill="#c4ccd6" stroke="#fff" data-vectornator-layer-name="SAC02">
+        <path
+          d="m442.082 62.302-4.103 23.9-11.815-1.818 4.103-23.9z"
+          data-vectornator-layer-name="Spot16"
+        />
+        <path
+          d="M430.237 60.486 426.19 84.36l-12.107-1.842 4.048-23.873z"
+          data-vectornator-layer-name="Spot15"
+        />
+        <path
+          d="m418.101 58.608-3.968 23.878-11.825-1.758 3.969-23.878z"
+          data-vectornator-layer-name="Spot14"
+        />
+        <path
+          d="m406.271 56.806-4.091 23.91-12.174-1.871 4.091-23.91z"
+          data-vectornator-layer-name="Spot13"
+        />
+        <path
+          d="m394.293 54.958-4.037 23.805-12.105-1.843 4.037-23.804z"
+          data-vectornator-layer-name="Spot12"
+        />
+        <path
+          d="m382.157 53.08-3.968 23.877-11.825-1.757 3.968-23.878z"
+          data-vectornator-layer-name="Spot11"
+        />
+        <path
+          d="m370.326 51.277-4.09 23.91-12.174-1.87 4.091-23.91z"
+          data-vectornator-layer-name="Spot10"
+        />
+        <path
+          d="m358.058 49.434-3.99 23.894-11.84-1.978 4.313-23.859z"
+          data-vectornator-layer-name="Spot9"
+        />
+        <path
+          d="m346.647 47.54-4.357 23.823-11.791-1.934 4.357-23.824z"
+          data-vectornator-layer-name="Spot8"
+        />
+        <path
+          d="m334.826 45.607-4.301 23.797-12.082-1.961 4.301-23.798z"
+          data-vectornator-layer-name="Spot7"
+        />
+        <path
+          d="m322.715 43.609-4.222 23.803-11.801-1.874 4.222-23.804z"
+          data-vectornator-layer-name="Spot6"
+        />
+        <path
+          d="m310.909 41.69-4.345 23.834-12.149-1.99 4.345-23.835z"
+          data-vectornator-layer-name="Spot5"
+        />
+        <path
+          d="m298.757 39.68-4.356 23.823-11.792-1.934 4.357-23.824z"
+          data-vectornator-layer-name="Spot4"
+        />
+        <path
+          d="m286.87 37.751-4.357 23.824-11.791-1.934 4.357-23.824z"
+          data-vectornator-layer-name="Spot3"
+        />
+        <path
+          d="m275.049 35.819-4.301 23.797-12.082-1.961 4.301-23.798z"
+          data-vectornator-layer-name="Spot2"
+        />
+        <path
+          d="m262.938 33.82-4.222 23.804-11.801-1.874 4.222-23.804z"
+          data-vectornator-layer-name="Spot1"
+        />
+      </g>
+      <g data-vectornator-layer-name="Group 6">
+        <path
+          fill="#ffffe5"
+          stroke="#ffffe5"
+          strokeWidth={2}
+          d="m1004.07 598.712-42.596-2.719 41.596-30.98z"
+          data-vectornator-layer-name="Curve 1"
+        />
+        <path
+          fill="#ffffe5"
+          stroke="#ffffe5"
+          strokeWidth={2}
+          d="m948.864 570.532-5.698-6.792L1002.23 520l-2.23 12.041z"
+          data-vectornator-layer-name="Curve 2"
+        />
+        <path
+          fill="#ffffe5"
+          stroke="#ffffe5"
+          strokeWidth={2}
+          d="m905.754 594.456 26.934-23.862 5.708 7.506-18.924 15.724z"
+          data-vectornator-layer-name="Curve 3"
+        />
+        <path
+          fill="#ffffe5"
+          stroke="#ffffe5"
+          strokeLinejoin="miter"
+          d="m961.716 512.875 5.159-12.302 1.702-15.457-4.912-15.523-24.482-27.045-25.866-10.848-25.36-1.847-14.929 8.592-6.577 9.011 5.392-28.785 58.379 10.855 36.49 28.778 17.107 36.774z"
+          data-vectornator-layer-name="Curve 4"
+        />
+        <path
+          fill="#ffffe5"
+          stroke="#ffffe5"
+          strokeLinejoin="miter"
+          d="m1002.23 487.373-6.105 2.959-21.796-40.482-38.317-30.841-62.073-11.228 3.186-17.307 21.575 3.994 30.026-186.177-24.482-4.938 5.206-21.385 74.327 21.347 16.223.75z"
+          data-vectornator-layer-name="Curve 5"
+        />
+        <path
+          fill="#ffffe5"
+          stroke="#ffffe5"
+          strokeLinejoin="miter"
+          d="m912.328 170.315 4.13-32.639 70.715-.334 13.367-77.907.07 133.028-13.315.352z"
+          data-vectornator-layer-name="Curve 6"
+        />
+        <path
+          fill="#ffffe5"
+          stroke="#ffffe5"
+          strokeLinejoin="miter"
+          d="m38.353 501.282 36.851-29.715 19.544-181.13.225-64.146 33.392-55.308 24.15-72.095L137.742 0l38.045.481 7.798 6.465-16.768 46.706-61.551 249.684-26.459 184.152 2.06 101.23-6.052-22.093-.377-67.863-11.635 7.18L2.598 593l-5.467 3.196L0 554.962z"
+          data-vectornator-layer-name="Curve 8"
+        />
+        <path
+          fill="#ffffe5"
+          stroke="#ffffe5"
+          strokeLinejoin="miter"
+          d="m137.007 593.824-11.227-26.558 2.739-80.585 23.974-26.547 8.421-19.081-14.509-2.311.349-3.222-11.123-1.907 12.776-92.667 5.381-13.204 5.198 4.18 1.199-8.425-29.937-4.729-1.785 11.137 3.768-3.174 5.551 1.262-18.421 121.524-8.631.495-5.466 36.946 4.429 109.441z"
+          data-vectornator-layer-name="Curve 9"
+        />
+        <path
+          fill="#ffffe5"
+          stroke="#ffffe5"
+          strokeLinejoin="miter"
+          d="m164.627 304.474-34.053-6.164 5.481-18.871 8.582 9.168 6.448-8.045 25.275-101.935-.345-12.328-2.817-1.463-5.778 4.879 2.876-11.366 27.195 4.502-1.625 8.065-7.408-3.44-29.598 127.011 9.096-3.012z"
+          data-vectornator-layer-name="Curve 1"
+        />
+        <path
+          fill="#ffffe5"
+          stroke="#ffffe5"
+          strokeLinejoin="miter"
+          d="m174.768 138.891 4.119-16.449 2.788 8.618 19.021-55.557-11.182.603 2.261-8.147 37.763 5.505-2.152 2.18-14.547.443-18.775 61.204 9.681.747-1.064 5.976z"
+          data-vectornator-layer-name="Curve 2"
+        />
+        <path
+          fill="#acd19e"
+          stroke="#acd19e"
+          strokeLinejoin="miter"
+          d="m137.667 593.824-11.084-26.983 3.108-79.641 24.109-27.235 8.113-18.693 141.493 22.655 1.406-15.538 14.807 2.392-2.621 15.913 530.664 82.463 18.428-99.354 7.21-10.973 14.84-8.309 25.162 2.245 25.287 10.289 24.639 27.429 4.525 14.191-1.358 16.146-5.733 13.122L861.865 593z"
+          data-vectornator-layer-name="Curve 1"
+        />
+        <path
+          fill="#d9d9d9"
+          stroke="#768596"
+          strokeLinejoin="miter"
+          strokeWidth={5}
+          d="m167.248 305.562 30.922-144.025"
+          data-vectornator-layer-name="Curve 2"
+        />
+        <path
+          fill="#d9d9d9"
+          stroke="#768596"
+          strokeLinejoin="miter"
+          strokeWidth={5}
+          d="m203.246 145.082.372-7.64"
+          data-vectornator-layer-name="Curve 3"
+        />
+        <path
+          fill="#d9d9d9"
+          stroke="#768596"
+          strokeLinejoin="miter"
+          strokeWidth={5}
+          d="m229.804 77.177 2.05-4.498"
+          data-vectornator-layer-name="Curve 4"
+        />
+        <path
+          fill="#d9d9d9"
+          stroke="#768596"
+          strokeWidth={5}
+          d="M916.026 134.901 247.958 28.355"
+          data-vectornator-layer-name="Curve 1"
+        />
+        <path
+          fill="#ffffe5"
+          stroke="#ffffe5"
+          strokeLinejoin="miter"
+          d="m266.815 0-19.47 28.182-4.789 17.444-5.266 11.303-39.852-5.705 9.292-23.584 5.192 10.212L228.502.078z"
+          data-vectornator-layer-name="Curve 7"
+        />
+        <path
+          fill="#ffffe5"
+          stroke="#ffffe5"
+          strokeLinejoin="miter"
+          d="m-2.87 11.711 32.785 14.313L68.481-.64-2.87 0z"
+          data-vectornator-layer-name="Curve 1"
+        />
+      </g>
+    </g>
+  </svg>
+);
+export default SAC01;

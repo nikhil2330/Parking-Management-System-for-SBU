@@ -1,8 +1,8 @@
 // client/src/components/LotView.js
-import React, { useState, useEffect, useRef } from 'react';
-import ParkingService from '../services/ParkingService';
-import PanZoomControls from './PanZoomControls';
-import './LotView.css';
+import React, { useState, useEffect, useRef } from "react";
+import ParkingService from "../services/ParkingService";
+import PanZoomControls from "./PanZoomControls";
+import "./LotView.css";
 
 const LotMapView = ({ lotId, onBack, highlightedSpot }) => {
   const [lotDetails, setLotDetails] = useState(null);
@@ -16,20 +16,20 @@ const LotMapView = ({ lotId, onBack, highlightedSpot }) => {
 
   useEffect(() => {
     ParkingService.fetchParkingLotDetails(lotId)
-      .then(data => setLotDetails(data))
-      .catch(err => console.error("Error fetching lot details", err));
+      .then((data) => setLotDetails(data))
+      .catch((err) => console.error("Error fetching lot details", err));
   }, [lotId]);
 
   useEffect(() => {
     import(`../assets/svgs/${lotId}.jsx`)
-      .then(module => setSvgComponent(() => module.default))
-      .catch(err => console.error("Error loading SVG for lot", lotId, err));
+      .then((module) => setSvgComponent(() => module.default))
+      .catch((err) => console.error("Error loading SVG for lot", lotId, err));
   }, [lotId]);
 
   useEffect(() => {
     const recalc = () => {
       if (!SvgComponent || !containerRef.current) return;
-      const svgElement = document.getElementById('svg-content');
+      const svgElement = document.getElementById("svg-content");
       if (svgElement) {
         const svgRect = svgElement.getBoundingClientRect();
         const iw = svgRect.width;
@@ -38,13 +38,16 @@ const LotMapView = ({ lotId, onBack, highlightedSpot }) => {
         const ch = containerRef.current.clientHeight;
         const newMinScale = Math.max(cw / iw, ch / ih);
         setScale(newMinScale);
-        setOffset({ x: (cw - iw * newMinScale) / 2, y: (ch - ih * newMinScale) / 2 });
+        setOffset({
+          x: (cw - iw * newMinScale) / 2,
+          y: (ch - ih * newMinScale) / 2,
+        });
         setSvgDimensions({ width: iw, height: ih });
       }
     };
     recalc();
-    window.addEventListener('resize', recalc);
-    return () => window.removeEventListener('resize', recalc);
+    window.addEventListener("resize", recalc);
+    return () => window.removeEventListener("resize", recalc);
   }, [SvgComponent]);
 
   const clampOffset = (off, currentScale) => {
@@ -57,7 +60,7 @@ const LotMapView = ({ lotId, onBack, highlightedSpot }) => {
     const minY = ch - ih * currentScale;
     return {
       x: Math.min(0, Math.max(off.x, minX)),
-      y: Math.min(0, Math.max(off.y, minY))
+      y: Math.min(0, Math.max(off.y, minY)),
     };
   };
 
@@ -69,7 +72,10 @@ const LotMapView = ({ lotId, onBack, highlightedSpot }) => {
 
   const handleMouseMove = (e) => {
     if (!dragging) return;
-    const newOffset = { x: e.clientX - startDrag.x, y: e.clientY - startDrag.y };
+    const newOffset = {
+      x: e.clientX - startDrag.x,
+      y: e.clientY - startDrag.y,
+    };
     setOffset(clampOffset(newOffset, scale));
   };
 
@@ -85,19 +91,19 @@ const LotMapView = ({ lotId, onBack, highlightedSpot }) => {
     const iw = svgDimensions.width;
     const ih = svgDimensions.height;
     const newMinScale = Math.max(cw / iw, ch / ih);
-    
+
     let newScale = scale - e.deltaY * 0.001;
     if (newScale < newMinScale) newScale = newMinScale;
     if (newScale > 3) newScale = 3;
-    
+
     const rect = containerRef.current.getBoundingClientRect();
     const mouseX = e.clientX - rect.left;
     const mouseY = e.clientY - rect.top;
     const newOffset = {
       x: offset.x + (1 - newScale / scale) * (mouseX - offset.x),
-      y: offset.y + (1 - newScale / scale) * (mouseY - offset.y)
+      y: offset.y + (1 - newScale / scale) * (mouseY - offset.y),
     };
-    
+
     setScale(newScale);
     setOffset(clampOffset(newOffset, newScale));
   };
@@ -115,7 +121,7 @@ const LotMapView = ({ lotId, onBack, highlightedSpot }) => {
     const centerY = ch / 2;
     const newOffset = {
       x: offset.x + (1 - newScale / scale) * (centerX - offset.x),
-      y: offset.y + (1 - newScale / scale) * (centerY - offset.y)
+      y: offset.y + (1 - newScale / scale) * (centerY - offset.y),
     };
     setScale(newScale);
     setOffset(clampOffset(newOffset, newScale));
@@ -126,13 +132,16 @@ const LotMapView = ({ lotId, onBack, highlightedSpot }) => {
     let newScale = scale / zoomStepFactor;
     const cw = containerRef.current.clientWidth;
     const ch = containerRef.current.clientHeight;
-    const newMinScale = Math.max(cw / svgDimensions.width, ch / svgDimensions.height);
+    const newMinScale = Math.max(
+      cw / svgDimensions.width,
+      ch / svgDimensions.height
+    );
     if (newScale < newMinScale) newScale = newMinScale;
     const centerX = cw / 2;
     const centerY = ch / 2;
     const newOffset = {
       x: offset.x + (1 - newScale / scale) * (centerX - offset.x),
-      y: offset.y + (1 - newScale / scale) * (centerY - offset.y)
+      y: offset.y + (1 - newScale / scale) * (centerY - offset.y),
     };
     setScale(newScale);
     setOffset(clampOffset(newOffset, newScale));
@@ -148,40 +157,86 @@ const LotMapView = ({ lotId, onBack, highlightedSpot }) => {
   const handlePanLeft = () => handlePan(panStep, 0);
   const handlePanRight = () => handlePan(-panStep, 0);
 
-  const containerWidth = containerRef.current ? containerRef.current.clientWidth : 0;
-  const containerHeight = containerRef.current ? containerRef.current.clientHeight : 0;
-  const minScale = svgDimensions ? Math.max(containerWidth / svgDimensions.width, containerHeight / svgDimensions.height) : 0;
+  const containerWidth = containerRef.current
+    ? containerRef.current.clientWidth
+    : 0;
+  const containerHeight = containerRef.current
+    ? containerRef.current.clientHeight
+    : 0;
+  const minScale = svgDimensions
+    ? Math.max(
+        containerWidth / svgDimensions.width,
+        containerHeight / svgDimensions.height
+      )
+    : 0;
   const canZoomIn = scale < 3;
   const canZoomOut = scale > minScale;
-  const canPanRight = svgDimensions ? offset.x > containerWidth - (svgDimensions.width * scale) : false;
+  const canPanRight = svgDimensions
+    ? offset.x > containerWidth - svgDimensions.width * scale
+    : false;
   const canPanLeft = offset.x < 0;
-  const canPanDown = svgDimensions ? offset.y > containerHeight - (svgDimensions.height * scale) : false;
+  const canPanDown = svgDimensions
+    ? offset.y > containerHeight - svgDimensions.height * scale
+    : false;
   const canPanUp = offset.y < 0;
 
   useEffect(() => {
     if (!SvgComponent || !lotDetails) return;
-    const svgElement = document.getElementById('svg-content');
+    const svgElement = document.getElementById("svg-content");
     if (svgElement) {
-      const spotElements = svgElement.querySelectorAll('[data-vectornator-layer-name^="Spot"]');
-      spotElements.forEach(spot => {
-        const layerName = spot.getAttribute('data-vectornator-layer-name'); // e.g., "Spot1"
+      const validLotIds = new Set();
+      if (lotDetails.lots && Array.isArray(lotDetails.lots)) {
+        lotDetails.lots.forEach((lot) => validLotIds.add(lot.lotId));
+      } else if (lotDetails.lotId) {
+        validLotIds.add(lotDetails.lotId);
+      }
+      console.log(validLotIds)
+
+      const spotElements = svgElement.querySelectorAll(
+        '[data-vectornator-layer-name^="Spot"]'
+      );
+      spotElements.forEach((spot) => {
+        const layerName = spot.getAttribute("data-vectornator-layer-name"); // e.g., "Spot1"
+        
+        let currentLotId = lotId;
+        const parentGroup = spot.closest("g[data-vectornator-layer-name]");
+        if (parentGroup) {
+          const groupName = parentGroup.getAttribute(
+            "data-vectornator-layer-name"
+          );
+          // Only use groupName if it exists in our set of valid lot IDs.
+          if (validLotIds.has(groupName)) {
+            currentLotId = groupName;
+          }
+        }
+
         const match = layerName.match(/Spot(\d+)/);
         if (match) {
           const num = parseInt(match[1], 10);
-          const paddedNum = String(num).padStart(4, '0');
+          const paddedNum = String(num).padStart(4, "0");
           // Assuming lotId is available in the parent scope as a prop
-          const spotId = `${lotId}-${paddedNum}`;
-          const spotData = lotDetails.spots && lotDetails.spots.find(s => s.spotId === spotId);
+          const spotId = `${currentLotId}-${paddedNum}`;
+          const spotData =
+            lotDetails.spots &&
+            lotDetails.spots.find((s) => s.spotId === spotId);
           spot.style.cursor = "pointer";
           // Set default fill colors
           if (spotData && spotData.status === "reserved") {
             spot.style.fill = "#ffcccc";
-            spot.onmouseover = () => { spot.style.fill = "#cc6666"; };
-            spot.onmouseout = () => { spot.style.fill = "#ffcccc"; };
+            spot.onmouseover = () => {
+              spot.style.fill = "#cc6666";
+            };
+            spot.onmouseout = () => {
+              spot.style.fill = "#ffcccc";
+            };
           } else {
             spot.style.fill = "#c4ccd6";
-            spot.onmouseover = () => { spot.style.fill = "#999999"; };
-            spot.onmouseout = () => { spot.style.fill = "#c4ccd6"; };
+            spot.onmouseover = () => {
+              spot.style.fill = "#999999";
+            };
+            spot.onmouseout = () => {
+              spot.style.fill = "#c4ccd6";
+            };
           }
           // If this spot is the highlighted spot, add a glowing class.
           if (spotId === highlightedSpot) {
@@ -206,8 +261,10 @@ const LotMapView = ({ lotId, onBack, highlightedSpot }) => {
 
   return (
     <div className="lot-map-view">
-      <button className="back-button" onClick={onBack}>Back</button>
-      <PanZoomControls 
+      <button className="back-button" onClick={onBack}>
+        Back
+      </button>
+      <PanZoomControls
         canZoomIn={canZoomIn}
         canZoomOut={canZoomOut}
         canPanUp={canPanUp}
@@ -233,7 +290,7 @@ const LotMapView = ({ lotId, onBack, highlightedSpot }) => {
         <div
           style={{
             transform: `translate(${offset.x}px, ${offset.y}px) scale(${scale})`,
-            transformOrigin: '0 0'
+            transformOrigin: "0 0",
           }}
         >
           <SvgComponent id="svg-content" />

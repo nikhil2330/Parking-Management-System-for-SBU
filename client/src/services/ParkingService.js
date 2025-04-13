@@ -56,10 +56,19 @@ const searchBuildings = async (query) => {
   }
 };
 
+const fetchPopularTimes = async (lotId) => {
+  const response = await fetch(`/api/parking/popularTimes/${lotId}`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch popular times');
+  }
+  return response.json(); // returns the array of day objects
+}
+
 export default {
   fetchClosestSpots,
   fetchSpotDetails,
   fetchParkingLotDetails,
   fetchParkingOverlay,
   searchBuildings,
+  fetchPopularTimes
 };
