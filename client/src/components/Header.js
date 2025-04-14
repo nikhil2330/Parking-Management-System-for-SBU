@@ -9,7 +9,7 @@ import './Header.css';
 function Header() {
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
-
+  
   /* username & greeting */
   const userName = localStorage.getItem('p4sbuUsername') || 'User';
   const greeting = useMemo(() => {
@@ -18,7 +18,7 @@ function Header() {
     if (h < 18) return 'Good afternoon';
     return 'Good evening';
   }, []);
-
+  
   return (
     <header className="header-container">
       {/* brand */}
@@ -26,7 +26,7 @@ function Header() {
         <FaCar className="header-car-icon" size={24} />
         <span className="header-title">P4SBU</span>
       </div>
-
+      
       {/* Greeting with reservation counter */}
       <div className="header-greeting">
         <div className="greeting-text">
@@ -38,7 +38,7 @@ function Header() {
           <span>2 active reservations</span>
         </div>
       </div>
-
+      
       {/* quick‑access nav */}
       <nav className="header-nav">
         <span className="header-link" onClick={() => navigate('/search-parking')}>
@@ -54,10 +54,14 @@ function Header() {
           <span>Pay</span>
         </span>
       </nav>
-
+      
       {/* user & theme */}
       <div className="header-right">
-        <div className="help-button" title="Help / Support">
+        <div 
+          className="help-button" 
+          title="Help / Support"
+          onClick={() => navigate('/help')}
+        >
           <FiHelpCircle size={24} />
         </div>
         <ThemeToggle />
@@ -69,7 +73,7 @@ function Header() {
           <FiUser size={20} />
         </div>
       </div>
-
+      
       {showModal && <UserProfileModal onClose={() => setShowModal(false)} />}
     </header>
   );

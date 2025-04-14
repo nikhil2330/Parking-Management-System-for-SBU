@@ -20,6 +20,11 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Password is required']
   },
+  userType: {
+    type: String,
+    enum: ['student', 'faculty', 'visitor'],
+    required: [true, 'User type is required'] 
+  },
   sbuId: {
     type: String,
     default: null
@@ -28,9 +33,19 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Driver\'s license is required']
   },
-  vehicleInfo: {
-    type: String,
-    required: [true, 'Vehicle information is required']
+  vehicles: {
+    type: [{
+      model: { type: String, required: true },
+      year: { type: String, required: true },
+      plate: { type: String, required: true },
+    }],
+    validate: {
+      validator: function (arr) {
+        return arr.length <= 5; // Max 5 vehicles
+      },
+      message: 'You can register a maximum of 5 vehicles.',
+    },
+    default: [],
   },
   contactInfo: {
     type: String,

@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Header from '../components/Header';
-import ApiService from '../services/api';
+import ReservationService from '../services/ReservationService';
 import './ModifyReservationPage.css';
 
 function ModifyReservationPage() {
@@ -27,28 +27,22 @@ function ModifyReservationPage() {
       
       setLoading(true);
       try {
-        // For demo purposes, create a mock reservation
-        const mockReservation = {
-          id: id,
-          startTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // Tomorrow
-          endTime: new Date(Date.now() + 26 * 60 * 60 * 1000).toISOString(), // Tomorrow + 2 hours
-          status: 'pending',
-          totalPrice: 5.00,
-          paymentStatus: 'unpaid',
-          spot: {
-            id: '001',
-            lotId: 'cpc01',
-            coordinates: [-73.1265, 40.9127]
-          }
-        };
+        // Get all reservations and find the one by ID
+        const allReservations = await ReservationService.getReservations();
+        const foundReservation = allReservations.find(res => res.id === id);
         
-        setReservation(mockReservation);
+        if (!foundReservation) {
+          setError('Reservation not found');
+          setLoading(false);
+          return;
+        }
+        
+        setReservation(foundReservation);
         
         // Format dates for datetime-local inputs
-        setStartTime(formatDateForInput(new Date(mockReservation.startTime)));
-        setEndTime(formatDateForInput(new Date(mockReservation.endTime)));
+        setStartTime(formatDateForInput(new Date(foundReservation.startTime)));
+        setEndTime(formatDateForInput(new Date(foundReservation.endTime)));
         
-        setError(null);
       } catch (err) {
         console.error('Error fetching reservation:', err);
         setError('Failed to load reservation details. Please try again.');
@@ -101,12 +95,19 @@ function ModifyReservationPage() {
       const durationHours = (endDate - startDate) / (1000 * 60 * 60);
       const newPrice = (durationHours * 2.50).toFixed(2); // $2.50 per hour
       
-      // Update reservation in state (for demo)
-      setReservation({
-        ...reservation,
+      // Update reservation via API
+      const updateData = {
         startTime: startDate.toISOString(),
         endTime: endDate.toISOString(),
         totalPrice: parseFloat(newPrice)
+      };
+      
+      const result = await ReservationService.updateReservation(id, updateData);
+      
+      // Update local state with response data
+      setReservation({
+        ...reservation,
+        ...result.reservation
       });
       
       setSuccess(true);
@@ -149,6 +150,23 @@ function ModifyReservationPage() {
     );
   }
 
+  if (!reservation) {
+    return (
+      <div className="modify-reservation-page">
+        <Header />
+        <div className="error-container">
+          <p>{error || "Reservation not found"}</p>
+          <button 
+            className="return-btn"
+            onClick={() => navigate('/reservations')}
+          >
+            Return to Reservations
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="modify-reservation-page">
       <Header />
@@ -166,92 +184,90 @@ function ModifyReservationPage() {
         
         {error && <div className="error-message">{error}</div>}
         
-        {reservation && (
-          <div className="reservation-details-card">
-            <h2>Reservation #{reservation.id.substring(4, 10)}</h2>
-            
-            <div className="reservation-info">
-              <div className="info-item">
-                <span className="info-label">Spot ID:</span>
-                <span className="info-value">{reservation.spot.id}</span>
-              </div>
-              
-              <div className="info-item">
-                <span className="info-label">Status:</span>
-                <span className={`status-badge status-${reservation.status}`}>
-                  {reservation.status}
-                </span>
-              </div>
-              
-              <div className="info-item">
-                <span className="info-label">Current Start Time:</span>
-                <span className="info-value">{formatDateForDisplay(reservation.startTime)}</span>
-              </div>
-              
-              <div className="info-item">
-                <span className="info-label">Current End Time:</span>
-                <span className="info-value">{formatDateForDisplay(reservation.endTime)}</span>
-              </div>
-              
-              <div className="info-item">
-                <span className="info-label">Price:</span>
-                <span className="info-value">${reservation.totalPrice.toFixed(2)}</span>
-              </div>
+        <div className="reservation-details-card">
+          <h2>Reservation #{reservation.id.substring(0, 6)}</h2>
+          
+          <div className="reservation-info">
+            <div className="info-item">
+              <span className="info-label">Spot ID:</span>
+              <span className="info-value">{reservation.spot?.id || 'N/A'}</span>
             </div>
             
-            <form onSubmit={handleSubmit} className="modify-form">
-              <h3>Update Reservation Times</h3>
-              
-              <div className="form-group">
-                <label htmlFor="startTime">New Start Time:</label>
-                <input 
-                  type="datetime-local" 
-                  id="startTime" 
-                  value={startTime} 
-                  onChange={(e) => setStartTime(e.target.value)}
-                  min={new Date().toISOString().slice(0, 16)}
-                  required 
-                />
-              </div>
-              
-              <div className="form-group">
-                <label htmlFor="endTime">New End Time:</label>
-                <input 
-                  type="datetime-local" 
-                  id="endTime" 
-                  value={endTime} 
-                  onChange={(e) => setEndTime(e.target.value)}
-                  min={startTime}
-                  required 
-                />
-              </div>
-              
-              <div className="form-footer">
-                <p className="note">
-                  Note: Price is calculated at $2.50 per hour. Final price will be displayed after update.
-                </p>
-                
-                <div className="form-actions">
-                  <button 
-                    type="button" 
-                    onClick={() => navigate('/reservations')}
-                    className="cancel-button"
-                  >
-                    Cancel
-                  </button>
-                  
-                  <button 
-                    type="submit" 
-                    className="save-button"
-                    disabled={submitting}
-                  >
-                    {submitting ? 'Updating...' : 'Update Reservation'}
-                  </button>
-                </div>
-              </div>
-            </form>
+            <div className="info-item">
+              <span className="info-label">Status:</span>
+              <span className={`status-badge status-${reservation.status}`}>
+                {reservation.status}
+              </span>
+            </div>
+            
+            <div className="info-item">
+              <span className="info-label">Current Start Time:</span>
+              <span className="info-value">{formatDateForDisplay(reservation.startTime)}</span>
+            </div>
+            
+            <div className="info-item">
+              <span className="info-label">Current End Time:</span>
+              <span className="info-value">{formatDateForDisplay(reservation.endTime)}</span>
+            </div>
+            
+            <div className="info-item">
+              <span className="info-label">Price:</span>
+              <span className="info-value">${reservation.totalPrice.toFixed(2)}</span>
+            </div>
           </div>
-        )}
+          
+          <form onSubmit={handleSubmit} className="modify-form">
+            <h3>Update Reservation Times</h3>
+            
+            <div className="form-group">
+              <label htmlFor="startTime">New Start Time:</label>
+              <input 
+                type="datetime-local" 
+                id="startTime" 
+                value={startTime} 
+                onChange={(e) => setStartTime(e.target.value)}
+                min={new Date().toISOString().slice(0, 16)}
+                required 
+              />
+            </div>
+            
+            <div className="form-group">
+              <label htmlFor="endTime">New End Time:</label>
+              <input 
+                type="datetime-local" 
+                id="endTime" 
+                value={endTime} 
+                onChange={(e) => setEndTime(e.target.value)}
+                min={startTime}
+                required 
+              />
+            </div>
+            
+            <div className="form-footer">
+              <p className="note">
+                Note: Price is calculated at $2.50 per hour. Final price will be displayed after update.
+              </p>
+              
+              <div className="form-actions">
+                <button 
+                  type="button" 
+                  onClick={() => navigate('/reservations')}
+                  className="cancel-button"
+                >
+                  Cancel
+                </button>
+                
+                <button 
+                  type="submit" 
+                  className="save-button"
+                  disabled={submitting}
+                >
+                  {submitting ? 'Updating...' : 'Update Reservation'}
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );

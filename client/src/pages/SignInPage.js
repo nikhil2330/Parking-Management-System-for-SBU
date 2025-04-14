@@ -1,4 +1,4 @@
-// client/src/pages/SignInPage.js (Professional)
+// client/src/pages/SignInPage.js
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import campusImage from '../assets/fall-2023-sunset.jpg';
@@ -14,6 +14,19 @@ function SignInPage() {
   const [error, setError] = useState(null);
   const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
+  // Check if user is already logged in
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      const isAdmin = localStorage.getItem('isAdmin') === 'true';
+      if (isAdmin) {
+        navigate('/admin');
+      } else {
+        navigate('/home');
+      }
+    }
+  }, [navigate]);
 
   // Add subtle animations after page loads
   useEffect(() => {
@@ -51,7 +64,22 @@ function SignInPage() {
     setLoadingMessage("Signing you in...");
 
     try {
-      // Call the login API using AuthService.loginUser
+      // Check for admin credentials
+      if (email === 'admin@gmail.com' && password === 'admin@P4SBU') {
+        // Create admin session
+        localStorage.setItem('token', 'admin-token-' + Date.now());
+        localStorage.setItem('p4sbuUsername', 'Administrator');
+        localStorage.setItem('userEmail', email);
+        localStorage.setItem('isAdmin', 'true');
+        
+        setLoadingMessage("Success! Redirecting to admin dashboard...");
+        setTimeout(() => {
+          navigate('/admin');
+        }, 1200);
+        return;
+      }
+      
+      // Regular user login
       const result = await AuthService.loginUser({ email, password });
 
       if (result.success) {
@@ -59,6 +87,9 @@ function SignInPage() {
         // Optionally store the token in localStorage if rememberMe is checked
         localStorage.setItem('token', result.token);
         localStorage.setItem('p4sbuUsername', result.username || 'User');
+        // Ensure admin flag is removed for regular users
+        localStorage.removeItem('isAdmin');
+        
         // Add a small delay for better UX
         setTimeout(() => {
           navigate('/home');
@@ -217,6 +248,23 @@ function SignInPage() {
         </div>
         <div className="bottom-accent"></div>
       </div>
+      
+      {/* Admin login hint - only show in development */}
+      {process.env.NODE_ENV === 'development' && (
+        <div className="admin-hint" style={{
+          position: 'fixed',
+          bottom: '10px',
+          right: '10px',
+          background: 'rgba(0,0,0,0.7)',
+          color: 'white',
+          padding: '5px 10px',
+          borderRadius: '5px',
+          fontSize: '12px',
+          zIndex: 1000
+        }}>
+          <p>Admin: admin@gmail.com / admin@P4SBU</p>
+        </div>
+      )}
     </div>
   );
 }

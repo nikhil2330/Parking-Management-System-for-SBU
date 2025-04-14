@@ -228,7 +228,7 @@ function SearchParkingPage() {
 
   const handleReserveSpot = (spotInfo) => {
     setSelectedSpotForReservation(spotInfo);
-    navigate(`/reservations/${spotInfo.spotId}`, {
+    navigate(`/reservations`, {
       state: { spotInfo, searchedBuilding }
     });
     };
