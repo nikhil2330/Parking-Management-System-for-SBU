@@ -28,6 +28,7 @@ const handleApiError = (error) => {
       // Handle unauthorized (e.g., token expired)
       localStorage.removeItem('token');
       localStorage.removeItem('p4sbuUsername');
+      localStorage.removeItem('isAdmin'); // Also remove admin flag
       window.location.href = '/'; // Redirect to login
     }
     return Promise.reject(error.response.data);
@@ -62,6 +63,27 @@ const ApiService = {
         // Basic validation
         const { email, password } = credentials;
         
+        // Check for admin credentials
+        if (email === 'admin@gmail.com' && password === 'admin@P4SBU') {
+          // Create admin session
+          const response = {
+            data: {
+              success: true,
+              token: 'admin-token-' + Date.now(),
+              username: 'Administrator',
+              isAdmin: true
+            }
+          };
+          
+          // Store auth data with admin flag
+          localStorage.setItem('token', response.data.token);
+          localStorage.setItem('p4sbuUsername', response.data.username);
+          localStorage.setItem('userEmail', email);
+          localStorage.setItem('isAdmin', 'true');
+          
+          return response.data;
+        }
+        
         // For demo purposes, accept any valid-looking email with password
         if (email && password && password.length >= 4) {
           // Create a simulated successful response
@@ -77,6 +99,7 @@ const ApiService = {
           localStorage.setItem('token', response.data.token);
           localStorage.setItem('p4sbuUsername', response.data.username);
           localStorage.setItem('userEmail', email);
+          localStorage.removeItem('isAdmin'); // Ensure admin flag is removed
           
           // If we don't have user data yet, initialize with email
           if (!getUserData()) {
@@ -128,7 +151,13 @@ const ApiService = {
       localStorage.removeItem('p4sbuUsername');
       localStorage.removeItem('userData');
       localStorage.removeItem('paymentMethods');
+      localStorage.removeItem('isAdmin'); // Also remove admin flag
       return Promise.resolve({ success: true });
+    },
+    
+    // Check if user is an admin
+    isAdmin: () => {
+      return localStorage.getItem('isAdmin') === 'true';
     }
   },
   
