@@ -24,24 +24,69 @@ const createReservation = async (data) => {
     console.log('Reservation API response:', response);
     return response.data;
   } catch (error) {
-    console.error('Reservation API error:', error.response ? error.response.data : error.message);
-    throw error.response ? error.response.data : error;
+    // Detailed error logging
+    console.error('Reservation API error details:', {
+      status: error.response?.status,
+      statusText: error.response?.statusText,
+      data: error.response?.data,
+      message: error.message
+    });
+    
+    if (error.response?.data?.details) {
+      console.error('Server error details:', error.response.data.details);
+    }
+    
+    if (error.response && error.response.data) {
+      throw new Error(error.response.data.error || 'Failed to create reservation');
+    } else {
+      throw new Error(error.message || 'Network error when creating reservation');
+    }
   }
 };
 
 const getReservations = async () => {
-  const response = await API.get('/reservation');
-  return response.data;
+  try {
+    const response = await API.get('/reservation');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching reservations:', error);
+    if (error.response && error.response.data) {
+      throw new Error(error.response.data.error || 'Failed to fetch reservations');
+    } else {
+      throw new Error(error.message || 'Network error when fetching reservations');
+    }
+  }
 };
 
 const updateReservation = async (id, data) => {
-  const response = await API.put(`/reservation/${id}`, data);
-  return response.data;
+  try {
+    console.log(`Updating reservation ${id} with data:`, data);
+    const response = await API.put(`/reservation/${id}`, data);
+    console.log('Update response:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Error updating reservation:', error);
+    if (error.response && error.response.data) {
+      throw new Error(error.response.data.error || 'Failed to update reservation');
+    } else {
+      throw new Error(error.message || 'Network error when updating reservation');
+    }
+  }
 };
 
 const cancelReservation = async (id) => {
-  const response = await API.delete(`/reservation/${id}`);
-  return response.data;
+  try {
+    console.log(`Cancelling reservation ${id}`);
+    const response = await API.delete(`/reservation/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error cancelling reservation:', error);
+    if (error.response && error.response.data) {
+      throw new Error(error.response.data.error || 'Failed to cancel reservation');
+    } else {
+      throw new Error(error.message || 'Network error when cancelling reservation');
+    }
+  }
 };
 
 export default {
