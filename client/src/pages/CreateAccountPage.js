@@ -6,6 +6,8 @@ import './premium-createaccount.css';
 
 function CreateAccountPage() {
   const navigate = useNavigate();
+
+  // Loading & success states
   const [isLoading, setIsLoading] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState('Processing your information...');
   const [success, setSuccess] = useState(false);
@@ -66,6 +68,7 @@ function CreateAccountPage() {
     else label = 'Very Strong';
     setPasswordStrength({ score, label });
   }, [password]);
+
 
   const getPasswordStrengthClass = () => {
     return passwordStrength.label

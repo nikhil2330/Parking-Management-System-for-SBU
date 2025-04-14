@@ -1,11 +1,13 @@
 // src/App.js
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 
 // Pages
 import SignInPage from './pages/SignInPage';
 import CreateAccountPage from './pages/CreateAccountPage';
 import HomePage from './pages/HomePage';
+// import DuoCallback from './pages/DuoCallback';
 import SearchParkingPage from './pages/SearchParkingPage';
 import ReservationsPage from './pages/ReservationsPage';
 import PaymentMethodsPage from './pages/PaymentMethodsPage';
@@ -14,7 +16,7 @@ import ClaimOfferPage from './pages/ClaimOfferPage';
 import AdminDashboard from './pages/AdminDashboard'; // Import the new admin dashboard
 import HelpPage from './pages/HelpPage';
 
-// Auth guard component
+// Auth guard component to protect routes
 const ProtectedRoute = ({ children }) => {
   const isAuthenticated = localStorage.getItem('token') !== null;
   const isAdmin = localStorage.getItem('isAdmin') === 'true';
