@@ -1,10 +1,116 @@
 import React, { useEffect, useState } from 'react';
 import ParkingService from '../services/ParkingService';
+import './PopularTimesChart.css';
+
+
+const PopularTimesChart = ({ popularTimes, capacity, onBack }) => {
+  // Calculate min and max averages, etc.
+  let minOccupied = Infinity;
+  let maxOccupied = -Infinity;
+  popularTimes.forEach(day => {
+    day.hours.forEach(h => {
+      const occ = capacity - h.average;
+      if (occ < minOccupied) minOccupied = occ;
+      if (occ > maxOccupied) maxOccupied = occ;
+    });
+  });
+
+  // Order days by dayOfWeek (0 = Sunday, 6 = Saturday)
+  const daysOrdered = [...popularTimes].sort((a, b) => a.dayOfWeek - b.dayOfWeek);
+  const today = new Date();
+  const currentDay = today.getDay();
+  const currentHour = today.getHours();
+  const [selectedDayIndex, setSelectedDayIndex] = useState(() => {
+    const idx = daysOrdered.findIndex(d => d.dayOfWeek === currentDay);
+    return idx >= 0 ? idx : 0;
+  });
+  const selectedDay = daysOrdered[selectedDayIndex] || daysOrdered[0];
+
+  // Compute "live" descriptor for current day.
+  const isLiveDay = selectedDay.dayOfWeek === currentDay;
+  let liveDescriptor = "";
+  if (isLiveDay) {
+    const currentData = selectedDay.hours.find(h => h.hour === currentHour);
+    const occ = currentData ? capacity - currentData.average : 0;
+    if (occ > maxOccupied * 0.66) liveDescriptor = "Busy";
+    else if (occ > maxOccupied * 0.33) liveDescriptor = "Moderate";
+    else liveDescriptor = "Not too busy";
+  }
+
+  return (
+    <div className="popular-times-chart-modal">
+      <div className="ptc-header">
+        <h2 className="ptc-title">Popular times</h2>
+        <button className="ptc-back-button" onClick={onBack}>Back</button>
+      </div>
+
+      {isLiveDay ? (
+        <div className="ptc-live-label"><strong>Live:</strong> {liveDescriptor}</div>
+      ) : (
+        <div className="ptc-live-label">Select a day to see typical hours.</div>
+      )}
+
+      <div className="ptc-day-tabs">
+        {daysOrdered.map(dayObj => {
+          const isSelected = dayObj.dayOfWeek === selectedDay.dayOfWeek;
+          return (
+            <button
+              key={dayObj.dayOfWeek}
+              className={`ptc-day-tab ${isSelected ? 'active' : ''}`}
+              onClick={() => {
+                const idx = daysOrdered.findIndex(d => d.dayOfWeek === dayObj.dayOfWeek);
+                setSelectedDayIndex(idx);
+              }}
+            >
+              {dayObj.dayName.slice(0, 3).toUpperCase()}
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="ptc-chart-area">
+        {selectedDay.hours.map(h => {
+          const occupied = capacity - h.average;
+          // Calculate percentage relative to capacity:
+          const heightPct = capacity === 0 ? 0 : (occupied / capacity) * 100;
+          const isCurrent = isLiveDay && h.hour === currentHour;
+          return (
+            <div
+              key={h.hour}
+              className={`ptc-chart-bar ${isCurrent ? 'current-hour' : ''}`}
+              style={{ height: `${heightPct}%` }}
+              title={`Hour: ${h.hour}:00 → Occupied: ${occupied}`}
+            />
+          );
+        })}
+      </div>
+
+      <div className="ptc-hour-axis">
+        <span>0</span>
+        <span>4</span>
+        <span>8</span>
+        <span>12</span>
+        <span>16</span>
+        <span>20</span>
+        <span>23</span>
+      </div>
+
+      <div className="ptc-subtext">
+        People typically spend up to <strong>4 hours</strong> here
+      </div>
+    </div>
+  );
+}
 
 const SpotDetails = ({ spotId, onClose, onReserve, onGetDirections, minWalkTime, maxWalkTime }) => {
   const [spotData, setSpotData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const [showPopularTimes, setShowPopularTimes] = useState(false);
+  const [popularTimes, setPopularTimes] = useState(null);
+  const [loadingPopularTimes, setLoadingPopularTimes] = useState(false);
+  const [errorPopularTimes, setErrorPopularTimes] = useState(null);
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -16,13 +122,44 @@ const SpotDetails = ({ spotId, onClose, onReserve, onGetDirections, minWalkTime,
       }
       setLoading(false);
     };
-
     fetchDetails();
   }, [spotId]);
+
+  // Use the service call to get popular times data.
+  const fetchPopularTimes = async () => {
+    if (!spotData || !spotData.lot || !spotData.lot.lotId) return;
+    setLoadingPopularTimes(true);
+    try {
+      const data = await ParkingService.fetchPopularTimes(spotData.lot.lotId);
+      setPopularTimes(data);
+      setErrorPopularTimes(null);
+    } catch (err) {
+      setErrorPopularTimes(err.message);
+    } finally {
+      setLoadingPopularTimes(false);
+    }
+  };
+
+  const togglePopularTimes = () => {
+    if (!showPopularTimes && !popularTimes) {
+      fetchPopularTimes();
+    }
+    setShowPopularTimes(prev => !prev);
+  };
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>{error}</div>;
   if (!spotData) return null;
+
+  if (showPopularTimes) {
+    // While loading popular times data, show a loader
+    if (loadingPopularTimes) return <div>Loading popular times data...</div>;
+    if (errorPopularTimes) return <div>Error: {errorPopularTimes}</div>;
+    if (popularTimes) {
+      return <PopularTimesChart popularTimes={popularTimes} capacity={spotData.lot.availability.total} onBack={togglePopularTimes} />
+      ;
+    }
+  }
 
   // --- Data Preparation ---
 
@@ -344,6 +481,15 @@ const SpotDetails = ({ spotId, onClose, onReserve, onGetDirections, minWalkTime,
             alt="Get Directions"
           />
           Get Directions
+        </button>
+        <button className="spot-card-btn popular-times-btn" onClick={togglePopularTimes} style={{ padding: '0.5rem 1rem' }}>
+          {/* Example chart icon – you can replace this SVG with one you like */}
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="3" y="3" width="4" height="12"></rect>
+            <rect x="10" y="8" width="4" height="7"></rect>
+            <rect x="17" y="5" width="4" height="10"></rect>
+          </svg>
+          Popular Times
         </button>
       </div>
     </div>
