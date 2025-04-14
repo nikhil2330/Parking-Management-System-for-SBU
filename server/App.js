@@ -22,7 +22,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use('/api/auth', authRoutes);
 app.use('/api/users', authenticateJWT, userRoutes);
-app.use('/api/reservation', authenticateJWT, reservationRoutes);
+app.use('/api/reservation',authenticateJWT, reservationRoutes);
 app.use('/api/payment', authenticateJWT, paymentRoutes);
 app.use('/api/parking', parkingRoutes);
 
