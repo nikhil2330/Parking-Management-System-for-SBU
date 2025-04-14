@@ -1,40 +1,38 @@
-// // src/App.js
+// client/src/App.js
 
-// src/App.js
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 
 // Pages
 import SignInPage from './pages/SignInPage';
 import CreateAccountPage from './pages/CreateAccountPage';
 import HomePage from './pages/HomePage';
+// import DuoCallback from './pages/DuoCallback';
 import SearchParkingPage from './pages/SearchParkingPage';
 import ReservationsPage from './pages/ReservationsPage';
 import PaymentMethodsPage from './pages/PaymentMethodsPage';
 import ModifyReservationPage from './pages/ModifyReservationPage';
 import ClaimOfferPage from './pages/ClaimOfferPage';
+// Import any other pages as needed
 
-// Auth guard component
+// Auth guard component to protect routes
 const ProtectedRoute = ({ children }) => {
   const isAuthenticated = localStorage.getItem('token') !== null;
-  
-  if (!isAuthenticated) {
-    // Redirect to sign in page if not authenticated
-    return <Navigate to="/" replace />;
-  }
-  
-  return children;
+  return isAuthenticated ? children : <Navigate to="/" replace />;
 };
 
 function App() {
   return (
-      <Routes>
-        {/* Public routes */}
-        <Route path="/" element={<SignInPage />} />
-        <Route path="/create" element={<CreateAccountPage />} />
-        
-        {/* Protected routes */}
-        <Route path="/home" element={
+    <Routes>
+      {/* Public routes */}
+      <Route path="/" element={<SignInPage />} />
+      <Route path="/create" element={<CreateAccountPage />} />
+
+      {/* Duo callback route */}
+      {/* <Route path="/duo-callback" element={<DuoCallback />} /> */}
+      
+       {/* Protected routes */}
+       <Route path="/home" element={
           <ProtectedRoute>
             <HomePage />
           </ProtectedRoute>
@@ -70,10 +68,10 @@ function App() {
             <ClaimOfferPage />
           </ProtectedRoute>
         } />
-        
-        {/* Fallback route */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+      
+      {/* Fallback route */}
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   );
 }
 
