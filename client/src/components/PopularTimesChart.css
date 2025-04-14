@@ -1,0 +1,131 @@
+:root {
+    --primary-red: #900;          /* used for current hour */
+    --light-gray: #e5e7eb;         /* default background for buttons and bars */
+    --medium-gray: #9ca3af;        /* for hover states */
+    --dark-gray: #374151;          /* active day-tab */
+    --white: #ffffff;
+    --gray-700: #374151;
+    --gray-800: #1f2937;
+  }
+  
+  /* Outer container */
+  .popular-times-chart-modal {
+    background-color: var(--white);
+    border-radius: 12px;
+    padding: 1rem 1.5rem;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+    max-width: 600px;
+    margin: 1rem auto;
+    color: var(--gray-800);
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+  }
+  
+  /* Header: title left, back button right */
+  .ptc-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }
+  .ptc-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+    color: var(--gray-800);
+  }
+  .ptc-back-button {
+    background-color: var(--light-gray);
+    border: none;
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    color: var(--gray-800);
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  .ptc-back-button:hover {
+    background-color: var(--medium-gray);
+  }
+  
+  /* Live/instruction label */
+  .ptc-live-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    color: var(--gray-700);
+  }
+  
+  /* Day tabs row */
+  .ptc-day-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  .ptc-day-tab {
+    background-color: var(--light-gray);
+    color: var(--gray-800);
+    border: 2px solid var(--light-gray);
+    padding: 0.4rem 0.8rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s, border-color 0.2s;
+  }
+  .ptc-day-tab:hover {
+    background-color: var(--medium-gray);
+    color: var(--white);
+    border-color: var(--medium-gray);
+  }
+  .ptc-day-tab.active {
+    background-color: var(--dark-gray);
+    color: var(--white);
+    border-color: var(--dark-gray);
+  }
+  
+  /* Chart area */
+  .ptc-chart-area {
+    display: flex;
+    align-items: flex-end;
+    gap: 5px;
+    height: 150px;
+    border-bottom: 1px solid var(--light-gray);
+    margin-bottom: 0.75rem;
+    overflow-x: auto;
+  }
+  .ptc-chart-bar {
+    flex: 1;
+    background-color: var(--light-gray); /* lighter by default */
+    width: 10px;
+    border-radius: 4px 4px 0 0;
+    transition: height 0.3s ease, background-color 0.3s ease;
+  }
+  .ptc-chart-bar:hover {
+    background-color: var(--medium-gray);
+  }
+  .ptc-chart-bar.current-hour {
+    background-color: var(--primary-red);
+  }
+  
+  /* Hour axis */
+  .ptc-hour-axis {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: var(--gray-700);
+    margin-bottom: 0.5rem;
+  }
+  .ptc-hour-axis span {
+    flex: 1;
+    text-align: center;
+  }
+  
+  /* Subtext */
+  .ptc-subtext {
+    font-size: 0.85rem;
+    color: var(--gray-700);
+  }
+  .ptc-subtext strong {
+    color: var(--primary-red);
+  }
+  
