@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Header from '../components/Header';
-import ApiService from '../services/api';
+import ReservationService from '../services/ReservationService';
 import './premium-reservations.css';
 
 function ReservationsPage() {
@@ -36,54 +36,22 @@ function ReservationsPage() {
 
   // Fetch all reservations on component mount
   useEffect(() => {
+    const fetchReservations = async () => {
+      setLoading(true);
+      try {
+        const data = await ReservationService.getReservations();
+        setReservations(data);
+        setError(null);
+      } catch (err) {
+        console.error('Error fetching reservations:', err);
+        setError('Failed to load reservations. Please try again.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
     fetchReservations();
   }, []);
-
-  const fetchReservations = async () => {
-    setLoading(true);
-    try {
-      // In a real app, we would call the API
-      // const data = await ApiService.reservation.getAll();
-      
-      // For demo purposes, let's create some mock reservations
-      const mockReservations = [
-        {
-          id: 'res-123456',
-          startTime: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(), // Tomorrow
-          endTime: new Date(Date.now() + 26 * 60 * 60 * 1000).toISOString(), // Tomorrow + 2 hours
-          status: 'pending',
-          totalPrice: 5.00,
-          paymentStatus: 'unpaid',
-          spot: {
-            id: '001',
-            lotId: 'cpc01',
-            coordinates: [-73.1265, 40.9127]
-          }
-        },
-        {
-          id: 'res-789012',
-          startTime: new Date(Date.now() + 48 * 60 * 60 * 1000).toISOString(), // Day after tomorrow
-          endTime: new Date(Date.now() + 52 * 60 * 60 * 1000).toISOString(), // Day after tomorrow + 4 hours
-          status: 'active',
-          totalPrice: 10.00,
-          paymentStatus: 'paid',
-          spot: {
-            id: '007',
-            lotId: 'cpc01',
-            coordinates: [-73.1268, 40.9130]
-          }
-        }
-      ];
-      
-      setReservations(mockReservations);
-      setError(null);
-    } catch (err) {
-      console.error('Error fetching reservations:', err);
-      setError('Failed to load reservations. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleCancelReservation = async (id) => {
     if (!window.confirm('Are you sure you want to cancel this reservation?')) {
@@ -91,18 +59,11 @@ function ReservationsPage() {
     }
     
     try {
-      // In a real app, we would call the API
-      // await ApiService.reservation.cancel(id);
-      
-      // For demo, just update the state
-      setReservations(reservations.map(res => 
-        res.id === id ? { ...res, status: 'cancelled' } : res
-      ));
-      
+      await ReservationService.cancelReservation(id);
+      const updatedReservations = await ReservationService.getReservations();
+      setReservations(updatedReservations);
       setSuccess(true);
       setSuccessMessage('Reservation successfully cancelled.');
-      
-      // Reset success state after 3 seconds
       setTimeout(() => {
         setSuccess(false);
         setSuccessMessage('');
@@ -117,9 +78,18 @@ function ReservationsPage() {
     navigate(`/modify-reservation/${id}`);
   };
 
-  const handleViewMap = (coordinates) => {
-    if (coordinates && coordinates.length === 2) {
-      const [lon, lat] = coordinates;
+  const handleViewDirections = (reservation) => {
+    if (reservation.spot && reservation.spot.location && reservation.building) {
+      const spotCoords = reservation.spot.location.coordinates; // [lon, lat]
+      const buildingCentroid = reservation.building.centroid;     // { x, y }
+      // Google Maps expects coordinates in lat,lng order.
+      const origin = `${spotCoords[1]},${spotCoords[0]}`;
+      const destination = `${buildingCentroid.y},${buildingCentroid.x}`;
+      const directionsUrl = `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}&travelmode=walking`;
+      window.open(directionsUrl, '_blank');
+    } else if (reservation.spot && reservation.spot.location) {
+      // Fallback: if no building, show the spot coordinates.
+      const [lon, lat] = reservation.spot.location.coordinates;
       window.open(`https://www.google.com/maps?q=${lat},${lon}`, '_blank');
     }
   };
@@ -201,37 +171,33 @@ function ReservationsPage() {
       const price = (hoursDiff * 2.50).toFixed(2); // $2.50 per hour
       
       // Create a new reservation object
-      const newRes = {
-        id: `res-${Date.now().toString().slice(-6)}`,
+      const payload = {
+        lotId: newReservation.lotId,
+        spotId: newReservation.spotId,
+        building: newReservation.building || null,  // store building _id if available
         startTime,
         endTime,
-        status: 'pending',
-        totalPrice: parseFloat(price),
-        paymentStatus: 'unpaid',
-        spot: {
-          id: newReservation.spotId || '001',
-          lotId: 'cpc01',
-          coordinates: [-73.1265, 40.9127]
-        }
+        totalPrice: price
       };
       
-      // Add to reservations list
-      setReservations([...reservations, newRes]);
+      // Call your backend API to create the reservation.
+      const createdReservation = await ReservationService.createReservation(payload);
+      
+      // Refresh the reservations list.
+      const updatedReservations = await ReservationService.getReservations();
+      setReservations(updatedReservations);
       setNewReservation(null);
       
-      // Show success message
       setSuccess(true);
       setSuccessMessage(`Reservation created successfully! Total price: $${price}`);
       
-      // Reset success state after 3 seconds
+      // Optionally, ask the user if they want to proceed to payment.
       setTimeout(() => {
         setSuccess(false);
         setSuccessMessage('');
-        
-        // Navigate to payment if needed
         if (window.confirm('Would you like to pay for this reservation now?')) {
           navigate('/payment-methods', { 
-            state: { reservationId: newRes.id, amount: price } 
+            state: { reservationId: createdReservation._id, amount: price } 
           });
         }
       }, 3000);
@@ -508,7 +474,7 @@ function ReservationsPage() {
                 <div className="reservation-actions">
                   <button 
                     className="reservation-btn map-btn"
-                    onClick={() => handleViewMap(reservation.spot.coordinates)}
+                    onClick={() => handleViewDirections(reservation)}
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon>

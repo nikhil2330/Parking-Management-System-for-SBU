@@ -3,8 +3,8 @@ const path = require('path');
 const { transform } = require('@svgr/core');
 
 // Change these paths according to your project structure:
-const inputDir = path.resolve(__dirname, 'client/public/assets/svgs'); // Folder with original SVGs
-const outputDir = path.resolve(__dirname, 'client/src/assets/svgs');     // Folder to output React components
+const inputDir = path.resolve(__dirname, '../../client/public/assets/svgs'); // Folder with original SVGs
+const outputDir = path.resolve(__dirname, '../../client/src/assets/svgs');     // Folder to output React components
 
 // Ensure the output directory exists
 if (!fs.existsSync(outputDir)) {

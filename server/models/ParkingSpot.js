@@ -10,7 +10,7 @@ const ParkingSpotSchema = new Schema(
     type: { 
       type: String, 
       required: true,
-      enum: ['standard', 'handicap', 'metered', 'ev', 'commuter', 'resident', 'reserved','faculty']
+      enum: ['facultyStaff', 'commuterPremium', 'metered', 'ada', 'commuter', 'resident', 'reservedMisc','stateVehiclesOnly','specialServiceVehiclesOnly', 'stateAndSpecialServiceVehicles', 'evCharging' ]
     },
     
     status: {
