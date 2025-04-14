@@ -16,6 +16,7 @@
     "tsparticles": "^3.8.1"
   },
   "devDependencies": {
-    "@svgr/core": "^8.1.0"
+    "@svgr/core": "^8.1.0",
+    "cypress": "^14.3.0"
   }
 }

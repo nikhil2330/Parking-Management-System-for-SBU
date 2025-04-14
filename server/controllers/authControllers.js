@@ -9,6 +9,11 @@ require('dotenv').config({ path: path.resolve(__dirname, '../config/.env') });
 const JWT_SECRET = process.env.JWT_SECRET;
 const JWT_EXPIRY = process.env.JWT_EXPIRY || '1d';
 
+// Import the two-factor helper module
+const twoFactorAuth = require('../services/twoFactorAuth');
+
+// ----------------------------------------------------------------------
+// Register a new user
 exports.register = async (req, res) => {
   // Check for validation errors from express-validator
   const errors = validationResult(req);
