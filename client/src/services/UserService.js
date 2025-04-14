@@ -1,4 +1,4 @@
-// client\src\services\UserService.js
+// client/src/services/UserService.js
 import axios from 'axios';
 
 const getProfile = async () => {
@@ -20,6 +20,19 @@ const getProfile = async () => {
 
 const updateProfile = async (profileData) => {
   try {
+    // If the user is still using the old vehicleInfo structure, convert it to vehicles array
+    if (profileData.vehicleInfo && !profileData.vehicles) {
+      profileData.vehicles = [{
+        model: profileData.vehicleInfo,
+        year: profileData.vehicleYear || '',
+        plate: profileData.plateNumber || ''
+      }];
+      // Remove old fields to avoid conflicts
+      delete profileData.vehicleInfo;
+      delete profileData.vehicleYear;
+      delete profileData.plateNumber;
+    }
+
     const token = localStorage.getItem('token');
     const response = await axios.put('/api/users/profile', profileData, {
       headers: { Authorization: `Bearer ${token}` }

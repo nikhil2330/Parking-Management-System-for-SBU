@@ -20,12 +20,21 @@ exports.updateProfile = async (req, res) => {
       return res.status(400).json({ errors: errors.array() });
     
     // Only allow updating these fields
-    const allowedKeys = ['firstName', 'lastName', 'sbuId', 'driversLicense', 'vehicleInfo', 'plateNumber', 'contactInfo', 'address'];
+    const allowedKeys = ['firstName', 'lastName', 'sbuId', 'driversLicense', 'vehicles', 'plateNumber', 'contactInfo', 'address'];
     const updateData = {};
     allowedKeys.forEach(key => {
-      if (req.body[key] && req.body[key].trim() !== "") {
-        updateData[key] = req.body[key];
+      if (req.body[key]) {
+        if (typeof req.body[key] === 'string') {
+          // For strings, trim and ensure it's not empty
+          if (req.body[key].trim() !== "") {
+            updateData[key] = req.body[key];
+          }
+        } else {
+          // For arrays/objects (like vehicles), just assign directly
+          updateData[key] = req.body[key];
+        }
       }
+      
     });
     
     if (Object.keys(updateData).length === 0) {

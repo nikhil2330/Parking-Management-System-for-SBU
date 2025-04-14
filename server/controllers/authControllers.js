@@ -9,6 +9,11 @@ require('dotenv').config({ path: path.resolve(__dirname, '../config/.env') });
 const JWT_SECRET = process.env.JWT_SECRET;
 const JWT_EXPIRY = process.env.JWT_EXPIRY || '1d';
 
+// Import the two-factor helper module
+const twoFactorAuth = require('../services/twoFactorAuth');
+
+// ----------------------------------------------------------------------
+// Register a new user
 exports.register = async (req, res) => {
   // Check for validation errors from express-validator
   const errors = validationResult(req);
@@ -16,7 +21,7 @@ exports.register = async (req, res) => {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  const { username, email, password, sbuId, driversLicense, vehicleInfo, contactInfo, address } = req.body;
+  const { username, email, password, userType, sbuId, driversLicense, vehicles, contactInfo, address } = req.body;
 
   try {
     // Check if a user with this email already exists
@@ -34,9 +39,10 @@ exports.register = async (req, res) => {
       username,
       email,
       password: hashedPassword,
+      userType,
       sbuId: sbuId || null,
       driversLicense,
-      vehicleInfo,
+      vehicles,
       contactInfo,
       address
     });
@@ -82,7 +88,7 @@ exports.login = async (req, res) => {
 
     // Sign and return the token
     const token = jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRY });
-    return res.json({ success: true, message: 'Login successful', token, username:user.username });
+    return res.json({ success: true, message: 'Login successful', token, username: user.username });
   } catch (error) {
     console.error('Login error:', error);
     return res.status(500).json({ message: 'Server error' });
