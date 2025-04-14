@@ -1,6 +1,6 @@
 // client/src/services/UserService.js
 import axios from 'axios';
-
+axios.defaults.baseURL = 'https://p4sbu.onrender.com';
 const getProfile = async () => {
   try {
     const token = localStorage.getItem('token');
