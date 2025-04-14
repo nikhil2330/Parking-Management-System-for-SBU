@@ -1,7 +1,6 @@
 // src/App.js
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { Routes, Route, Navigate } from 'react-router-dom';
 
 // Pages
 import SignInPage from './pages/SignInPage';
