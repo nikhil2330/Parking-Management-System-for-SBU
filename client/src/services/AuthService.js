@@ -1,6 +1,7 @@
 // client/src/services/AuthService.js
 
 import axios from 'axios';
+axios.defaults.baseURL = 'https://p4sbu.onrender.com';
 
 const registerUser = async (userData) => {
   try {
