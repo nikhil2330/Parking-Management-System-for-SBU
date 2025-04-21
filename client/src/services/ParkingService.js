@@ -1,13 +1,25 @@
 // client/src/services/ParkingService.js
 import axios from 'axios';
-axios.defaults.baseURL = 'https://p4sbu.onrender.com';
+// axios.defaults.baseURL = 'https://p4sbu.onrender.com';
+axios.defaults.baseURL = 'http://localhost:8000';
 
-const fetchClosestSpots = async (buildingId, config = {}) => {
+const fetchAllAvailableSpots = async () => {
+  const res = await axios.get("/api/parking/available-spots");
+  return res.data.spots;
+};
+const fetchFilteredAvailableSpots = async (filters) => {
+  const res = await axios.post("/api/parking/filtered-available-spots", filters);
+  return res.data.spots;
+};
+
+
+const fetchClosestSpots = async (buildingId, {spotIds}, config = {}) => {
   try {
-    const response = await axios.get('/api/parking/closest-spots', {
-      params: { buildingId },
-      ...config
-    });
+    const response = await axios.post(
+      '/api/parking/closest-spots',
+      { buildingId, spotIds }, // send in body
+      config
+    );
     return response.data;
   } catch (error) {
     const errMsg = error.response?.data?.error || error.message;
@@ -71,5 +83,7 @@ export default {
   fetchParkingLotDetails,
   fetchParkingOverlay,
   searchBuildings,
-  fetchPopularTimes
+  fetchPopularTimes,
+  fetchAllAvailableSpots,
+  fetchFilteredAvailableSpots,
 };

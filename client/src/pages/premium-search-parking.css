@@ -247,6 +247,46 @@
   box-shadow: 0 4px 6px rgba(153, 0, 0, 0.2);
 }
 
+.active-filters-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0.75rem 0 0 0.5rem;
+  align-items: center;
+}
+
+.filter-tag {
+  background: #ffe5e5;
+  color: var(--primary-red);
+  border-radius: 999px;
+  padding: 0.15rem 0.7rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 1px 4px rgba(153,0,0,0.04);
+  transition: background 0.2s;
+  margin-bottom: 0.1rem;
+}
+
+.filter-tag .remove-tag-btn {
+  background: none;
+  border: none;
+  color: var(--primary-red);
+  font-size: 1.1em;
+  margin-left: 0.5em;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+}
+
+.filter-tag .remove-tag-btn:hover {
+  color: #7a0000;
+}
+
 /* Main content area */
 .main-content {
   flex: 1;
@@ -292,7 +332,7 @@
   z-index: 9999;      /* keep it above other elements (like the map) */
   max-height: 300px;  /* limit how tall the dropdown can get */
   overflow-y: auto;   /* scroll if too many suggestions */
-  padding: 0.5rem 0;
+  padding: 0.5rem 0; 
 }
 
 /* Each suggestion item */

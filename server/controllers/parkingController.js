@@ -18,23 +18,48 @@ exports.getParkingOverlay = async (req, res) => {
   }
 };
 
+exports.getAvailableSpots = async (req, res) => {
+  console.log('[getAvailableSpots] Request received at', new Date().toISOString());
+  const start = Date.now();
+
+  try {
+    const spots = await ParkingSpot.find({ status: "available" }).select("spotId lotId");
+    res.json({ spots });
+    console.log(`[getAvailableSpots] Success, took ${Date.now() - start}ms`);
+
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch available spots" });
+  }
+};
+
+
 // ----------------------------------------------------------------------
 // Get the closest available spots based on a building ID.
 // Uses the wayfinding service to compute distances.
 exports.getClosestSpots = async (req, res) => {
+  console.log('[getClosestSpots] Request received at', new Date().toISOString());
+  const start = Date.now();
   try {
-    const buildingId = req.query.buildingId;
+    const buildingId = req.method === "POST" ? req.body.buildingId : req.query.buildingId;
+    let spotIds = req.method === "POST" ? req.body.spotIds : req.query.spotIds;
+    if (typeof spotIds === "string") {
+      spotIds = spotIds.split(",");
+    }
     if (!buildingId) {
       return res.status(400).json({ error: 'Missing buildingId parameter' });
     }
     
-    // Get all available parking spots from MongoDB (only need their spotId)
-    const availableSpots = await ParkingSpot.find({ status: 'available' }).select('spotId');
-    const availableSpotIds = new Set(availableSpots.map(spot => spot.spotId));
+    if (!spotIds || !spotIds.length) {
+      const allSpots = await ParkingSpot.find({ status: "available" }).select("spotId");
+      spotIds = new Set(allSpots.map((s) => s.spotId));
+    } else {
+      spotIds = new Set(spotIds.filter(Boolean));
+    }
     
     // Calculate the closest spots using the wayfinding service
-    const spots = await wayfindingService.findClosestAvailableSpots(buildingId, availableSpotIds);
+    const spots = await wayfindingService.findClosestAvailableSpots(buildingId, spotIds);
     res.json({ spots });
+    console.log(`[getClosestSpots] Success, took ${Date.now() - start}ms`);
   } catch (err) {
     console.error('Error in getClosestSpots:', err);
     res.status(500).json({ error: 'Server error' });
@@ -136,3 +161,73 @@ exports.getPopularTimesController = async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 }
+
+async function getMatchingLotIds(filters) {
+  const lotQuery = {};
+
+  // Price filter
+  if (filters.price) {
+    lotQuery.$or = [
+      { price: { $exists: true, $lte: filters.price[1] } },
+      { baseRate: { $exists: true, $lte: filters.price[1] } }
+    ];
+  }
+
+  // Covered/Uncovered filter
+  if (filters.covered) {
+    lotQuery.types = filters.covered;
+  }
+
+  // Zone filter (if you have a zone field in ParkingLot)
+  if (filters.zone) {
+    lotQuery.zone = filters.zone;
+  }
+
+  // Categories filter
+  if (filters.categories) {
+    Object.entries(filters.categories).forEach(([cat, checked]) => {
+      if (checked) lotQuery[`categories.${cat}`] = { $gt: 0 };
+    });
+  }
+
+  // If no lot filters, return null to indicate "all lots"
+  if (Object.keys(lotQuery).length === 0) return null;
+
+  const lots = await ParkingLot.find(lotQuery).select('_id');
+  return lots.map(lot => lot._id);
+}
+
+exports.getFilteredAvailableSpots = async (req, res) => {
+  try {
+    const filters = req.body || req.query;
+    const spotQuery = { status: "available" };
+
+    // Get matching lot ObjectIds for lot-based filters
+    const matchingLotIds = await getMatchingLotIds(filters);
+
+    if (matchingLotIds && matchingLotIds.length > 0) {
+      spotQuery.lot = { $in: matchingLotIds };
+    } else if (matchingLotIds && matchingLotIds.length === 0) {
+      // No lots match the filter, so return empty
+      return res.json({ spots: [] });
+    }
+
+    // Spot type/category filter
+    if (filters.categories) {
+      const checkedCategories = Object.entries(filters.categories)
+        .filter(([cat, checked]) => checked)
+        .map(([cat]) => cat);
+
+      if (checkedCategories.length > 0) {
+        spotQuery.type = { $in: checkedCategories };
+      }
+    }
+
+    // Find spots and populate lot for frontend display
+    const spots = await ParkingSpot.find(spotQuery).populate('lot').select("spotId lot");
+    res.json({ spots });
+  } catch (err) {
+    console.error('Error in getFilteredAvailableSpots:', err);
+    res.status(500).json({ error: "Failed to fetch filtered spots" });
+  }
+};

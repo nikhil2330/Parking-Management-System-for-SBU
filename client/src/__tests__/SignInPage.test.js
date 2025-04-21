@@ -2,7 +2,7 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import SignInPage from '../pages/SignInPage';
-import { BrowserRouter, useNavigate } from 'react-router-dom';
+import { BrowserRouter} from 'react-router-dom';
 
 
 // Mock AuthService.loginUser to simulate API responses

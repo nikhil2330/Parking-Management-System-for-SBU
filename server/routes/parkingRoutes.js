@@ -7,7 +7,9 @@ const parkingController = require('../controllers/parkingController');
 router.get('/overlay', parkingController.getParkingOverlay);
 
 // Closest available spots (for search results)
-router.get('/closest-spots', parkingController.getClosestSpots);
+router.post('/closest-spots', parkingController.getClosestSpots);
+router.get('/available-spots', parkingController.getAvailableSpots);
+
 
 // Detailed spot info
 router.get('/spot/:spotId/details', parkingController.getSpotDetails);
@@ -16,6 +18,8 @@ router.get('/spot/:spotId/details', parkingController.getSpotDetails);
 router.get('/lot/:lotId/details', parkingController.getParkingLotDetails);
 
 router.get('/search/buildings', parkingController.searchBuildings);
+
+router.post('/filtered-available-spots', parkingController.getFilteredAvailableSpots);
 
 
 // GET /api/popularTimes/:lotId
