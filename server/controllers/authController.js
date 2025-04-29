@@ -44,13 +44,18 @@ exports.register = async (req, res) => {
       driversLicense,
       vehicles,
       contactInfo,
-      address
+      address,
+      role: 'user',
+      status: 'pending'
     });
 
     await newUser.save();
 
     // Registration complete. We do not sign a JWT here.
-    return res.status(201).json({ message: 'User registered successfully' });
+    return res.status(201).json({
+      success: true,
+      message: 'Account request submitted. Waiting for admin approval.'
+    });
   } catch (error) {
     console.error('Registration error:', error);
     return res.status(500).json({ message: 'Server error' });
@@ -72,6 +77,13 @@ exports.login = async (req, res) => {
     if (!user) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
+    if (user.status !== 'approved') {
+      return res.status(403).json({
+        message: user.status === 'rejected'
+          ? 'Account rejected by admin.'
+          : 'Account awaiting admin approval.'
+      });
+    }
 
     // Compare the provided password with the stored hashed password
     const isMatch = await bcrypt.compare(password, user.password);
@@ -79,16 +91,25 @@ exports.login = async (req, res) => {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
-    // Prepare the payload for the JWT
+    // Prepare the payload for the JWT - INCLUDE ROLE HERE
     const payload = {
       id: user._id,
       email: user.email,
-      username: user.username
+      username: user.username,
+      role: user.role // Add user's role to the JWT payload
     };
 
     // Sign and return the token
     const token = jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRY });
-    return res.json({ success: true, message: 'Login successful', token, username: user.username });
+    
+    // Return role in the response as well
+    return res.json({ 
+      success: true, 
+      message: 'Login successful', 
+      token, 
+      username: user.username,
+      role: user.role  // Include role in the response
+    });
   } catch (error) {
     console.error('Login error:', error);
     return res.status(500).json({ message: 'Server error' });

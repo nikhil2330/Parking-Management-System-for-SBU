@@ -1,6 +1,5 @@
 // client/src/services/ParkingService.js
 import axios from 'axios';
-axios.defaults.baseURL = 'https://p4sbu.onrender.com';
 
 const fetchClosestSpots = async (buildingId, config = {}) => {
   try {

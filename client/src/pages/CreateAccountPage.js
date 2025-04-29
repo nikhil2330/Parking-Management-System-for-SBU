@@ -204,9 +204,9 @@ function CreateAccountPage() {
         <div className="success-container">
           <div className="success-header"></div>
           <div className="success-icon"></div>
-          <h1 className="success-title">Account Created!</h1>
-          <p className="success-message">Your P4SBU account has been successfully created.</p>
-          <p className="success-message">You can now sign in with your credentials.</p>
+          <h1 className="success-title">Account Request Submitted!</h1>
+          <p className="success-message">Your account request was submitted and will be reviewed by an Administrator shortly.</p>
+          <p className="success-message">Please wait 2-3 business days for account approval.</p>
           <div className="redirect-message">
             <span className="redirect-spinner"></span>
             Redirecting to sign in page...

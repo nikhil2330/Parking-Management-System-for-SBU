@@ -1,3 +1,5 @@
+// server/App.js
+
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
@@ -10,33 +12,51 @@ const reservationRoutes = require('./routes/reservationRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const parkingRoutes = require('./routes/parkingRoutes');
 const authenticateJWT = require('./middleware/authenticateJWT');
-// ... your other middleware and routes
+const adminRoutes = require('./routes/adminRoutes');
+const ticketRoutes = require('./routes/ticketRoutes');
 
 
 const app = express();
 
-// Middleware configuration
-app.use(cors());
+// Only allow frontend running on localhost:3000
+app.use(cors({
+  origin: 'http://localhost:3000',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
+// Parse JSON and URL‑encoded bodies
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+// Mount routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', authenticateJWT, userRoutes);
-app.use('/api/reservation',authenticateJWT, reservationRoutes);
+app.use('/api/reservation', authenticateJWT, reservationRoutes);
 app.use('/api/payment', authenticateJWT, paymentRoutes);
 app.use('/api/parking', parkingRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/tickets', ticketRoutes);
 
+// Health check or status endpoint
 if (process.env.NODE_ENV === 'production') {
-  // In production, serve the React build.
-  app.use(express.static(path.join(__dirname, 'build')));
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'build', 'index.html'));
+  app.get('/api/status', (req, res) => {
+    res.json({ status: 'API is running' });
   });
 } else {
-  // In development, you don't have a build folder, so just return a test message.
   app.get('/', (req, res) => {
     res.send('Test');
   });
 }
+
+// Global error handler
+app.use((err, req, res, next) => {
+  console.error('Server error:', err.stack);
+  res.status(500).json({
+    error: 'Internal Server Error',
+    message: process.env.NODE_ENV === 'production' ? null : err.message
+  });
+});
 
 module.exports = app;

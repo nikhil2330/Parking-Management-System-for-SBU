@@ -14,6 +14,7 @@ import ModifyReservationPage from './pages/ModifyReservationPage';
 import ClaimOfferPage from './pages/ClaimOfferPage';
 import AdminDashboard from './pages/AdminDashboard'; // Import the new admin dashboard
 import HelpPage from './pages/HelpPage';
+import TicketsPage from './pages/TicketsPage'; // Import the new tickets page
 
 // Auth guard component to protect routes
 const ProtectedRoute = ({ children }) => {
@@ -107,6 +108,13 @@ function App() {
       <Route path="/help" element={
         <ProtectedRoute>
           <HelpPage />
+        </ProtectedRoute>
+      } />
+      
+      {/* Tickets Page Route */}
+      <Route path="/tickets" element={
+        <ProtectedRoute>
+          <TicketsPage />
         </ProtectedRoute>
       } />
       

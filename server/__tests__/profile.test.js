@@ -42,6 +42,8 @@ describe('User Profile Endpoints', () => {
       .put('/api/users/profile')
       .set('Authorization', `Bearer ${token}`)
       .send({
+        firstName: 'Test',
+        lastName: 'User',
         sbuId: '123456789',
         driversLicense: 'D1234567',
         contactInfo: '111-111-1111',
@@ -49,6 +51,6 @@ describe('User Profile Endpoints', () => {
       });
     expect(res.statusCode).toEqual(200);
     expect(res.body.success).toBe(true);
-    expect(res.body.user.sbuId).toEqual('123456789');
+    expect(res.body.user.firstName).toEqual('Test');
   });
 });

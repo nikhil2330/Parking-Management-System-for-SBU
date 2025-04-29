@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaCar, FaSearch, FaCalendarAlt, FaCreditCard } from 'react-icons/fa';
+import { FaCar, FaSearch, FaCalendarAlt, FaCreditCard, FaTicketAlt } from 'react-icons/fa';
 import { FiUser, FiHelpCircle } from 'react-icons/fi';
 import UserProfileModal from './UserProfileModal';
 import ThemeToggle from './ThemeToggle';
@@ -52,6 +52,10 @@ function Header() {
         <span className="header-link" onClick={() => navigate('/payment-methods')}>
           <FaCreditCard className="header-link-icon" />
           <span>Pay</span>
+        </span>
+        <span className="header-link" onClick={() => navigate('/tickets')}>
+          <FaTicketAlt className="header-link-icon" />
+          <span>Tickets</span>
         </span>
       </nav>
       
