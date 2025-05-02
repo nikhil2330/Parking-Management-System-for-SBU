@@ -409,6 +409,14 @@ const ApiService = {
   
   // Payment related endpoints
   payment: {
+     createCheckoutSession: async (reservationId) => {
+        try {
+         const { data } = await API.post('/payments/checkout', { reservationId });
+         return data;
+       } catch (error) {
+         return handleApiError(error);
+       }
+     },
     getMethods: async () => {
       try {
         // DEMO MODE: Get payment methods from localStorage

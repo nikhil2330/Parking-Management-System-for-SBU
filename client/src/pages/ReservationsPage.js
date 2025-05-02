@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Header from '../components/Header';
 import ReservationService from '../services/ReservationService';
+import ApiService from '../services/api';    
 import './ReservationsPage.css';
 
 function ReservationsPage() {
@@ -575,7 +576,20 @@ function ReservationsPage() {
                         <span className="reservation-detail-value">${reservation.totalPrice.toFixed(2)}</span>
                         
                         {reservation.paymentStatus === 'unpaid' && (
-                          <button className="pay-now-btn">
+                          <button
+                              className="pay-now-btn"
+                                onClick={async () => {
+                                  try {
+                                    const { url } = await ApiService.payment.createCheckoutSession(
+                                      reservation._id
+                                    );
+                                    window.location.href = url;           // hand-off to Stripe Checkout
+                                  } catch (err) {
+                                    console.error(err);
+                                    alert(err.message || 'Could not start checkout');
+                                  }
+                                }}
+                              >
                             <svg 
                               xmlns="http://www.w3.org/2000/svg" 
                               width="24" 
