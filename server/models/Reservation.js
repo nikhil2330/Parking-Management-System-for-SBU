@@ -35,6 +35,10 @@ const ReservationSchema = new Schema({
     enum: ['unpaid', 'paid'], 
     default: 'unpaid' 
   },
+  stripeSessionId: {                
+    type: String,
+    default: null
+    },
   status: {
     type: String,
     enum: ['pending', 'active', 'completed', 'cancelled'],

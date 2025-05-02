@@ -409,6 +409,36 @@ const ApiService = {
   
   // Payment related endpoints
   payment: {
+     createCheckoutSession: async (reservationId) => {
+        try {
+         const { data } = await API.post('/payments/checkout', { reservationId });
+         return data;
+       } catch (error) {
+         return handleApiError(error);
+       }
+     },  
+     createTicketCheckoutSession: async (ticketId) => {
+            try {
+              const { data } = await API.post('/payments/tickets/checkout', { ticketId });
+              return data;
+            } catch (error) { return handleApiError(error); }
+          },
+          confirmTicket: async (sessionId) => {
+            try {
+              const { data } = await API.get(`/payments/tickets/confirm/${sessionId}`);
+              return data;
+            } catch (error) { return handleApiError(error); }
+          },
+     confirm: async (sessionId) => {
+            try {
+              const { data } = await API.get(`/payments/confirm/${sessionId}`);
+              return data;          
+            } catch (error) {
+              return handleApiError(error);
+            }
+          },
+      
+      
     getMethods: async () => {
       try {
         // DEMO MODE: Get payment methods from localStorage
