@@ -56,10 +56,41 @@ module.exports = {
     });
   },
 
+  
   verifyWebhook: (signature, payload) =>
     stripe.webhooks.constructEvent(
       payload,
       signature,
       process.env.STRIPE_WEBHOOK_SECRET
     ),
+
+    createEventReservationCheckoutSession: async ({
+      eventReservation,
+      user,
+      successUrl,
+      cancelUrl
+    }) => {
+      return stripe.checkout.sessions.create({
+        mode: 'payment',
+        payment_method_types: ['card'],
+        customer_email: user.email,
+        automatic_tax: { enabled: true },
+        line_items: [{
+          price_data: {
+            currency: 'usd',
+            unit_amount: Math.round(eventReservation.totalPrice * 100),
+            product_data: { name: `Event reservation ${eventReservation._id}` },
+            tax_behavior: 'exclusive'
+          },
+          quantity: 1
+        }],
+        metadata: {
+          eventReservationId: eventReservation._id.toString(),
+          userId: user.id.toString()
+        },
+        success_url: successUrl,
+        cancel_url: cancelUrl
+      });
+    }
 };
+
