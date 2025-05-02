@@ -1,14 +1,17 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaCar, FaSearch, FaCalendarAlt, FaCreditCard, FaTicketAlt } from 'react-icons/fa';
 import { FiUser, FiHelpCircle } from 'react-icons/fi';
 import UserProfileModal from './UserProfileModal';
 import ThemeToggle from './ThemeToggle';
+import axios from 'axios';
 import './Header.css';
 
 function Header() {
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
+  const [activeReservationsCount, setActiveReservationsCount] = useState(0);
+  const [loading, setLoading] = useState(true);
   
   /* username & greeting */
   const userName = localStorage.getItem('p4sbuUsername') || 'User';
@@ -17,6 +20,60 @@ function Header() {
     if (h < 12) return 'Good morning';
     if (h < 18) return 'Good afternoon';
     return 'Good evening';
+  }, []);
+  
+  // Create an axios instance with auth token
+  const api = axios.create({ baseURL: process.env.REACT_APP_API_URL });
+  api.interceptors.request.use((config) => {
+    const token = localStorage.getItem('token');
+    if (token) config.headers.Authorization = `Bearer ${token}`;
+    return config;
+  });
+  
+  // Fetch active reservations count
+  useEffect(() => {
+    const fetchActiveReservations = async () => {
+      try {
+        setLoading(true);
+        
+        // Fetch both regular and event reservations
+        const [regularData, eventData] = await Promise.all([
+          api.get('/reservation'),
+          api.get('/event-reservation')
+        ]);
+        
+        const now = new Date();
+        
+        // Count active regular reservations
+        const activeRegular = regularData.data.filter(reservation => {
+          const startTime = new Date(reservation.startTime);
+          const endTime = new Date(reservation.endTime);
+          return now >= startTime && now <= endTime && reservation.status !== 'cancelled';
+        }).length;
+        
+        // Count active event reservations
+        const activeEvent = eventData.data.filter(reservation => {
+          const startTime = new Date(reservation.startTime);
+          const endTime = new Date(reservation.endTime);
+          return now >= startTime && now <= endTime && 
+                 (reservation.status === 'active' || reservation.status === 'approved');
+        }).length;
+        
+        // Set total active reservations count
+        setActiveReservationsCount(activeRegular + activeEvent);
+        setLoading(false);
+      } catch (err) {
+        console.error('Error fetching reservations:', err);
+        setLoading(false);
+      }
+    };
+    
+    fetchActiveReservations();
+    
+    // Refresh count every 5 minutes
+    const refreshInterval = setInterval(fetchActiveReservations, 5 * 60 * 1000);
+    
+    return () => clearInterval(refreshInterval);
   }, []);
   
   return (
@@ -33,9 +90,11 @@ function Header() {
           <span>{greeting}, </span>
           <span className="username">{userName}!</span>
         </div>
-        <div className="reservation-badge">
+        <div className="reservation-badge" onClick={() => navigate('/reservations')}>
           <FaCalendarAlt className="reservation-icon" />
-          <span>2 active reservations</span>
+          <span>
+            {loading ? 'Loading...' : `${activeReservationsCount} active ${activeReservationsCount === 1 ? 'reservation' : 'reservations'}`}
+          </span>
         </div>
       </div>
       
@@ -48,6 +107,10 @@ function Header() {
         <span className="header-link" onClick={() => navigate('/reservations')}>
           <FaCalendarAlt className="header-link-icon" />
           <span>Reserve</span>
+        </span>
+        <span className="header-link" onClick={() => navigate('/event-reservation')}>
+          <FaCalendarAlt className="header-link-icon" />
+          <span>Events</span>
         </span>
         <span className="header-link" onClick={() => navigate('/payment-methods')}>
           <FaCreditCard className="header-link-icon" />

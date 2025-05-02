@@ -699,7 +699,7 @@
   font-style: italic;
 }
 
-/* Empty State - New */
+/* Empty State - UPDATED to remove box-in-box appearance */
 .empty-state-row td {
   padding: 3rem 1rem;
   text-align: center;
@@ -709,11 +709,23 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1rem;
+  justify-content: center;
+  text-align: center;
+  padding: 3rem 0;
+  height: 100%;
+  width: 100%;
+  
+  /* Remove all box-creating properties */
+  background: none !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  margin: 0 !important;
 }
 
 .empty-state svg {
   color: var(--gray-400);
+  margin-bottom: 1rem;
 }
 
 .empty-state p {
@@ -1644,4 +1656,78 @@
   .admin-table-container {
     padding: 0 1rem 1rem;
   }
+}
+
+/* Add these styles to your existing admin-dashboard.css file */
+
+/* Empty state message styling */
+.empty-state-message {
+  height: 200px !important;
+  background: none !important;
+  border: none !important;
+}
+
+.no-data-message {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--gray-500);
+  text-align: center;
+}
+
+/* Add or update these styles in your admin-dashboard.css file */
+
+/* Card icon styling */
+.card-icon {
+  margin-bottom: 12px;
+  font-size: 24px;
+  background-color: #f8f9fa;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+/* Individual card icon colors */
+.revenue-card .card-icon {
+  color: #4158D0;
+  background-color: rgba(65, 88, 208, 0.1);
+}
+
+.reservations-card .card-icon {
+  color: #00C49F;
+  background-color: rgba(0, 196, 159, 0.1);
+}
+
+.average-card .card-icon {
+  color: #FFBB28;
+  background-color: rgba(255, 187, 40, 0.1);
+}
+
+.peak-card .card-icon {
+  color: #FF8042;
+  background-color: rgba(255, 128, 66, 0.1);
+}
+
+/* Card styling enhancement */
+.analytics-summary-card {
+  padding: 25px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.analytics-summary-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08);
+}
+
+.card-value {
+  font-size: 28px;
+  margin-bottom: 10px;
 }

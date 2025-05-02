@@ -1,4 +1,3 @@
-// src/App.js
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 
@@ -12,9 +11,10 @@ import ReservationsPage from './pages/ReservationsPage';
 import PaymentMethodsPage from './pages/PaymentMethodsPage';
 import ModifyReservationPage from './pages/ModifyReservationPage';
 import ClaimOfferPage from './pages/ClaimOfferPage';
-import AdminDashboard from './pages/AdminDashboard'; // Import the new admin dashboard
+import AdminDashboard from './pages/AdminDashboard';
 import HelpPage from './pages/HelpPage';
-import TicketsPage from './pages/TicketsPage'; // Import the new tickets page
+import TicketsPage from './pages/TicketsPage';
+import EventReservationPage from './pages/EventReservationPage'; // Import the new event reservation page
 
 // Auth guard component to protect routes
 const ProtectedRoute = ({ children }) => {
@@ -79,6 +79,13 @@ function App() {
         </ProtectedRoute>
       } />
       
+      {/* New Event Reservation Route */}
+      <Route path="/event-reservation" element={
+        <ProtectedRoute>
+          <EventReservationPage />
+        </ProtectedRoute>
+      } />
+      
       <Route path="/reservations" element={
         <ProtectedRoute>
           <ReservationsPage />
@@ -91,7 +98,6 @@ function App() {
         </ProtectedRoute>
       } />
       
-      {/* Fix for the ModifyReservationPage route to include the :id parameter */}
       <Route path="/modify-reservation/:id" element={
         <ProtectedRoute>
           <ModifyReservationPage />
@@ -104,14 +110,12 @@ function App() {
         </ProtectedRoute>
       } />
       
-      {/* Help Page Route */}
       <Route path="/help" element={
         <ProtectedRoute>
           <HelpPage />
         </ProtectedRoute>
       } />
       
-      {/* Tickets Page Route */}
       <Route path="/tickets" element={
         <ProtectedRoute>
           <TicketsPage />

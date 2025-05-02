@@ -908,3 +908,627 @@
     0 15px 25px rgba(0,0,0,.4),
     0 0 22px rgba(255,75,75,.15);
 }
+
+/* Update this in your premium-home.css file */
+
+/* Action cards grid update for symmetrical 3-2 layout */
+.action-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+
+/* Special handling for the 4th and 5th cards to span 1.5 columns each */
+.action-cards .action-card:nth-child(4),
+.action-cards .action-card:nth-child(5) {
+  grid-column: span 1.5;
+}
+
+/* Start 4th card at column line 1 */
+.action-cards .action-card:nth-child(4) {
+  grid-column-start: 1;
+}
+
+/* Start 5th card at column line 2.5 */
+.action-cards .action-card:nth-child(5) {
+  grid-column-start: 2.5;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+  .action-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .action-cards .action-card:nth-child(4),
+  .action-cards .action-card:nth-child(5) {
+    grid-column: span 1;
+  }
+  
+  .action-cards .action-card:nth-child(4) {
+    grid-column-start: 1;
+  }
+  
+  .action-cards .action-card:nth-child(5) {
+    grid-column-start: 2;
+  }
+}
+
+@media (max-width: 768px) {
+  .action-cards {
+    grid-template-columns: 1fr;
+  }
+  
+  .action-cards .action-card:nth-child(4),
+  .action-cards .action-card:nth-child(5) {
+    grid-column: span 1;
+    grid-column-start: 1;
+  }
+}
+
+/* Make all card heights consistent */
+.action-card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-content {
+  flex-grow: 1;
+}
+
+/* Fix for card icons to ensure consistent styling */
+.action-card:nth-child(4) .card-icon {
+  background-color: rgba(230, 57, 70, 0.1);
+}
+
+.action-card:nth-child(5) .card-icon {
+  background-color: rgba(142, 68, 173, 0.1);
+}
+
+.action-card:nth-child(4):hover {
+  border-color: #e63946;
+}
+
+.action-card:nth-child(5):hover {
+  border-color: #8e44ad;
+}
+
+/* Loading indicators */
+.loading-indicator {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  color: var(--gray-500);
+  font-style: italic;
+}
+
+/* Empty states */
+/* Replace the empty-state styling completely with this version */
+.empty-state {
+  /* Remove all box-creating properties */
+  background: none;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  margin: 0;
+  
+  /* Fill the container completely */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+  padding: 2rem 0;
+  
+  /* Ensure text styling is clean */
+  text-align: center;
+}
+
+.empty-state-icon {
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  color: var(--gray-400);
+}
+
+.empty-state h3 {
+  color: var(--gray-700);
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.empty-state p {
+  color: var(--gray-500);
+  max-width: 85%;
+  margin: 0 auto;
+  line-height: 1.5;
+}
+
+/* Section header styling to remove View All button space */
+.section-header {
+  justify-content: flex-start;
+}
+
+.section-title {
+  margin-right: auto;
+}
+
+/* ===== ACTION CARDS LAYOUT - REPLACE EXISTING SECTION ===== */
+/* Action Cards - Core Styling */
+.action-cards {
+  grid-column: span 12;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  grid-template-areas:
+    "card1 card1 card2 card2 card3 card3"
+    "card4 card4 card4 card5 card5 card5";
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  perspective: 1000px;
+}
+
+.action-cards .action-card:nth-child(1) { grid-area: card1; }
+.action-cards .action-card:nth-child(2) { grid-area: card2; }
+.action-cards .action-card:nth-child(3) { grid-area: card3; }
+.action-cards .action-card:nth-child(4) { grid-area: card4; }
+.action-cards .action-card:nth-child(5) { grid-area: card5; }
+
+/* Responsive layout adjustments */
+@media (max-width: 1300px) {
+  .action-cards {
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-areas:
+      "card1 card1 card2 card2"
+      "card3 card3 card4 card4"
+      "card5 card5 card5 card5";
+  }
+}
+
+@media (max-width: 768px) {
+  .action-cards {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "card1"
+      "card2"
+      "card3"
+      "card4"
+      "card5";
+  }
+}
+
+/* Keep all your existing action card style rules */
+/* Just add/update these specific ones */
+
+.action-card:nth-child(4) .card-icon {
+  background-color: rgba(230, 57, 70, 0.1);
+}
+
+.action-card:nth-child(5) .card-icon {
+  background-color: rgba(142, 68, 173, 0.1);
+}
+
+.action-card:nth-child(4):hover {
+  border-color: #e63946;
+}
+
+.action-card:nth-child(5):hover {
+  border-color: #8e44ad;
+}
+
+/* Replace the empty-state styling completely with this version */
+.empty-state {
+  /* Remove all box-creating properties */
+  background: none;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  margin: 0;
+  
+  /* Fill the container completely */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+  padding: 2rem 0;
+  
+  /* Ensure text styling is clean */
+  text-align: center;
+}
+
+.empty-state-icon {
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  color: var(--gray-400);
+}
+
+.empty-state h3 {
+  color: var(--gray-700);
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.empty-state p {
+  color: var(--gray-500);
+  max-width: 85%;
+  margin: 0 auto;
+  line-height: 1.5;
+}
+
+/* ===== LOADING INDICATORS - ADD THIS SECTION ===== */
+/* Loading states */
+.loading-indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 1.5rem;
+  height: 180px;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--gray-200);
+  border-top: 3px solid var(--info-blue);
+  border-radius: 50%;
+  margin-bottom: 1rem;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-text {
+  color: var(--gray-500);
+  font-size: 0.95rem;
+}
+
+/* ===== SECTION HEADER ADJUSTMENT - UPDATE THIS SECTION ===== */
+.section-header {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.section-title {
+  margin-right: auto;
+}
+
+/* Add these CSS rules to your premium-home.css file */
+
+/* Fixed empty state styling */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: 220px;
+  width: 100%;
+  height: 100%;
+  padding: 2rem 0;
+  
+  /* Remove all properties that create a "box" appearance */
+  background: none !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  margin: 0 !important;
+}
+
+.empty-state-icon {
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  color: var(--gray-400);
+}
+
+.empty-state h3 {
+  color: var(--gray-700);
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.empty-state p {
+  color: var(--gray-500);
+  max-width: 85%;
+  margin: 0 auto;
+  line-height: 1.5;
+}
+
+/* Loading spinner animation */
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--gray-200);
+  border-top: 3px solid var(--info-blue);
+  border-radius: 50%;
+  margin-bottom: 1rem;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem 1.5rem;
+  height: 180px;
+}
+
+.loading-text {
+  color: var(--gray-500);
+  font-size: 0.95rem;
+}
+
+/* Notifications empty state styling */
+.notifications-section .empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: 250px;
+  width: 100%;
+  padding: 2rem 1rem;
+  
+  /* Remove all box-creating properties */
+  background: none !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  margin: 0 !important;
+}
+
+.notifications-section .empty-state-icon {
+  width: 70px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  color: var(--gray-400);
+}
+
+.notifications-section .empty-state-icon svg {
+  width: 42px;
+  height: 42px;
+  opacity: 0.7;
+}
+
+.notifications-section .empty-state h3 {
+  color: var(--gray-700);
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.notifications-section .empty-state p {
+  color: var(--gray-500);
+  font-size: 1rem;
+  max-width: 85%;
+  margin: 0 auto;
+  line-height: 1.5;
+}
+
+/* Activity section empty state - for consistency */
+.activity-section .empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: 250px;
+  width: 100%;
+  padding: 2rem 1rem;
+  
+  /* Remove all box-creating properties */
+  background: none !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  margin: 0 !important;
+}
+
+/* Remove the bar above notifications empty state */
+.notifications-section .empty-state::before,
+.notifications-section .section-container::after,
+.notifications-section .section-container > div:not(.section-header):not(.empty-state):not(.notification-list):not(.loading-indicator) {
+  display: none !important;
+}
+
+/* Ensure no colored bars at the top of empty state */
+.notifications-section .empty-state {
+  position: relative;
+  border-top: none !important;
+}
+
+/* Remove any progress bars or decorative elements above empty state */
+.notifications-section .section-container > svg,
+.notifications-section .section-container > hr,
+.notifications-section .section-container > .progress-bar {
+  display: none !important;
+}
+
+/* Adjust vertical position of empty notifications message */
+.notifications-section .empty-state {
+  margin-top: -25px; /* Move everything up a bit */
+  padding-top: 0; /* Remove any top padding */
+}
+
+/* Adjust the bell icon position */
+.notifications-section .empty-state-icon {
+  margin-bottom: 1rem; /* Slightly reduce space between icon and heading */
+}
+
+/* Fine-tune positioning for the heading and paragraph */
+.notifications-section .empty-state h3 {
+  margin-top: 0; /* Remove any top margin */
+  margin-bottom: 0.5rem; /* Reduce space between heading and paragraph */
+}
+
+.notifications-section .empty-state p {
+  margin-top: 0.5rem; /* Consistent spacing */
+}
+
+/* Remove the bar above activity empty state */
+.activity-section .empty-state::before,
+.activity-section .section-container::after,
+.activity-section .section-container > div:not(.section-header):not(.empty-state):not(.activity-list):not(.loading-indicator) {
+  display: none !important;
+}
+
+/* Ensure no colored bars at the top of empty state */
+.activity-section .empty-state {
+  position: relative;
+  border-top: none !important;
+}
+
+/* Remove any progress bars or decorative elements above empty state */
+.activity-section .section-container > svg,
+.activity-section .section-container > hr,
+.activity-section .section-container > .progress-bar {
+  display: none !important;
+}
+
+/* Adjust vertical position of empty activity message */
+.activity-section .empty-state {
+  margin-top: -25px; /* Move everything up a bit */
+  padding-top: 0; /* Remove any top padding */
+}
+
+/* Fine-tune the icon and text positioning */
+.activity-section .empty-state-icon {
+  margin-bottom: 1rem;
+}
+
+.activity-section .empty-state h3 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+}
+
+.activity-section .empty-state p {
+  margin-top: 0.5rem;
+}
+
+/* Improve vertical centering for activity empty state */
+.activity-section .empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  /* Increase height for better vertical distribution */
+  min-height: 320px;
+  padding: 0;
+  margin: 0;
+}
+
+/* Adjust the icon size and spacing for better proportions */
+.activity-section .empty-state-icon {
+  width: 80px;
+  height: 80px;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.activity-section .empty-state-icon svg {
+  width: 40px;
+  height: 40px;
+  opacity: 0.7;
+}
+
+/* Increase spacing between elements */
+.activity-section .empty-state h3 {
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+}
+
+.activity-section .empty-state p {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  max-width: 80%;
+}
+
+/* Ensure there's enough bottom space */
+.activity-section .section-container {
+  padding-bottom: 2rem;
+}
+
+/* Ensure perfect centering for activity empty state */
+.activity-section .empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
+  min-height: 320px;
+  padding: 0;
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Container positioning to support absolute positioning */
+.activity-section .section-container {
+  position: relative;
+  min-height: 400px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Section header to stay at top */
+.activity-section .section-header {
+  position: relative;
+  z-index: 2;
+}
+
+/* Make all text elements perfectly centered */
+.activity-section .empty-state h3,
+.activity-section .empty-state p {
+  width: 100%;
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Adjust icon to be perfectly centered */
+.activity-section .empty-state-icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-left: auto;
+  margin-right: auto;
+}

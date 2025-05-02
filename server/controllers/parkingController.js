@@ -29,11 +29,12 @@ exports.getClosestSpots = async (req, res) => {
     }
     
     // Get all available parking spots from MongoDB (only need their spotId)
+    const limit = parseInt(req.query.limit, 10) || 5;
     const availableSpots = await ParkingSpot.find({ status: 'available' }).select('spotId');
     const availableSpotIds = new Set(availableSpots.map(spot => spot.spotId));
     
     // Calculate the closest spots using the wayfinding service
-    const spots = await wayfindingService.findClosestAvailableSpots(buildingId, availableSpotIds);
+    const spots = await wayfindingService.findClosestAvailableSpots(buildingId, availableSpotIds, limit);
     res.json({ spots });
   } catch (err) {
     console.error('Error in getClosestSpots:', err);
