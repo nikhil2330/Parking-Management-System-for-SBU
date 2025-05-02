@@ -1,12 +1,13 @@
 {
   "name": "client",
+  "proxy": "http://localhost:8000",
   "version": "0.1.0",
   "private": true,
-  "proxy": "http://localhost:8000",
   "dependencies": {
     "@testing-library/dom": "^10.4.0",
     "@testing-library/user-event": "^13.5.0",
     "axios": "^1.8.4",
+    "dayjs": "^1.11.13",
     "framer-motion": "^12.9.2",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.503.0",
@@ -48,8 +49,17 @@
       "last 1 safari version"
     ]
   },
+  "jest": {
+    "transformIgnorePatterns": [
+      "/node_modules/(?!react-router-dom)/"
+    ]
+  },
   "devDependencies": {
+    "@babel/preset-env": "^7.26.9",
+    "@babel/preset-react": "^7.26.3",
     "@testing-library/jest-dom": "^6.6.3",
-    "@testing-library/react": "^16.3.0"
+    "@testing-library/react": "^16.3.0",
+    "babel-jest": "^29.7.0",
+    "identity-obj-proxy": "^3.0.0"
   }
 }

@@ -16,6 +16,8 @@ import {
   RadialBarChart, RadialBar
 } from 'recharts';
 
+import AdminEventApproval from '../components/AdminEventApproval';
+
 /* ------------------------------------------------------------------ */
 /* axios helper – base URL & token header                             */
 /* ------------------------------------------------------------------ */
@@ -31,7 +33,7 @@ function AdminDashboard() {
   const analyticsRef = useRef(null);
 
   /* ----------------------------- state ---------------------------- */
-  const [activeTab, setActiveTab] = useState('users');   // 'users' | 'bookings' | 'analytics' | 'tickets'
+  const [activeTab, setActiveTab] = useState('users');   // 'users' | 'bookings' | 'analytics' | 'tickets' | 'events'
   const [isLoading, setIsLoading] = useState(true);
 
   const [userRequests, setUserRequests] = useState([]);
@@ -1087,20 +1089,21 @@ function AdminDashboard() {
           </div>
 
           {/* ===== Tabs Navigation ===== */}
-          <div className="admin-tabs">
-            <button className={`admin-tab ${activeTab === 'users' ? 'active' : ''}`} onClick={() => setActiveTab('users')}>
-              User Requests {stats.pendingUsers > 0 && <span className="badge">{stats.pendingUsers}</span>}
-            </button>
-            <button className={`admin-tab ${activeTab === 'bookings' ? 'active' : ''}`} onClick={() => setActiveTab('bookings')}>
-              Booking Requests {stats.pendingBookings > 0 && <span className="badge">{stats.pendingBookings}</span>}
-            </button>
-            <button className={`admin-tab ${activeTab === 'tickets' ? 'active' : ''}`} onClick={() => setActiveTab('tickets')}>
-              Tickets {stats.pendingTickets > 0 && <span className="badge">{stats.pendingTickets}</span>}
-            </button>
-            <button className={`admin-tab ${activeTab === 'analytics' ? 'active' : ''}`} onClick={() => setActiveTab('analytics')}>
-              Analytics
-            </button>
-          </div>
+<div className="admin-tabs">
+  <button className={`admin-tab ${activeTab === 'users' ? 'active' : ''}`} onClick={() => setActiveTab('users')}>
+    User Requests {stats.pendingUsers > 0 && <span className="badge">{stats.pendingUsers}</span>}
+  </button>
+  {/* Remove the Booking Requests tab */}
+  <button className={`admin-tab ${activeTab === 'tickets' ? 'active' : ''}`} onClick={() => setActiveTab('tickets')}>
+    Tickets {stats.pendingTickets > 0 && <span className="badge">{stats.pendingTickets}</span>}
+  </button>
+  <button className={`admin-tab ${activeTab === 'events' ? 'active' : ''}`} onClick={() => setActiveTab('events')}>
+    Event Reservations
+  </button>
+  <button className={`admin-tab ${activeTab === 'analytics' ? 'active' : ''}`} onClick={() => setActiveTab('analytics')}>
+    Analytics
+  </button>
+</div>
 
           {/* ===== Content Area ===== */}
           <div className="admin-content-area">
@@ -1134,45 +1137,69 @@ function AdminDashboard() {
                     Year
                   </button>
                 </div>
-
+                
                 {/* Analytics Summary Cards */}
                 <div className="analytics-summary-grid">
                   <div className="analytics-summary-card revenue-card">
-                    <div className="card-icon">💰</div>
-                    <h3>Total Revenue</h3>
-                    <div className="card-value">${analytics.totalRevenue.toFixed(2)}</div>
-                  </div>
-                  
-                  <div className="analytics-summary-card reservations-card">
-                    <div className="card-icon">🚗</div>
-                    <h3>Total Reservations</h3>
-                    <div className="card-value">
-                      {analytics.reservationsByDate.reduce((sum, day) => sum + day.count, 0)}
-                    </div>
-                  </div>
-                  
-                  <div className="analytics-summary-card average-card">
-                    <div className="card-icon">📅</div>
-                    <h3>Average Daily</h3>
-                    <div className="card-value">
-                      {derivedAnalytics.avgDailyReservations.toFixed(1)}
-                    </div>
-                    <div className="card-info">
-                      Reservations per day
-                    </div>
-                  </div>
-                  
-                  <div className="analytics-summary-card peak-card">
-                    <div className="card-icon">📈</div>
-                    <h3>Peak Day</h3>
-                    <div className="card-value">
-                      {derivedAnalytics.peakDay.count}
-                    </div>
-                    <div className="card-info">
-                      on {derivedAnalytics.peakDay.date}
-                    </div>
-                  </div>
-                </div>
+                    <div className="card-icon">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <line x1="12" y1="1" x2="12" y2="23"></line>
+        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+      </svg>
+    </div>
+    <h3>Total Revenue</h3>
+    <div className="card-value">${analytics.totalRevenue.toFixed(2)}</div>
+  </div>
+  
+  <div className="analytics-summary-card reservations-card">
+    <div className="card-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="1" y="3" width="15" height="13"></rect>
+        <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+        <circle cx="5.5" cy="18.5" r="2.5"></circle>
+        <circle cx="18.5" cy="18.5" r="2.5"></circle>
+      </svg>
+    </div>
+    <h3>Total Reservations</h3>
+    <div className="card-value">
+      {analytics.reservationsByDate.reduce((sum, day) => sum + day.count, 0)}
+    </div>
+  </div>
+  
+  <div className="analytics-summary-card average-card">
+    <div className="card-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+        <line x1="16" y1="2" x2="16" y2="6"></line>
+        <line x1="8" y1="2" x2="8" y2="6"></line>
+        <line x1="3" y1="10" x2="21" y2="10"></line>
+      </svg>
+    </div>
+    <h3>Average Daily</h3>
+    <div className="card-value">
+      {derivedAnalytics.avgDailyReservations.toFixed(1)}
+    </div>
+    <div className="card-info">
+      Reservations per day
+    </div>
+  </div>
+  
+  <div className="analytics-summary-card peak-card">
+    <div className="card-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+        <polyline points="17 6 23 6 23 12"></polyline>
+      </svg>
+    </div>
+    <h3>Peak Day</h3>
+    <div className="card-value">
+      {derivedAnalytics.peakDay.count}
+    </div>
+    <div className="card-info">
+      on {derivedAnalytics.peakDay.date}
+    </div>
+  </div>
+</div>
 
                 {/* Main Charts */}
                 <div className="analytics-charts">
@@ -1436,36 +1463,35 @@ function AdminDashboard() {
                     </tr>
                   </thead>
                   <tbody>
-                    {getCurrentItems().map(user => (
-                      <tr
-                        key={user.id}
-                        className={`${user.status !== 'pending' ? `status-${user.status}` : ''} ${animatingItems[user.id] ? `animate-${animatingItems[user.id]}` : ''}`}
-                      >
-                        <td>{user.name}</td>
-                        <td>{user.email}</td>
-                        <td>{user.department}</td>
-                        <td>{formatDate(user.requestDate)}</td>
-                        <td><span className={`status-badge ${user.status}`}>{user.status}</span></td>
-                        <td>
-                          {user.status === 'pending' ? (
-                            <div className="action-buttons">
-                              <button className="approve-btn" onClick={() => handleUserAction(user.id, 'approved')}>Approve</button>
-                              <button className="reject-btn" onClick={() => handleUserAction(user.id, 'rejected')}>Reject</button>
-                            </div>
-                          ) : (
-                            <div className="action-completed">
-                              {user.status === 'approved' ? '✅ Approved' : '❌ Rejected'}
-                            </div>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                    {getCurrentItems().length === 0 && (
-                      <tr className="empty-state-row">
-                        <td colSpan="6">
-                          <div className="empty-state">
-                            <p>No user requests found</p>
-                          </div>
+                    {getCurrentItems().length > 0 ? (
+                      getCurrentItems().map(user => (
+                        <tr
+                          key={user.id}
+                          className={`${user.status !== 'pending' ? `status-${user.status}` : ''} ${animatingItems[user.id] ? `animate-${animatingItems[user.id]}` : ''}`}
+                        >
+                          <td>{user.name}</td>
+                          <td>{user.email}</td>
+                          <td>{user.department}</td>
+                          <td>{formatDate(user.requestDate)}</td>
+                          <td><span className={`status-badge ${user.status}`}>{user.status}</span></td>
+                          <td>
+                            {user.status === 'pending' ? (
+                              <div className="action-buttons">
+                                <button className="approve-btn" onClick={() => handleUserAction(user.id, 'approved')}>Approve</button>
+                                <button className="reject-btn" onClick={() => handleUserAction(user.id, 'rejected')}>Reject</button>
+                              </div>
+                            ) : (
+                              <div className="action-completed">
+                                {user.status === 'approved' ? '✅ Approved' : '❌ Rejected'}
+                              </div>
+                            )}
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan="6" className="empty-state-message">
+                          <div className="no-data-message">No user requests found</div>
                         </td>
                       </tr>
                     )}
@@ -1544,43 +1570,50 @@ function AdminDashboard() {
                     </tr>
                   </thead>
                   <tbody>
-                    {getCurrentItems().map(booking => (
-                      <tr
-                        key={booking.id}
-                        className={`${booking.status !== 'pending' ? `status-${booking.status}` : ''} ${animatingItems[booking.id] ? `animate-${animatingItems[booking.id]}` : ''}`}
-                      >
-                        <td>
-                          <div>{booking.requester}</div>
-                        </td>
-                        <td>
-                          <div className="lots-container">
-                            {booking.lots.map((lot,i) => <span key={i} className="lot-badge">{lot}</span>)}
-                          </div>
-                        </td>
-                        <td>{booking.spots}</td>
-                        <td>
-                          <div className="date-range">
-                            <div>{formatDate(booking.startDate)}</div>
-                            <div>to</div>
-                            <div>{formatDate(booking.endDate)}</div>
-                          </div>
-                        </td>
-                        <td>{booking.reason}</td>
-                        <td><span className={`status-badge ${booking.status}`}>{booking.status}</span></td>
-                        <td>
-                          {booking.status === 'pending' ? (
-                            <div className="action-buttons">
-                              <button onClick={() => handleBookingAction(booking.id,'approved')}>Approve</button>
-                              <button onClick={() => handleBookingAction(booking.id,'rejected')}>Reject</button>
+                    {getCurrentItems().length > 0 ? (
+                      getCurrentItems().map(booking => (
+                        <tr
+                          key={booking.id}
+                          className={`${booking.status !== 'pending' ? `status-${booking.status}` : ''} ${animatingItems[booking.id] ? `animate-${animatingItems[booking.id]}` : ''}`}
+                        >
+                          <td>
+                            <div>{booking.requester}</div>
+                          </td>
+                          <td>
+                            <div className="lots-container">
+                              {booking.lots.map((lot,i) => <span key={i} className="lot-badge">{lot}</span>)}
                             </div>
-                          ) : (
-                            <div>{booking.status==='approved'?'✅ Approved':'❌ Rejected'}</div>
-                          )}
+                          </td>
+                          <td>{booking.spots}</td>
+                          <td>
+                            <div className="date-range">
+                              <div>{formatDate(booking.startDate)}</div>
+                              <div>to</div>
+                              <div>{formatDate(booking.endDate)}</div>
+                            </div>
+                          </td>
+                          <td>{booking.reason}</td>
+                          <td><span className={`status-badge ${booking.status}`}>{booking.status}</span></td>
+                          <td>
+                            {booking.status === 'pending' ? (
+                              <div className="action-buttons">
+                                <button className="approve-btn" onClick={() => handleBookingAction(booking.id,'approved')}>Approve</button>
+                                <button className="reject-btn" onClick={() => handleBookingAction(booking.id,'rejected')}>Reject</button>
+                              </div>
+                            ) : (
+                              <div className="action-completed">
+                                {booking.status==='approved'?'✅ Approved':'❌ Rejected'}
+                              </div>
+                            )}
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan="7" className="empty-state-message">
+                          <div className="no-data-message">No booking requests found</div>
                         </td>
                       </tr>
-                    ))}
-                    {getCurrentItems().length===0 && (
-                      <tr><td colSpan="7"><div>No booking requests found</div></td></tr>
                     )}
                   </tbody>
                 </table>
@@ -1615,90 +1648,90 @@ function AdminDashboard() {
                   <p className="admin-section-desc">Issue and manage tickets for parking violations</p>
                   
                   <form className="ticket-form" onSubmit={handleCreateTicket}>
-  <h3 className="form-title">Issue New Ticket</h3>
-  <div className="form-grid">
-    <div className="form-group">
-      <label htmlFor="userEmail">
-        <span className="label-icon">📧</span> User Email
-      </label>
-      <input
-        type="email"
-        id="userEmail"
-        name="userEmail"
-        value={newTicket.userEmail}
-        onChange={handleTicketFormChange}
-        required
-        className="form-input"
-        placeholder="Enter user's email"
-      />
-    </div>
-    
-    <div className="form-group">
-      <label htmlFor="amount">
-        <span className="label-icon">💰</span> Amount ($)
-      </label>
-      <div className="input-with-icon">
-        <span className="input-icon">$</span>
-        <input
-          type="number"
-          id="amount"
-          name="amount"
-          value={newTicket.amount}
-          onChange={handleTicketFormChange}
-          required
-          min="1"
-          step="0.01"
-          className="form-input"
-          placeholder="Enter amount"
-        />
-      </div>
-    </div>
-    
-    <div className="form-group">
-      <label htmlFor="dueDate">
-        <span className="label-icon">📅</span> Due Date
-      </label>
-      <input
-        type="date"
-        id="dueDate"
-        name="dueDate"
-        value={newTicket.dueDate}
-        onChange={handleTicketFormChange}
-        required
-        className="form-input"
-      />
-    </div>
-    
-    <div className="form-group full-width">
-      <label htmlFor="reason">
-        <span className="label-icon">📝</span> Reason
-      </label>
-      <input
-        type="text"
-        id="reason"
-        name="reason"
-        value={newTicket.reason}
-        onChange={handleTicketFormChange}
-        required
-        className="form-input"
-        placeholder="Enter reason for ticket"
-      />
-    </div>
-    
-    <div className="form-actions">
-      <button type="submit" className="form-submit-btn">
-        {isSubmitting ? (
-          <>
-            <span className="processing-spinner-small" aria-hidden="true"></span>
-            Issuing Ticket...
-          </>
-        ) : (
-          <>Issue Ticket</>
-        )}
-      </button>
-    </div>
-  </div>
-</form>
+                    <h3 className="form-title">Issue New Ticket</h3>
+                    <div className="form-grid">
+                      <div className="form-group">
+                        <label htmlFor="userEmail">
+                          <span className="label-icon">📧</span> User Email
+                        </label>
+                        <input
+                          type="email"
+                          id="userEmail"
+                          name="userEmail"
+                          value={newTicket.userEmail}
+                          onChange={handleTicketFormChange}
+                          required
+                          className="form-input"
+                          placeholder="Enter user's email"
+                        />
+                      </div>
+                      
+                      <div className="form-group">
+                        <label htmlFor="amount">
+                          <span className="label-icon">💰</span> Amount ($)
+                        </label>
+                        <div className="input-with-icon">
+                          <span className="input-icon">$</span>
+                          <input
+                            type="number"
+                            id="amount"
+                            name="amount"
+                            value={newTicket.amount}
+                            onChange={handleTicketFormChange}
+                            required
+                            min="1"
+                            step="0.01"
+                            className="form-input"
+                            placeholder="Enter amount"
+                          />
+                        </div>
+                      </div>
+                      
+                      <div className="form-group">
+                        <label htmlFor="dueDate">
+                          <span className="label-icon">📅</span> Due Date
+                        </label>
+                        <input
+                          type="date"
+                          id="dueDate"
+                          name="dueDate"
+                          value={newTicket.dueDate}
+                          onChange={handleTicketFormChange}
+                          required
+                          className="form-input"
+                        />
+                      </div>
+                      
+                      <div className="form-group full-width">
+                        <label htmlFor="reason">
+                          <span className="label-icon">📝</span> Reason
+                        </label>
+                        <input
+                          type="text"
+                          id="reason"
+                          name="reason"
+                          value={newTicket.reason}
+                          onChange={handleTicketFormChange}
+                          required
+                          className="form-input"
+                          placeholder="Enter reason for ticket"
+                        />
+                      </div>
+                      
+                      <div className="form-actions">
+                        <button type="submit" className="form-submit-btn">
+                          {isSubmitting ? (
+                            <>
+                              <span className="processing-spinner-small" aria-hidden="true"></span>
+                              Issuing Ticket...
+                            </>
+                          ) : (
+                            <>Issue Ticket</>
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  </form>
                   
                   <div className="filter-group">
                     <label>Filter by Status:</label>
@@ -1744,26 +1777,44 @@ function AdminDashboard() {
                     </tr>
                   </thead>
                   <tbody>
-                    {getCurrentItems().map(ticket => (
-                      <tr
-                        key={ticket._id}
-                        className={`status-${ticket.status}`}
-                      >
-                        <td>
-                          <div className="user-info">
-                            <div className="user-name">{ticket.user.username}</div>
-                            <div className="user-email">{ticket.user.email}</div>
-                          </div>
-                        </td>
-                        <td className="amount-cell">{formatCurrency(ticket.amount)}</td>
-                        <td>{ticket.reason}</td>
-                        <td>{formatDate(ticket.issueDate)}</td>
-                        <td>{formatDate(ticket.dueDate)}</td>
-                        <td><span className={`status-badge ${ticket.status}`}>{ticket.status}</span></td>
-                        <td>
-                          <div className="ticket-actions">
-                            {ticket.status === 'pending' && (
-                              <>
+                    {getCurrentItems().length > 0 ? (
+                      getCurrentItems().map(ticket => (
+                        <tr
+                          key={ticket._id}
+                          className={`status-${ticket.status}`}
+                        >
+                          <td>
+                            <div className="user-info">
+                              <div className="user-name">{ticket.user?.username || 'Unknown User'}</div>
+                              <div className="user-email">{ticket.user?.email || 'No email'}</div>
+                            </div>
+                          </td>
+                          <td className="amount-cell">{formatCurrency(ticket.amount)}</td>
+                          <td>{ticket.reason}</td>
+                          <td>{formatDate(ticket.issueDate)}</td>
+                          <td>{formatDate(ticket.dueDate)}</td>
+                          <td><span className={`status-badge ${ticket.status}`}>{ticket.status}</span></td>
+                          <td>
+                            <div className="ticket-actions">
+                              {ticket.status === 'pending' && (
+                                <>
+                                  <button 
+                                    className="ticket-btn paid-btn"
+                                    onClick={() => handleTicketStatusChange(ticket._id, 'paid')}
+                                    title="Mark as Paid"
+                                  >
+                                    <span aria-hidden="true">✓</span> Mark Paid
+                                  </button>
+                                  <button 
+                                    className="ticket-btn overdue-btn"
+                                    onClick={() => handleTicketStatusChange(ticket._id, 'overdue')}
+                                    title="Mark as Overdue"
+                                  >
+                                    <span aria-hidden="true">⚠️</span> Mark Overdue
+                                  </button>
+                                </>
+                              )}
+                              {ticket.status === 'overdue' && (
                                 <button 
                                   className="ticket-btn paid-btn"
                                   onClick={() => handleTicketStatusChange(ticket._id, 'paid')}
@@ -1771,41 +1822,22 @@ function AdminDashboard() {
                                 >
                                   <span aria-hidden="true">✓</span> Mark Paid
                                 </button>
-                                <button 
-                                  className="ticket-btn overdue-btn"
-                                  onClick={() => handleTicketStatusChange(ticket._id, 'overdue')}
-                                  title="Mark as Overdue"
-                                >
-                                  <span aria-hidden="true">⚠️</span> Mark Overdue
-                                </button>
-                              </>
-                            )}
-                            {ticket.status === 'overdue' && (
+                              )}
                               <button 
-                                className="ticket-btn paid-btn"
-                                onClick={() => handleTicketStatusChange(ticket._id, 'paid')}
-                                title="Mark as Paid"
+                                className="ticket-btn delete-btn"
+                                onClick={() => setTicketToDelete(ticket._id)}
+                                title="Delete Ticket"
                               >
-                                <span aria-hidden="true">✓</span> Mark Paid
+                                <span aria-hidden="true">🗑️</span> Delete
                               </button>
-                            )}
-                            <button 
-                              className="ticket-btn delete-btn"
-                              onClick={() => setTicketToDelete(ticket._id)}
-                              title="Delete Ticket"
-                            >
-                              <span aria-hidden="true">🗑️</span> Delete
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                    {getCurrentItems().length === 0 && (
-                      <tr className="empty-state-row">
-                        <td colSpan="7">
-                          <div className="empty-state">
-                            <p>No tickets found</p>
-                          </div>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan="7" className="empty-state-message">
+                          <div className="no-data-message">No tickets found</div>
                         </td>
                       </tr>
                     )}
@@ -1838,6 +1870,13 @@ function AdminDashboard() {
                     <option value="100">100</option>
                   </select>
                 </div>
+              </div>
+            )}
+
+            {/* Event Reservations Tab Content */}
+            {activeTab === 'events' && (
+              <div className="admin-table-container">
+                <AdminEventApproval />
               </div>
             )}
           </div>

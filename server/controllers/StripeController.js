@@ -32,8 +32,28 @@ module.exports = {
       success_url: successUrl,
       cancel_url: cancelUrl,
     });
-
     return session;
+  },
+ 
+  //Ticket checkout
+  createTicketCheckoutSession: async ({ ticket, user, successUrl, cancelUrl }) => {
+    return stripe.checkout.sessions.create({
+      mode: 'payment',
+      payment_method_types: ['card'],
+      customer_email: user.email,
+      line_items: [{
+        price_data: {
+        currency: 'usd',
+          unit_amount: Math.round(ticket.amount * 100),
+          product_data: { name: `Parking ticket ${ticket._id}` },
+          tax_behavior: 'exclusive'
+        },
+        quantity: 1
+      }],
+      metadata: { ticketId: ticket._id.toString(), userId: user.id.toString() },
+      success_url: successUrl,
+      cancel_url: cancelUrl
+    });
   },
 
   verifyWebhook: (signature, payload) =>

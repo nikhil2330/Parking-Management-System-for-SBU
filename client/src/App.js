@@ -1,4 +1,3 @@
-// src/App.js
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 
@@ -12,9 +11,10 @@ import ReservationsPage from './pages/ReservationsPage';
 import PaymentMethodsPage from './pages/PaymentMethodsPage';
 import ModifyReservationPage from './pages/ModifyReservationPage';
 import ClaimOfferPage from './pages/ClaimOfferPage';
-import AdminDashboard from './pages/AdminDashboard'; // Import the new admin dashboard
+import AdminDashboard from './pages/AdminDashboard';
 import HelpPage from './pages/HelpPage';
-import TicketsPage from './pages/TicketsPage'; // Import the new tickets page
+import TicketsPage from './pages/TicketsPage';
+import EventReservationPage from './pages/EventReservationPage'; // Import the new event reservation page
 
 // Auth guard component to protect routes
 const ProtectedRoute = ({ children }) => {
@@ -58,66 +58,109 @@ function App() {
       {/* Public routes */}
       <Route path="/" element={<SignInPage />} />
       <Route path="/create" element={<CreateAccountPage />} />
-      
+
       {/* Admin routes */}
-      <Route path="/admin" element={
-        <AdminRoute>
-          <AdminDashboard />
-        </AdminRoute>
-      } />
-      
+      <Route
+        path="/admin"
+        element={
+          <AdminRoute>
+            <AdminDashboard />
+          </AdminRoute>
+        }
+      />
+
       {/* Protected routes */}
-      <Route path="/home" element={
-        <ProtectedRoute>
-          <HomePage />
-        </ProtectedRoute>
-      } />
-      
-      <Route path="/search-parking" element={
-        <ProtectedRoute>
-          <SearchParkingPage />
-        </ProtectedRoute>
-      } />
-      
-      <Route path="/reservations" element={
-        <ProtectedRoute>
-          <ReservationsPage />
-        </ProtectedRoute>
-      } />
-      
-      <Route path="/payment-methods" element={
-        <ProtectedRoute>
-          <PaymentMethodsPage />
-        </ProtectedRoute>
-      } />
-      
-      {/* Fix for the ModifyReservationPage route to include the :id parameter */}
-      <Route path="/modify-reservation/:id" element={
-        <ProtectedRoute>
-          <ModifyReservationPage />
-        </ProtectedRoute>
-      } />
-      
-      <Route path="/claim-offer" element={
-        <ProtectedRoute>
-          <ClaimOfferPage />
-        </ProtectedRoute>
-      } />
-      
-      {/* Help Page Route */}
-      <Route path="/help" element={
-        <ProtectedRoute>
-          <HelpPage />
-        </ProtectedRoute>
-      } />
-      
-      {/* Tickets Page Route */}
-      <Route path="/tickets" element={
-        <ProtectedRoute>
-          <TicketsPage />
-        </ProtectedRoute>
-      } />
-      
+      <Route
+        path="/home"
+        element={
+          <ProtectedRoute>
+            <HomePage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/search-parking"
+        element={
+          <ProtectedRoute>
+            <SearchParkingPage />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* New Event Reservation Route */}
+      <Route
+        path="/event-reservation"
+        element={
+          <ProtectedRoute>
+            <EventReservationPage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/reservations"
+        element={
+          <ProtectedRoute>
+            <ReservationsPage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/reservations/:spotId"
+        element={
+          <ProtectedRoute>
+            <ReservationsPage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/payment-methods"
+        element={
+          <ProtectedRoute>
+            <PaymentMethodsPage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/modify-reservation/:id"
+        element={
+          <ProtectedRoute>
+            <ModifyReservationPage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/claim-offer"
+        element={
+          <ProtectedRoute>
+            <ClaimOfferPage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/help"
+        element={
+          <ProtectedRoute>
+            <HelpPage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/tickets"
+        element={
+          <ProtectedRoute>
+            <TicketsPage />
+          </ProtectedRoute>
+        }
+      />
+
       {/* Fallback route */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

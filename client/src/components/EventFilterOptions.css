@@ -1,0 +1,138 @@
+/* EventFilterOptions.css - Matches the SearchParkingPage filter styling */
+
+.filters-panel {
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    min-width: 260px;
+    height: fit-content;
+  }
+  
+  .filters-header {
+    background-color: var(--primary-dark, #0A2541);
+    color: white;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  .filters-header h2 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+  
+  .filters-icon {
+    opacity: 0.9;
+  }
+  
+  .filters-body {
+    padding: 15px;
+  }
+  
+  .filter-group {
+    margin-bottom: 20px;
+  }
+  
+  .filter-label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #333;
+    font-size: 0.9rem;
+  }
+  
+  .filter-input,
+  .filter-select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: border-color 0.2s ease;
+  }
+  
+  .filter-input:focus,
+  .filter-select:focus {
+    border-color: var(--primary-red, #900);
+    outline: none;
+  }
+  
+  .filter-checkbox-group {
+    margin-top: 8px;
+  }
+  
+  .filter-checkbox-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  
+  .filter-checkbox-item input[type="checkbox"] {
+    margin-right: 8px;
+  }
+  
+  /* Highlight the number of spots filter */
+  .special-filter {
+    background-color: #f0f7ff;
+    padding: 15px;
+    border-radius: 8px;
+    border-left: 4px solid #4158D0;
+    margin-bottom: 20px;
+  }
+  
+  .special-filter .filter-label {
+    color: #4158D0;
+    font-weight: 600;
+  }
+  
+  .special-filter .filter-input {
+    border-color: #4158D0;
+  }
+  
+  .filter-actions {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 15px;
+  }
+  
+  .filter-clear-btn {
+    background-color: transparent;
+    border: 1px solid #ddd;
+    padding: 8px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    color: #666;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    flex: 1;
+  }
+  
+  .filter-apply-btn {
+    background-color: var(--primary-dark, #0A2541);
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    flex: 1;
+  }
+  
+  .filter-clear-btn:hover {
+    background-color: #f0f0f0;
+  }
+  
+  .filter-apply-btn:hover {
+    background-color: #0d3154;
+  }
+  
+  @media (max-width: 768px) {
+    .filters-panel {
+      width: 100%;
+    }
+  }

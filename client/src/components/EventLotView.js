@@ -1,68 +1,87 @@
-// client/src/components/LotView.js
 import React, { useState, useEffect, useRef } from "react";
 import ParkingService from "../services/ParkingService";
 import PanZoomControls from "./PanZoomControls";
 import "./LotView.css";
+import "./EventLotView.css";
 
-const LotMapView = ({ lotId, onBack, highlightedSpot, dateTimeRange }) => {
-  const [lotDetails, setLotDetails] = useState(null);
+const EventLotView = ({
+  lotId,
+  lotDetails,
+  onBack,
+  selectedSpots,
+  onSpotSelection,
+  isSelectingForEvent = false,
+}) => {
   const [SvgComponent, setSvgComponent] = useState(null);
   const [scale, setScale] = useState(1);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
   const [dragging, setDragging] = useState(false);
   const [startDrag, setStartDrag] = useState({ x: 0, y: 0 });
   const [svgDimensions, setSvgDimensions] = useState(null);
+  const [spotStatusMap, setSpotStatusMap] = useState({});
   const containerRef = useRef(null);
-  const [lotAvailability, setLotAvailability] = useState(null);
 
-
+  // Fetch or use provided lotDetails to build spotStatusMap
   useEffect(() => {
-    ParkingService.fetchParkingLotDetails(lotId)
-      .then((data) => setLotDetails(data))
-      .catch((err) => console.error("Error fetching lot details", err));
-  }, [lotId]);
-  useEffect(() => {
-    // Fetch lot availability for the selected time window
-    const fetchAvailability = async () => {
-      const start = encodeURIComponent(dateTimeRange.start);
-      const end = encodeURIComponent(dateTimeRange.end);
-      const data = await ParkingService.fetchLotAvailability(lotId, dateTimeRange.start, dateTimeRange.end);
-      setLotAvailability(data);
-    };
-    fetchAvailability();
-  }, [lotId, dateTimeRange]);
+    if (!lotDetails) {
+      ParkingService.fetchParkingLotDetails(lotId)
+        .then((data) => {
+          const spotStatus = {};
+          data.spots.forEach((spot) => {
+            spotStatus[spot.spotId] = {
+              status: spot.status,
+              type: spot.type,
+            };
+          });
+          setSpotStatusMap(spotStatus);
+        })
+        .catch((err) => console.error("Error fetching lot details", err));
+    } else {
+      const spotStatus = {};
+      lotDetails.spots.forEach((spot) => {
+        spotStatus[spot.spotId] = {
+          status: spot.status,
+          type: spot.type,
+        };
+      });
+      setSpotStatusMap(spotStatus);
+    }
+  }, [lotId, lotDetails]);
 
-
+  // Dynamically import the SVG component for this lot
   useEffect(() => {
     import(`../assets/svgs/${lotId}.jsx`)
       .then((module) => setSvgComponent(() => module.default))
-      .catch((err) => console.error("Error loading SVG for lot", lotId, err));
+      .catch((err) =>
+        console.error("Error loading SVG for lot", lotId, err)
+      );
   }, [lotId]);
 
+  // Center and scale the SVG on mount and window resize
   useEffect(() => {
     const recalc = () => {
       if (!SvgComponent || !containerRef.current) return;
       const svgElement = document.getElementById("svg-content");
-      if (svgElement) {
-        const svgRect = svgElement.getBoundingClientRect();
-        const iw = svgRect.width;
-        const ih = svgRect.height;
-        const cw = containerRef.current.clientWidth;
-        const ch = containerRef.current.clientHeight;
-        const newMinScale = Math.max(cw / iw, ch / ih);
-        setScale(newMinScale);
-        setOffset({
-          x: (cw - iw * newMinScale) / 2,
-          y: (ch - ih * newMinScale) / 2,
-        });
-        setSvgDimensions({ width: iw, height: ih });
-      }
+      if (!svgElement) return;
+      const svgRect = svgElement.getBoundingClientRect();
+      const iw = svgRect.width;
+      const ih = svgRect.height;
+      const cw = containerRef.current.clientWidth;
+      const ch = containerRef.current.clientHeight;
+      const newMinScale = Math.max(cw / iw, ch / ih);
+      setScale(newMinScale);
+      setOffset({
+        x: (cw - iw * newMinScale) / 2,
+        y: (ch - ih * newMinScale) / 2,
+      });
+      setSvgDimensions({ width: iw, height: ih });
     };
     recalc();
     window.addEventListener("resize", recalc);
     return () => window.removeEventListener("resize", recalc);
   }, [SvgComponent]);
 
+  // Clamp offset so the SVG cannot be panned out of view
   const clampOffset = (off, currentScale) => {
     if (!containerRef.current || !svgDimensions) return off;
     const cw = containerRef.current.clientWidth;
@@ -77,12 +96,12 @@ const LotMapView = ({ lotId, onBack, highlightedSpot, dateTimeRange }) => {
     };
   };
 
+  // Mouse event handlers for panning
   const handleMouseDown = (e) => {
     e.preventDefault();
     setDragging(true);
     setStartDrag({ x: e.clientX - offset.x, y: e.clientY - offset.y });
   };
-
   const handleMouseMove = (e) => {
     if (!dragging) return;
     const newOffset = {
@@ -91,11 +110,11 @@ const LotMapView = ({ lotId, onBack, highlightedSpot, dateTimeRange }) => {
     };
     setOffset(clampOffset(newOffset, scale));
   };
-
   const handleMouseUp = () => {
     setDragging(false);
   };
 
+  // Wheel handler for zooming
   const handleWheel = (e) => {
     e.preventDefault();
     if (!containerRef.current || !svgDimensions) return;
@@ -106,8 +125,7 @@ const LotMapView = ({ lotId, onBack, highlightedSpot, dateTimeRange }) => {
     const newMinScale = Math.max(cw / iw, ch / ih);
 
     let newScale = scale - e.deltaY * 0.001;
-    if (newScale < newMinScale) newScale = newMinScale;
-    if (newScale > 3) newScale = 3;
+    newScale = Math.min(Math.max(newScale, newMinScale), 3);
 
     const rect = containerRef.current.getBoundingClientRect();
     const mouseX = e.clientX - rect.left;
@@ -121,13 +139,12 @@ const LotMapView = ({ lotId, onBack, highlightedSpot, dateTimeRange }) => {
     setOffset(clampOffset(newOffset, newScale));
   };
 
+  // PanZoomControls handlers
   const zoomStepFactor = 1.1;
   const panStep = 20;
-
   const handleZoomIn = () => {
     if (!containerRef.current || !svgDimensions) return;
-    let newScale = scale * zoomStepFactor;
-    if (newScale > 3) newScale = 3;
+    let newScale = Math.min(scale * zoomStepFactor, 3);
     const cw = containerRef.current.clientWidth;
     const ch = containerRef.current.clientHeight;
     const centerX = cw / 2;
@@ -139,17 +156,15 @@ const LotMapView = ({ lotId, onBack, highlightedSpot, dateTimeRange }) => {
     setScale(newScale);
     setOffset(clampOffset(newOffset, newScale));
   };
-
   const handleZoomOut = () => {
     if (!containerRef.current || !svgDimensions) return;
-    let newScale = scale / zoomStepFactor;
     const cw = containerRef.current.clientWidth;
     const ch = containerRef.current.clientHeight;
     const newMinScale = Math.max(
       cw / svgDimensions.width,
       ch / svgDimensions.height
     );
-    if (newScale < newMinScale) newScale = newMinScale;
+    let newScale = Math.max(scale / zoomStepFactor, newMinScale);
     const centerX = cw / 2;
     const centerY = ch / 2;
     const newOffset = {
@@ -159,17 +174,15 @@ const LotMapView = ({ lotId, onBack, highlightedSpot, dateTimeRange }) => {
     setScale(newScale);
     setOffset(clampOffset(newOffset, newScale));
   };
-
   const handlePan = (dx, dy) => {
-    const newOffset = { x: offset.x + dx, y: offset.y + dy };
-    setOffset(clampOffset(newOffset, scale));
+    setOffset(clampOffset({ x: offset.x + dx, y: offset.y + dy }, scale));
   };
-
   const handlePanUp = () => handlePan(0, panStep);
   const handlePanDown = () => handlePan(0, -panStep);
   const handlePanLeft = () => handlePan(panStep, 0);
   const handlePanRight = () => handlePan(-panStep, 0);
 
+  // Computed control enablement
   const containerWidth = containerRef.current
     ? containerRef.current.clientWidth
     : 0;
@@ -193,89 +206,85 @@ const LotMapView = ({ lotId, onBack, highlightedSpot, dateTimeRange }) => {
     : false;
   const canPanUp = offset.y < 0;
 
+  // Update spot styling and click handlers
   useEffect(() => {
-    if (!SvgComponent || !lotDetails) return;
+    if (!SvgComponent) return;
     const svgElement = document.getElementById("svg-content");
-    if (svgElement) {
-      const validLotIds = new Set();
-      if (lotDetails.lots && Array.isArray(lotDetails.lots)) {
-        lotDetails.lots.forEach((lot) => validLotIds.add(lot.lotId));
-      } else if (lotDetails.lotId) {
-        validLotIds.add(lotDetails.lotId);
+    if (!svgElement) return;
+    const spotElements = svgElement.querySelectorAll(
+      '[data-vectornator-layer-name^="Spot"]'
+    );
+
+    spotElements.forEach((spot) => {
+      const layerName = spot.getAttribute("data-vectornator-layer-name");
+      const match = layerName.match(/Spot(\d+)/);
+      if (!match) return;
+      const num = parseInt(match[1], 10);
+      const paddedNum = String(num).padStart(4, "0");
+      const spotId = `${lotId}-${paddedNum}`;
+
+      const spotInfo = spotStatusMap[spotId];
+      const isReserved = spotInfo?.status === "reserved";
+      const isSelected = selectedSpots.includes(spotId);
+
+      // Cursor style
+      spot.style.cursor = isReserved ? "not-allowed" : "pointer";
+
+      if (isReserved) {
+        // Reserved spots
+        spot.style.fill = "#ffcccc";
+        spot.onmouseover = () => {
+          /* no hover change */
+        };
+        spot.onmouseout = () => {
+          /* no hover change */
+        };
+        spot.onclick = null;
+      } else if (isSelected) {
+        // Selected spots
+        spot.style.fill = "#4CAF50";
+        spot.onmouseover = () => {
+          spot.style.fill = "#388E3C";
+        };
+        spot.onmouseout = () => {
+          spot.style.fill = "#4CAF50";
+        };
+        if (isSelectingForEvent) {
+          spot.onclick = () => onSpotSelection(spotId, false);
+        }
+      } else {
+        // Available spots
+        spot.style.fill = "#c4ccd6";
+        spot.onmouseover = () => {
+          spot.style.fill = "#999999";
+        };
+        spot.onmouseout = () => {
+          spot.style.fill = "#c4ccd6";
+        };
+        if (isSelectingForEvent) {
+          spot.onclick = () => onSpotSelection(spotId, true);
+        }
       }
-      console.log(validLotIds)
-
-      const spotElements = svgElement.querySelectorAll(
-        '[data-vectornator-layer-name^="Spot"]'
-      );
-      spotElements.forEach((spot) => {
-        const layerName = spot.getAttribute("data-vectornator-layer-name"); // e.g., "Spot1"
-        
-        let currentLotId = lotId;
-        const parentGroup = spot.closest("g[data-vectornator-layer-name]");
-        if (parentGroup) {
-          const groupName = parentGroup.getAttribute(
-            "data-vectornator-layer-name"
-          );
-          // Only use groupName if it exists in our set of valid lot IDs.
-          if (validLotIds.has(groupName)) {
-            currentLotId = groupName;
-          }
-        }
-
-        const match = layerName.match(/Spot(\d+)/);
-        if (match) {
-          const num = parseInt(match[1], 10);
-          const paddedNum = String(num).padStart(4, "0");
-          // Assuming lotId is available in the parent scope as a prop
-          const spotId = `${currentLotId}-${paddedNum}`;
-          const spotData =
-            lotAvailability?.spots &&
-            lotAvailability.spots.find((s) => s.spotId === spotId);
-
-          if (spotData && !spotData.available) {
-            spot.style.fill = "#ffcccc";
-            spot.onmouseover = () => {
-              spot.style.fill = "#cc6666";
-            };
-            spot.onmouseout = () => {
-              spot.style.fill = "#ffcccc";
-            };
-          } else {
-            spot.style.fill = "#c4ccd6";
-            spot.onmouseover = () => {
-              spot.style.fill = "#999999";
-            };
-            spot.onmouseout = () => {
-              spot.style.fill = "#c4ccd6";
-            };
-          }
-          // If this spot is the highlighted spot, add a glowing class.
-          if (spotId === highlightedSpot) {
-            spot.classList.add("highlighted-spot");
-          } else {
-            spot.classList.remove("highlighted-spot");
-          }
-          // Optional: on click, update highlighted spot.
-          spot.onclick = () => {
-            console.log("Clicked spot", spotId, spotData);
-            // Update the highlighted spot so the glowing effect changes accordingly.
-            // setHighlightedSpot(spotId); // if you want the SVG to respond to clicks.
-          };
-        }
-      });
-    }
-  }, [SvgComponent, lotDetails, lotId, highlightedSpot, lotAvailability]);
+    });
+  }, [
+    SvgComponent,
+    spotStatusMap,
+    selectedSpots,
+    lotId,
+    isSelectingForEvent,
+    onSpotSelection,
+  ]);
 
   if (!SvgComponent) {
-    return <div>Loading SVG...</div>;
+    return <div>Loading parking lot map...</div>;
   }
 
   return (
-    <div className="lot-map-view">
+    <div className="event-lot-view">
       <button className="back-button" onClick={onBack}>
         Back
       </button>
+
       <PanZoomControls
         canZoomIn={canZoomIn}
         canZoomOut={canZoomOut}
@@ -290,6 +299,7 @@ const LotMapView = ({ lotId, onBack, highlightedSpot, dateTimeRange }) => {
         onPanLeft={handlePanLeft}
         onPanRight={handlePanRight}
       />
+
       <div
         className="svg-container"
         ref={containerRef}
@@ -312,4 +322,4 @@ const LotMapView = ({ lotId, onBack, highlightedSpot, dateTimeRange }) => {
   );
 };
 
-export default LotMapView;
+export default EventLotView;

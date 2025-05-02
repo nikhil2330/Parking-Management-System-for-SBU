@@ -1,5 +1,3 @@
-// server/App.js
-
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
@@ -14,7 +12,7 @@ const parkingRoutes = require('./routes/parkingRoutes');
 const authenticateJWT = require('./middleware/authenticateJWT');
 const adminRoutes = require('./routes/adminRoutes');
 const ticketRoutes = require('./routes/ticketRoutes');
-
+const eventReservationRoutes = require('./routes/eventReservationRoutes'); // Import the new routes
 
 const app = express();
 
@@ -40,6 +38,7 @@ app.use('/api/payment', authenticateJWT, paymentRoutes);
 app.use('/api/parking', parkingRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/tickets', ticketRoutes);
+app.use('/api/event-reservation', authenticateJWT, eventReservationRoutes); // Register the new routes
 
 // Health check or status endpoint
 if (process.env.NODE_ENV === 'production') {

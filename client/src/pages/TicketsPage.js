@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import './tickets-page.css';
+import ApiService from '../services/api';  
+
 
 // axios helper with authentication
 const api = axios.create({ baseURL: process.env.REACT_APP_API_URL });
@@ -23,6 +25,9 @@ function TicketsPage() {
   const [showPaymentSuccess, setShowPaymentSuccess] = useState(false);
   const [paymentProcessing, setPaymentProcessing] = useState(false);
   const successMessageRef = useRef(null);
+  const [searchParams] = useSearchParams();
+  const sessionId = searchParams.get('session_id');
+
 
   // Fetch user tickets
   useEffect(() => {
@@ -61,6 +66,21 @@ function TicketsPage() {
     fetchTickets();
   }, []);
 
+  useEffect(() => {
+    if (!sessionId) return;
+    (async () => {
+      try {
+        await api.post('/auth/ping');        // optional keep-alive if you need it
+        await ApiService.payment.confirmTicket(sessionId);
+        // refresh list
+        const { data } = await api.get('/tickets/user');
+        setTickets(Array.isArray(data) ? data : []);
+      } catch (e) {
+        console.error('Ticket payment confirm failed', e);
+      }
+    })();
+  }, [sessionId]);
+  
   // Format date helper
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -122,6 +142,14 @@ function TicketsPage() {
     
     setActiveTicket(ticket);
     setShowModal(true);
+    try {
+          const { url } =
+            await ApiService.payment.createTicketCheckoutSession(ticket._id);
+          window.location.href = url;     
+        } catch (err) {
+          console.error(err);
+          alert(err.message || 'Could not start checkout');
+        }
   };
 
   // Process payment

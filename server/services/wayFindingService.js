@@ -4,7 +4,7 @@ const neo4j = require('neo4j-driver');
 const PriorityQueue = require('js-priority-queue');
 
 
-async function findClosestAvailableSpots(buildingId, availableSpotIds) {
+async function findClosestAvailableSpots(buildingId, availableSpotIds, limit = 4) {
   const session = driver.session();
   try {
     const result = await session.run(
@@ -23,7 +23,7 @@ async function findClosestAvailableSpots(buildingId, availableSpotIds) {
     
     distances[startNodeId] = 0;
     pq.queue({ node: buildingNode, distance: 0 });
-    const n =4
+    const n =limit;
     const foundSpots = [];
 
     while (pq.length && foundSpots.length < n) {
@@ -37,6 +37,7 @@ async function findClosestAvailableSpots(buildingId, availableSpotIds) {
 
       if (current.node.labels.includes('Spot')) {
         const spotId = current.node.properties.id;
+
         if (availableSpotIds.has(spotId)) {
           foundSpots.push({ spotId, distance: current.distance });
           if (foundSpots.length === n) break;
