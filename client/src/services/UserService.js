@@ -21,7 +21,7 @@ API.interceptors.request.use(
  * GET /api/users/profile
  * Returns the full user object from the server.
  */
-axios.defaults.baseURL = 'http://localhost:8000';
+//axios.defaults.baseURL = 'http://localhost:8000';
 const getProfile = async () => {
   try {
     const { data } = await API.get('/users/profile');

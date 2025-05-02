@@ -6,7 +6,7 @@ const API = axios.create({
   baseURL: process.env.REACT_APP_API_URL,  // uses .env or falls back to proxy
   headers: { 'Content-Type': 'application/json' }
 });
-axios.defaults.baseURL = 'http://localhost:8000';
+//axios.defaults.baseURL = 'http://localhost:8000';
 
 const registerUser = async (userData) => {
   
