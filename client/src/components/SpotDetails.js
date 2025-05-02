@@ -547,6 +547,23 @@ const SpotDetails = ({ spotId, onClose, onReserve, onGetDirections, minWalkTime,
           />
           Get Directions
         </button>
+        <button className="spot-card-btn popular-times-btn" onClick={togglePopularTimes} style={{ padding: '0.5rem 1rem' }}>
+
+          {/* Example chart icon – you can replace this SVG with one you like */}
+
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+
+            <rect x="3" y="3" width="4" height="12"></rect>
+
+            <rect x="10" y="8" width="4" height="7"></rect>
+
+            <rect x="17" y="5" width="4" height="10"></rect>
+
+          </svg>
+
+          Popular Times
+
+        </button>
       </div>
     </div>
   );

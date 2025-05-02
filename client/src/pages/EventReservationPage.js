@@ -10,6 +10,46 @@ import GoogleMapsService from '../services/GoogleMapService';
 import './premium-search-parking.css';
 import './event-reservation.css';
 
+const DEFAULT_FILTERS = {
+  price: [0, 20],
+  covered: "",
+  zone: "",
+  categories: {
+    commuterPremium: false,
+    metered: false,
+    commuter: false,
+    resident: false,
+    ada: false,
+    reservedMisc: false,
+    stateVehiclesOnly: false,
+    specialServiceVehiclesOnly: false,
+    stateAndSpecialServiceVehicles: false,
+    evCharging: false,
+  },
+  spotsNeeded: 1,
+};
+
+function getNextHourDate() {
+  const now = new Date();
+  now.setMinutes(0, 0, 0);
+  now.setHours(now.getHours() + 1);
+  return now;
+}
+function formatDateForInput(date) {
+  const pad = (n) => n.toString().padStart(2, "0");
+  return (
+    date.getFullYear() +
+    "-" +
+    pad(date.getMonth() + 1) +
+    "-" +
+    pad(date.getDate()) +
+    "T" +
+    pad(date.getHours()) +
+    ":" +
+    pad(date.getMinutes())
+  );
+}
+
 function EventReservationPage() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -32,17 +72,50 @@ function EventReservationPage() {
   const [showEventForm, setShowEventForm] = useState(false);
   const spotsAbortControllerRef = useRef(null);
   
-  const [activeFilters, setActiveFilters] = useState({
-    destination: '',
-    spotsNeeded: '',
-    zone: '',
-    ratePlan: '',
-    covered: '',
-    paymentKiosk: false,
-    evCharging: false,
-    bikeRack: false,
-    shuttleService: false
+  // Filters and time
+  const [draftFilters, setDraftFilters] = useState(DEFAULT_FILTERS);
+  const [activeFilters, setActiveFilters] = useState(DEFAULT_FILTERS);
+
+  // Time range
+  const defaultStart = getNextHourDate();
+  const defaultEnd = new Date(defaultStart);
+  defaultEnd.setHours(defaultEnd.getHours() + 2);
+  const [dateTimeRange, setDateTimeRange] = useState({
+    start: formatDateForInput(defaultStart),
+    end: formatDateForInput(defaultEnd),
   });
+  const [appliedDateTimeRange, setAppliedDateTimeRange] = useState({
+    start: formatDateForInput(defaultStart),
+    end: formatDateForInput(defaultEnd),
+  });
+
+  // Handle time changes
+  const handleDateTimeRangeChange = (field, value) => {
+    setDateTimeRange((prev) => {
+      const updated = { ...prev, [field]: value };
+      setAppliedDateTimeRange(updated); // Immediately apply
+      return updated;
+    });
+  };
+
+  // Handle filter changes
+  const handleFilterChange = (name, value) => {
+    setDraftFilters((prev) => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleApplyFilters = () => {
+    setActiveFilters(draftFilters);
+    performSearch();
+  };
+
+  const handleFilterClear = () => {
+    setDraftFilters(DEFAULT_FILTERS);
+    setActiveFilters(DEFAULT_FILTERS);
+    performSearch();
+  };
 
   useEffect(() => {
     // On first render, force the URL to reset to '/event-reservation'
@@ -85,16 +158,14 @@ function EventReservationPage() {
   }, [searchQuery, searchedBuilding]);
 
   const performSearch = async (selectedBuilding = null) => {
-    console.log('Performing search with building:', searchedBuilding || selectedBuilding);
     setClosestLots([]);
     setLoading(true);
     setIsCollapsed(false);
     setError(null);
 
-    let buildingId = '';
+    let buildingId = "";
     let buildingToUse = null;
 
-    // If a building is passed (from suggestion click), use it
     if (selectedBuilding) {
       buildingToUse = selectedBuilding;
       buildingId = selectedBuilding.buildingID;
@@ -102,7 +173,6 @@ function EventReservationPage() {
       buildingToUse = searchedBuilding;
       buildingId = searchedBuilding.buildingID;
     } else if (buildingSuggestions.length > 0) {
-      // Try to find an exact match first
       const exactMatch = buildingSuggestions.find(
         (b) => b.name.toLowerCase() === searchQuery.trim().toLowerCase()
       );
@@ -112,7 +182,6 @@ function EventReservationPage() {
         setSearchedBuilding(exactMatch);
         setSearchQuery(exactMatch.name);
       } else {
-        // Fallback to the first suggestion
         buildingToUse = buildingSuggestions[0];
         buildingId = buildingSuggestions[0].buildingID;
         setSearchedBuilding(buildingSuggestions[0]);
@@ -124,15 +193,14 @@ function EventReservationPage() {
       return;
     }
 
-    // Clear suggestions once search is triggered
     setBuildingSuggestions([]);
 
-    // Recenter if autoCenter is enabled and building has a centroid.
     if (buildingToUse && buildingToUse.centroid) {
       setAutoCenter(true);
       setMapCenter([buildingToUse.centroid.y, buildingToUse.centroid.x]);
     }
 
+    // Abort previous search if any
     if (spotsAbortControllerRef.current) {
       spotsAbortControllerRef.current.abort();
     }
@@ -140,120 +208,79 @@ function EventReservationPage() {
     spotsAbortControllerRef.current = controller;
 
     try {
-      navigate(
-        `/event-reservation?buildingId=${encodeURIComponent(buildingToUse.buildingID)}${
-          selectedLotId ? `&lotId=${encodeURIComponent(selectedLotId)}` : ''
-        }`
+      // Always pass filters, time, and signal
+      const data = await ParkingService.fetchClosestSpots(
+        buildingId,
+        activeFilters,
+        appliedDateTimeRange.start,
+        appliedDateTimeRange.end,
+        { signal: controller.signal, limit: 100 }
       );
-      
-      // First, get closest spots like the regular search
-      const data = await ParkingService.fetchClosestSpots(buildingId, {
-        signal: controller.signal,
-        limit: 50
-      });
-      console.log('Closest spots:', data.spots);
-      
-      if (data.spots && data.spots.length > 0) {
-        // Group spots by lot to create our lot-based results
-        const spotsByLot = {};
-        const minSpotsNeeded = activeFilters.spotsNeeded ? parseInt(activeFilters.spotsNeeded) : 1;
-        
-        // Track which lots we process and their distances
-        const processedLots = new Map();
-        
-        // Process each spot
-        for (const spot of data.spots) {
-          // Extract lotId from spotId (format: lotId-spotNumber)
-          const lotId = spot.spotId.split('-')[0];
-          
-          if (!spotsByLot[lotId]) {
-            spotsByLot[lotId] = {
-              lotId: lotId,
-              spots: [],
-              distance: spot.distance, // Initialize with first spot's distance
-            };
-          }
-          
-          // Add spot to this lot
-          spotsByLot[lotId].spots.push(spot);
-          
-          // Track the minimum distance for this lot
-          if (spot.distance < spotsByLot[lotId].distance) {
-            spotsByLot[lotId].distance = spot.distance;
-          }
+
+      // Group spots by lot
+      const spotsByLot = {};
+      const minSpotsNeeded = activeFilters.spotsNeeded ? parseInt(activeFilters.spotsNeeded) : 1;
+      for (const spot of data.spots) {
+        const lotId = spot.spotId.split('-')[0];
+        if (!spotsByLot[lotId]) {
+          spotsByLot[lotId] = {
+            lotId: lotId,
+            spots: [],
+            distance: spot.distance,
+          };
         }
-        
-        // Get detailed lot information for each lot
-        const lotDetailsPromises = Object.values(spotsByLot).map(async (lotInfo) => {
-          try {
-            const details = await ParkingService.fetchParkingLotDetails(lotInfo.lotId);
-            
-            // pull out the lot doc and its spots array
-const {
-  lots: [ lotInfoDoc ],
-  spots: allSpots
-} = details;
-
-// only count the spots in this lot
-const lotSpots = allSpots.filter(s =>
-  s.lot.toString() === lotInfoDoc._id.toString()
-);
-
-// now count only those still marked "available"
-const availableCount = lotSpots.filter(s => s.status === 'available').length;
-
-            
-return {
-  lotId: lotInfo.lotId,
-  officialLotName: lotInfoDoc.officialLotName || lotInfo.lotId,
-  availableSpots: availableCount,
-  totalSpots: lotInfoDoc.capacity || lotSpots.length,
-  distance: lotInfo.distance,
-};
-
-          } catch (err) {
-            console.error(`Failed to get details for lot ${lotInfo.lotId}:`, err);
-            return {
-              lotId: lotInfo.lotId,
-              officialLotName: lotInfo.lotId,
-              availableSpots: lotInfo.spots.length,
-              totalSpots: lotInfo.spots.length,
-              distance: lotInfo.distance,
-            };
-          }
-        });
-        
-        // Wait for all lot detail requests to complete
-        const lotsWithDetails = await Promise.all(lotDetailsPromises);
-        
-        // Filter lots that have enough spots
-        const filteredLots = lotsWithDetails.filter(lot => lot.availableSpots >= minSpotsNeeded);
-        
-        // Sort by distance
-        filteredLots.sort((a, b) => a.distance - b.distance);
-
-        const topLots = filteredLots.slice(0, 5);
-        
-        if (filteredLots.length === 0) {
-          setError(`No parking lots found with at least ${minSpotsNeeded} available spots.`);
+        spotsByLot[lotId].spots.push(spot);
+        if (spot.distance < spotsByLot[lotId].distance) {
+          spotsByLot[lotId].distance = spot.distance;
         }
-        console.log('Filtered lots:', filteredLots);
-        console.log('Top 3 lots to display:', topLots);
-        setClosestLots(topLots);
-      } else {
-        setError("No parking spots found near this building.");
       }
-      
+
+      // Get lot details for each lot
+      const lotDetailsPromises = Object.values(spotsByLot).map(async (lotInfo) => {
+        try {
+          const details = await ParkingService.fetchParkingLotDetails(lotInfo.lotId);
+          const {
+            lots: [ lotInfoDoc ],
+            spots: allSpots
+          } = details;
+          const lotSpots = allSpots.filter(s =>
+            s.lot.toString() === lotInfoDoc._id.toString()
+          );
+          const availableCount = lotSpots.filter(s => s.status === 'available').length;
+          return {
+            lotId: lotInfo.lotId,
+            officialLotName: lotInfoDoc.officialLotName || lotInfo.lotId,
+            availableSpots: availableCount,
+            totalSpots: lotInfoDoc.capacity || lotSpots.length,
+            distance: lotInfo.distance,
+          };
+        } catch (err) {
+          return {
+            lotId: lotInfo.lotId,
+            officialLotName: lotInfo.lotId,
+            availableSpots: lotInfo.spots.length,
+            totalSpots: lotInfo.spots.length,
+            distance: lotInfo.distance,
+          };
+        }
+      });
+
+      const lotsWithDetails = await Promise.all(lotDetailsPromises);
+      // Filter lots that have enough spots
+      const filteredLots = lotsWithDetails.filter(lot => lot.availableSpots >= minSpotsNeeded);
+      filteredLots.sort((a, b) => a.distance - b.distance);
+      setClosestLots(filteredLots.slice(0, 5));
+      if (filteredLots.length === 0) {
+        setError(`No parking lots found with at least ${minSpotsNeeded} available spots.`);
+      }
       if (buildingToUse && buildingToUse.centroid) {
         setSelectedBuildingCoordinates([buildingToUse.centroid.y, buildingToUse.centroid.x]);
       }
     } catch (err) {
       if (err.name === 'AbortError') {
-        console.log('Request aborted for current search.');
         return;
       } else {
         setError("Failed to load closest lots");
-        console.error(err);
       }
     } finally {
       if (spotsAbortControllerRef.current === controller) {
@@ -262,15 +289,53 @@ return {
     }
   };
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    setBuildingSuggestions([]);
-    setAutoCenter(true);
-    performSearch();
+
+  // const handleSpotSelection = (spotId, isSelected) => {
+  //   let isReserved = false;
+  //   if (selectedLotDetails && selectedLotDetails.spots) {
+  //     const spotDetail = selectedLotDetails.spots.find(spot => spot.spotId === spotId);
+  //     isReserved = spotDetail?.status === "reserved";
+  //   }
+  //   if (isReserved && isSelected) return;
+  //   if (isSelected) {
+  //     setSelectedSpots(prev => [...prev, spotId]);
+  //   } else {
+  //     setSelectedSpots(prev => prev.filter(id => id !== spotId));
+  //   }
+  // };
+
+
+  const handleCreateEventReservation = async () => {
+    if (!eventName.trim()) {
+      alert("Please enter an event name.");
+      return;
+    }
+    if (selectedSpots.length === 0) {
+      alert("Please select at least one parking spot.");
+      return;
+    }
+    try {
+      const totalPrice = selectedSpots.length * 10; // Example: $10 per spot
+      const reservationData = {
+        lotId: selectedLotId,
+        spotIds: selectedSpots,
+        building: searchedBuilding?.buildingID,
+        startTime: appliedDateTimeRange.start,
+        endTime: appliedDateTimeRange.end,
+        totalPrice,
+        eventName,
+        reason: eventReason
+      };
+      await EventReservationService.createEventReservation(reservationData);
+      alert("Event reservation request submitted successfully. Waiting for admin approval.");
+      navigate('/reservations');
+    } catch (error) {
+      alert(`Failed to create event reservation: ${error.message}`);
+    }
   };
 
+  // Building suggestion select
   const handleSuggestionSelect = (building) => {
-    console.log('Selected building:', building);
     setSearchQuery(building.name);
     setSearchedBuilding(building);
     setBuildingSuggestions([]);
@@ -278,31 +343,21 @@ return {
     performSearch(building);
   };
 
+  // Search bar submit
+  const handleSearch = (e) => {
+    e.preventDefault();
+    setBuildingSuggestions([]);
+    setAutoCenter(true);
+    performSearch();
+  };
+
+
   const handleMapMove = (newCenter) => {
     setMapCenter(newCenter);
     setAutoCenter(false);
   };
 
-  const handleFilterChange = (name, value) => {
-    setActiveFilters(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
-  const handleFilterClear = () => {
-    setActiveFilters({
-      destination: '',
-      spotsNeeded: '',
-      zone: '',
-      ratePlan: '',
-      covered: '',
-      paymentKiosk: false,
-      evCharging: false,
-      bikeRack: false,
-      shuttleService: false
-    });
-  };
+  
 
   const handleLotClick = async (lotId) => {
     setSelectedLotId(lotId);
@@ -361,40 +416,6 @@ return {
     setShowEventForm(true);
   };
 
-  const handleCreateEventReservation = async () => {
-    if (!eventName.trim()) {
-      alert("Please enter an event name.");
-      return;
-    }
-    
-    if (selectedSpots.length === 0) {
-      alert("Please select at least one parking spot.");
-      return;
-    }
-    
-    try {
-      // Calculate total price based on selected spots
-      const totalPrice = selectedSpots.length * 10; // Example: $10 per spot
-      
-      const reservationData = {
-        lotId: selectedLotId,
-        spotIds: selectedSpots,
-        building: searchedBuilding?.buildingID,
-        startTime: new Date().toISOString(), // Replace with actual datetime picker value
-        endTime: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(), // Example: 2 hours later
-        totalPrice,
-        eventName,
-        reason: eventReason
-      };
-      
-      await EventReservationService.createEventReservation(reservationData);
-      alert("Event reservation request submitted successfully. Waiting for admin approval.");
-      navigate('/reservations');
-    } catch (error) {
-      console.error("Error creating event reservation:", error);
-      alert(`Failed to create event reservation: ${error.message}`);
-    }
-  };
 
   const handleCancelSearch = () => {
     setLoading(false);

@@ -5,32 +5,13 @@ axios.defaults.baseURL = 'http://localhost:8000';
 
 const fetchClosestSpots = async (buildingId, filters, startTime, endTime, { limit, signal } = {}) => {
   try {
-    const params = { buildingId, filters, startTime, endTime, ...(limit ? { limit } : {}) };
-    const response = await axios.get('/api/parking/closest-spots', {
-     params,
-      signal
-    });
+    const data = { buildingId, filters, startTime, endTime, ...(limit ? { limit } : {}) };
+    const response = await axios.post('/api/parking/closest-spots', data, { signal });
     return response.data;
   } catch (error) {
     const errMsg = error.response?.data?.error || error.message;
     throw new Error(errMsg);
   }
-};
-
-const fetchFilteredAvailableSpots = async (filters, startTime, endTime) => {
-  const res = await axios.post("/api/parking/filtered-available-spots", {
-    ...filters,
-    startTime,
-    endTime,
-  });
-  return res.data.spots;
-};
-
-const fetchAllAvailableSpots = async (startTime, endTime) => {
-  const res = await axios.get("/api/parking/all-available-spots", {
-    params: { startTime, endTime },
-  });
-  return res.data.spots;
 };
 
 const fetchLotAvailability = async (lotId, start, end) => {
@@ -109,8 +90,6 @@ export default {
   fetchParkingOverlay,
   searchBuildings,
   fetchPopularTimes,
-  fetchAllAvailableSpots,
-  fetchFilteredAvailableSpots,
   fetchLotAvailability,
   fetchSpotReservations,
 };
