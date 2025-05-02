@@ -180,6 +180,7 @@ function SearchParkingPage() {
   // Only updates draft filters (UI), not active filters
   const handleFilterClear = () => {
     setDraftFilters(DEFAULT_FILTERS);
+    setActiveFilters(DEFAULT_FILTERS);
   };
 
   // Copies draft filters to active filters and fetches filtered spots (but does NOT search)

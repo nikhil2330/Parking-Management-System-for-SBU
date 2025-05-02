@@ -223,22 +223,17 @@ const EventLotView = ({
       const paddedNum = String(num).padStart(4, "0");
       const spotId = `${lotId}-${paddedNum}`;
 
-      const spotInfo = spotStatusMap[spotId];
-      const isReserved = spotInfo?.status === "reserved";
+      const spotInfo = lotDetails?.spots?.find((s) => s.spotId === spotId);
+      const isAvailable = spotInfo?.isAvailableForTime;
       const isSelected = selectedSpots.includes(spotId);
 
-      // Cursor style
-      spot.style.cursor = isReserved ? "not-allowed" : "pointer";
+      spot.style.cursor = isAvailable ? "pointer" : "not-allowed";
 
-      if (isReserved) {
-        // Reserved spots
+      if (!isAvailable) {
+        // Unavailable spots (reserved for the selected time window)
         spot.style.fill = "#ffcccc";
-        spot.onmouseover = () => {
-          /* no hover change */
-        };
-        spot.onmouseout = () => {
-          /* no hover change */
-        };
+        spot.onmouseover = null;
+        spot.onmouseout = null;
         spot.onclick = null;
       } else if (isSelected) {
         // Selected spots
