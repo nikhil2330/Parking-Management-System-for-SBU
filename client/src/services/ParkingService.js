@@ -83,6 +83,17 @@ const fetchSpotReservations = async (spotId, start, end) => {
   return res.data.reservations;
 };
 
+const fetchClosestLots = async (buildingId, filters, startTime, endTime, { signal } = {}) => {
+  try {
+    const data = { buildingId, filters, startTime, endTime };
+    const response = await axios.post('/api/parking/closest-lots', data, { signal });
+    return response.data;
+  } catch (error) {
+    const errMsg = error.response?.data?.error || error.message;
+    throw new Error(errMsg);
+  }
+};
+
 export default {
   fetchClosestSpots,
   fetchSpotDetails,
@@ -92,4 +103,5 @@ export default {
   fetchPopularTimes,
   fetchLotAvailability,
   fetchSpotReservations,
+  fetchClosestLots,
 };

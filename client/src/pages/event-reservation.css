@@ -14,6 +14,23 @@
     margin: 0 0 5px 0;
     color: #0A2541;
   }
+
+  .special-filter {
+    background-color: #f0f7ff;
+    padding: 15px;
+    border-radius: 8px;
+    border-left: 4px solid #4158D0;
+    margin-bottom: 20px;
+  }
+  
+  .special-filter .filter-label {
+    color: #4158D0;
+    font-weight: 600;
+  }
+  
+  .special-filter .filter-input {
+    border-color: #4158D0;
+  }
   
   .event-reservation-header p {
     margin: 0;
