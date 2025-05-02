@@ -23,9 +23,9 @@ const ParkingSpotSchema = new Schema(
       coordinates: { type: [Number], index: '2dsphere' }
     },
     
-    reservedBy: { type: Schema.Types.ObjectId, ref: 'User', default: null },
+    // reservedBy: { type: Schema.Types.ObjectId, ref: 'User', default: null },
     
-    reservationExpiresAt: { type: Date, default: null },
+    // reservationExpiresAt: { type: Date, default: null },
   },
   { timestamps: true }
 );

@@ -8,7 +8,6 @@ router.get('/overlay', parkingController.getParkingOverlay);
 
 // Closest available spots (for search results)
 router.post('/closest-spots', parkingController.getClosestSpots);
-router.get('/available-spots', parkingController.getAvailableSpots);
 
 
 // Detailed spot info
@@ -19,10 +18,12 @@ router.get('/lot/:lotId/details', parkingController.getParkingLotDetails);
 
 router.get('/search/buildings', parkingController.searchBuildings);
 
-router.post('/filtered-available-spots', parkingController.getFilteredAvailableSpots);
+router.get('/lot/:lotId/availability', parkingController.getLotAvailability);
 
 
 // GET /api/popularTimes/:lotId
 router.get('/popularTimes/:lotId', parkingController.getPopularTimesController);
+
+router.get('/spot/:spotId/reservations', parkingController.getSpotReservations);
 
 module.exports = router;

@@ -4,20 +4,72 @@ const ParkingLot = require('../models/ParkingLot');
 const ParkingSpot = require('../models/ParkingSpot');
 const mongoose = require('mongoose');
 
+
+async function updateSpotAndLotStatus(spotId, lotId) {
+  const now = new Date();
+
+  // 1. Update spot status
+  const reservations = await Reservation.find({
+    spot: spotId,
+    status: { $in: ['pending', 'active'] },
+    startTime: { $lt: now },
+    endTime: { $gt: now }
+  });
+
+  let status = 'available';
+  if (reservations.length > 0) {
+    status = reservations[0].status === 'active' ? 'occupied' : 'reserved';
+  } else {
+    // Check for future reservation
+    const futureRes = await Reservation.findOne({
+      spot: spotId,
+      status: { $in: ['pending', 'active'] },
+      startTime: { $gt: now }
+    });
+    if (futureRes) status = 'reserved';
+  }
+  await ParkingSpot.findByIdAndUpdate(spotId, { status });
+
+  // 2. Update lot availability and categories
+  const lot = await ParkingLot.findById(lotId).populate('spots');
+  if (!lot) return;
+
+  const spotIds = lot.spots.map(s => s._id);
+  const reservedNow = await Reservation.find({
+    spot: { $in: spotIds },
+    status: { $in: ['pending', 'active'] },
+    startTime: { $lt: now },
+    endTime: { $gt: now }
+  }).select('spot');
+
+  const reservedIds = new Set(reservedNow.map(r => r.spot.toString()));
+  let available = 0;
+  const categories = {};
+  for (const spot of lot.spots) {
+    if (!reservedIds.has(spot._id.toString())) available++;
+    categories[spot.type] = (categories[spot.type] || 0) + (!reservedIds.has(spot._id.toString()) ? 1 : 0);
+  }
+  lot.availability.available = available;
+  for (const cat of Object.keys(lot.categories)) {
+    lot.categories[cat] = categories[cat] || 0;
+  }
+  await lot.save();
+}
+
 /**
  * Create a new reservation with enhanced error handling.
  */
 exports.createReservation = async (req, res) => {
   console.log('Reservation request received:', req.body);
   console.log('User from JWT:', req.user);
-  
+
   const { lotId, spotId, building, startTime, endTime, totalPrice } = req.body;
   const userId = req.user?.id;
 
   // Validate required fields
   if (!lotId || !spotId || !startTime || !endTime || !totalPrice) {
     console.log('Missing required fields:', { lotId, spotId, startTime, endTime, totalPrice });
-    return res.status(400).json({ 
+    return res.status(400).json({
       error: 'Missing required fields',
       details: {
         lotId: lotId ? 'present' : 'missing',
@@ -37,7 +89,7 @@ exports.createReservation = async (req, res) => {
 
   // Convert string IDs to ObjectIds if needed
   let lotObjectId, spotObjectId, buildingObjectId;
-  
+
   try {
     // First try to find parking spot by spotId string field
     const spot = await ParkingSpot.findOne({ spotId });
@@ -54,7 +106,7 @@ exports.createReservation = async (req, res) => {
         return res.status(400).json({ error: 'Invalid spot ID format' });
       }
     }
-    
+
     // Same for lot
     const lot = await ParkingLot.findOne({ lotId });
     if (lot) {
@@ -67,7 +119,7 @@ exports.createReservation = async (req, res) => {
       console.log('Invalid lotId format:', lotId);
       return res.status(400).json({ error: 'Invalid lot ID format' });
     }
-    
+
     // Handle building ID if provided
     if (building) {
       if (mongoose.Types.ObjectId.isValid(building)) {
@@ -82,11 +134,22 @@ exports.createReservation = async (req, res) => {
     return res.status(400).json({ error: 'Error processing parking IDs', details: idError.message });
   }
 
+  // Overlap checker
+  const overlap = await Reservation.findOne({
+    spot: spotObjectId,
+    status: { $in: ['pending', 'active'] },
+    $or: [
+      { startTime: { $lt: new Date(endTime) }, endTime: { $gt: new Date(startTime) } }
+    ]
+  });
+  if (overlap) {
+    return res.status(409).json({ error: 'Spot already reserved for this time window.' });
+  }
+
   const session = await mongoose.startSession();
   session.startTransaction();
-  
+
   try {
-    // Create the reservation with ObjectIds
     const reservationData = {
       lot: lotObjectId,
       spot: spotObjectId,
@@ -98,52 +161,24 @@ exports.createReservation = async (req, res) => {
       paymentStatus: 'unpaid',
       status: 'pending'
     };
-    
-    console.log('Creating reservation with data:', reservationData);
-    
     const [newRes] = await Reservation.create([reservationData], { session });
-    console.log('Reservation created successfully:', newRes);
 
-    // Update the ParkingSpot
-    const spotUpdateResult = await ParkingSpot.findByIdAndUpdate(
-      spotObjectId,
-      {
-        status: 'reserved',
-        reservedBy: userId,
-        reservationExpiresAt: new Date(endTime)
-      },
-      { session, new: true }
-    );
-    
-    console.log('Spot update result:', spotUpdateResult ? 'success' : 'spot not found');
-
-    // Update the ParkingLot
-    const lotUpdateResult = await ParkingLot.findByIdAndUpdate(
-      lotObjectId,
-      { $inc: { 'availability.available': -1 } },
-      { session, new: true }
-    );
-    
-    console.log('Lot update result:', lotUpdateResult ? 'success' : 'lot not found');
+    await updateSpotAndLotStatus(spotObjectId, lotObjectId);
 
     await session.commitTransaction();
     session.endSession();
-
     return res.status(201).json(newRes);
   } catch (err) {
     await session.abortTransaction();
     session.endSession();
     console.error('Error creating reservation:', err);
-    
+
     // Enhanced error response
     if (err.name === 'ValidationError') {
       const validationErrors = {};
-      
-      // Extract validation error messages
       for (const field in err.errors) {
         validationErrors[field] = err.errors[field].message;
       }
-      
       return res.status(400).json({
         error: 'Validation error',
         details: validationErrors
@@ -154,9 +189,9 @@ exports.createReservation = async (req, res) => {
         details: `${err.path}: ${err.value}`
       });
     }
-    
-    return res.status(500).json({ 
-      error: 'Internal server error', 
+
+    return res.status(500).json({
+      error: 'Internal server error',
       message: err.message,
       stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
     });
@@ -182,32 +217,31 @@ exports.updateReservation = async (req, res) => {
   const reservationId = req.params.id;
   const { startTime, endTime, totalPrice, building } = req.body;
   try {
-    const updateData = {
-      startTime: new Date(startTime),
-      endTime: new Date(endTime),
-      totalPrice
-    };
-    if (building) {
-      updateData.building = building;
+    const reservation = await Reservation.findById(reservationId);
+    if (!reservation) return res.status(404).json({ error: 'Reservation not found' });
+
+    // Overlap checker
+    const overlap = await Reservation.findOne({
+      spot: reservation.spot,
+      _id: { $ne: reservationId },
+      status: { $in: ['pending', 'active'] },
+      $or: [
+        { startTime: { $lt: new Date(endTime) }, endTime: { $gt: new Date(startTime) } }
+      ]
+    });
+    if (overlap) {
+      return res.status(409).json({ error: 'Spot already reserved for this time window.' });
     }
 
-    const updatedRes = await Reservation.findOneAndUpdate(
-      { _id: reservationId },
-      updateData,
-      { new: true }
-    );
-    
-    if (!updatedRes) {
-      return res.status(404).json({ error: 'Reservation not found' });
-    }
-    
-    // Also update the spot's reservation expiry
-    await ParkingSpot.findByIdAndUpdate(
-      updatedRes.spot,
-      { reservationExpiresAt: new Date(endTime) }
-    );
-    
-    return res.json(updatedRes);
+    reservation.startTime = new Date(startTime);
+    reservation.endTime = new Date(endTime);
+    reservation.totalPrice = totalPrice;
+    if (building) reservation.building = building;
+    await reservation.save();
+
+    await updateSpotAndLotStatus(reservation.spot, reservation.lot);
+
+    return res.json(reservation);
   } catch (err) {
     console.error('Error updating reservation:', err);
     return res.status(500).json({ error: 'Internal server error', details: err.message });
@@ -225,27 +259,11 @@ exports.cancelReservation = async (req, res) => {
       session.endSession();
       return res.status(404).json({ error: 'Reservation not found' });
     }
-    
+
     reservation.status = 'cancelled';
     await reservation.save({ session });
 
-    // Reset the ParkingSpot
-    await ParkingSpot.findByIdAndUpdate(
-      reservation.spot,
-      {
-        status: 'available',
-        reservedBy: null,
-        reservationExpiresAt: null
-      },
-      { session }
-    );
-
-    // Update the ParkingLot
-    await ParkingLot.findByIdAndUpdate(
-      reservation.lot,
-      { $inc: { 'availability.available': 1 } },
-      { session }
-    );
+    await updateSpotAndLotStatus(reservation.spot, reservation.lot);
 
     await session.commitTransaction();
     session.endSession();
@@ -258,3 +276,6 @@ exports.cancelReservation = async (req, res) => {
     return res.status(500).json({ error: 'Internal server error', details: err.message });
   }
 };
+
+
+exports.updateSpotAndLotStatus = updateSpotAndLotStatus;

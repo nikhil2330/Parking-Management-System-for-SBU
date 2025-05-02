@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import ParkingService from '../services/ParkingService';
 import './PopularTimesChart.css';
+import dayjs from 'dayjs';
 
 
 const PopularTimesChart = ({ popularTimes, capacity, onBack }) => {
+  console.log(popularTimes)
+  console.log(capacity)
   // Calculate min and max averages, etc.
   let minOccupied = Infinity;
   let maxOccupied = -Infinity;
@@ -102,7 +105,7 @@ const PopularTimesChart = ({ popularTimes, capacity, onBack }) => {
   );
 }
 
-const SpotDetails = ({ spotId, onClose, onReserve, onGetDirections, minWalkTime, maxWalkTime }) => {
+const SpotDetails = ({ spotId, onClose, onReserve, onGetDirections, minWalkTime, maxWalkTime, dateTimeRange }) => {
   const [spotData, setSpotData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -111,19 +114,91 @@ const SpotDetails = ({ spotId, onClose, onReserve, onGetDirections, minWalkTime,
   const [popularTimes, setPopularTimes] = useState(null);
   const [loadingPopularTimes, setLoadingPopularTimes] = useState(false);
   const [errorPopularTimes, setErrorPopularTimes] = useState(null);
+  const [lotAvailability, setLotAvailability] = useState(null);
+  const [availabilityInfo, setAvailabilityInfo] = useState(null);
+
+  const [currentReservation, setCurrentReservation] = useState(null);
+
 
   useEffect(() => {
     const fetchDetails = async () => {
       try {
         const data = await ParkingService.fetchSpotDetails(spotId);
         setSpotData(data);
+        setLoading(false);
+
       } catch (err) {
         setError("Failed to fetch spot details.");
       }
-      setLoading(false);
     };
     fetchDetails();
   }, [spotId]);
+
+  useEffect(() => {
+    if (!spotData?.lot?.lotId || !dateTimeRange) return;
+    ParkingService.fetchLotAvailability(
+      spotData.lot.lotId,
+      dateTimeRange.start,
+      dateTimeRange.end
+    ).then((data) => setLotAvailability(data));
+  }, [spotData, dateTimeRange]);
+
+  useEffect(() => {
+    if (!spotData?.spotId || !dateTimeRange) return;
+    ParkingService.fetchSpotReservations(
+      spotData.spotId,
+      dateTimeRange.start,
+      dateTimeRange.end
+    ).then(reservations => {
+      setCurrentReservation(reservations && reservations.length > 0 ? reservations[0] : null);
+    });
+  }, [spotData, dateTimeRange]);
+
+  useEffect(() => {
+    if (!lotAvailability) return;
+    if (!Array.isArray(lotAvailability.spots)) {
+      setError("Lot availability data is malformed.");
+      return;
+    }
+    let spotAvail = lotAvailability.spots.find((s) => s.spotId === spotId);
+    if (!spotAvail) {
+      spotAvail = {
+        available: true,
+        status: "available",
+        type: spotData?.type || "",
+      };
+    }
+    setAvailabilityInfo({
+      available: spotAvail.available,
+      status: spotAvail.status,
+      category: spotAvail.type,
+      lotAvailable: lotAvailability.available,
+      lotOccupied: lotAvailability.occupied,
+      lotTotal: lotAvailability.total,
+      categoryCounts: lotAvailability.categoryCounts,
+    });
+  }, [lotAvailability, spotId, spotData]);
+
+  function getSpotStatus() {
+    if (!availabilityInfo) return "Unknown";
+    if (availabilityInfo.available) return "Available";
+    if (currentReservation) {
+      const now = dayjs();
+      const resStart = dayjs(currentReservation.startTime);
+      const resEnd = dayjs(currentReservation.endTime);
+      if (now.isAfter(resStart) && now.isBefore(resEnd)) {
+        return "Occupied";
+      } else if (now.isBefore(resStart)) {
+        return "Reserved";
+      }
+    }
+    return "Reserved";
+  }
+
+  let reservedUntilText = "N/A";
+  if (currentReservation) {
+    reservedUntilText = dayjs(currentReservation.endTime).format("MMM D, YYYY h:mm A");
+  }
 
   // Use the service call to get popular times data.
   const fetchPopularTimes = async () => {
@@ -131,6 +206,8 @@ const SpotDetails = ({ spotId, onClose, onReserve, onGetDirections, minWalkTime,
     setLoadingPopularTimes(true);
     try {
       const data = await ParkingService.fetchPopularTimes(spotData.lot.lotId);
+      console.log(data)
+
       setPopularTimes(data);
       setErrorPopularTimes(null);
     } catch (err) {
@@ -147,9 +224,9 @@ const SpotDetails = ({ spotId, onClose, onReserve, onGetDirections, minWalkTime,
     setShowPopularTimes(prev => !prev);
   };
 
-  if (loading) return <div>Loading...</div>;
   if (error) return <div>{error}</div>;
   if (!spotData) return null;
+  if (loading || !availabilityInfo) return <div>Loading...</div>;
 
   if (showPopularTimes) {
     // While loading popular times data, show a loader
@@ -161,39 +238,26 @@ const SpotDetails = ({ spotId, onClose, onReserve, onGetDirections, minWalkTime,
     }
   }
 
-  // --- Data Preparation ---
-
-  // Extract spot number from spotId (assumes format "lotId-spotNumber")
   let spotNumber = "";
-  if (spotData.spotId && spotData.spotId.includes('-')) {
+  if (spotData?.spotId && spotData.spotId.includes('-')) {
     const [lotPart, numberPart] = spotData.spotId.split('-');
     spotNumber = numberPart;
   }
-
-  // If reserved and we have an expiration time, show it; otherwise “N/A”
-  let reservedUntilText = "N/A";
-  if (spotData.status === 'reserved' && spotData.reservationExpiresAt) {
-    reservedUntilText = new Date(spotData.reservationExpiresAt).toLocaleString();
-  }
-
-  // Lot and building information
-  const lot = spotData.lot || {};
+  const lot = spotData?.lot || {};
   const officialLotName = lot.officialLotName || "Unknown Lot";
   const campus = lot.campus || "Main Campus";
   const closestBuilding = lot.closestBuilding || "Computing Center";
-
-  // Rates and availability
   const baseRate = lot.price || lot.baseRate || 0;
-  const availableSpots = (lot.availability && lot.availability.available) || 0;
-  const totalSpots = (lot.availability && lot.availability.total) || "";
+  const walkTimeText = (minWalkTime && maxWalkTime) ? `${minWalkTime} - ${maxWalkTime} minutes` : "N/A";
   const timings = lot.timings || "24/7";
 
-  // For now, walk time is static, since distance isn’t available
-  const walkTimeText = (minWalkTime && maxWalkTime) ? `${minWalkTime} - ${maxWalkTime} minutes` : "N/A";
+  // Use time-window-aware counts
+  const availableSpots = availabilityInfo?.lotAvailable || 0;
+  const totalSpots = availabilityInfo?.lotTotal || "";
+  const categoryCounts = availabilityInfo?.categoryCounts || {};
 
   // Categories with non-zero values
-  const categories = lot.categories || {};
-  const activeCategories = Object.entries(categories)
+  const activeCategories = Object.entries(categoryCounts)
     .filter(([key, value]) => value > 0)
     .map(([key, value]) => ({ key, value }));
 
@@ -205,8 +269,8 @@ const SpotDetails = ({ spotId, onClose, onReserve, onGetDirections, minWalkTime,
           Lot {officialLotName} – Spot {spotNumber}
         </h3>
         <div className="spot-availability">
-          <span className={`status-${spotData.status}`}>
-            {spotData.status.charAt(0).toUpperCase() + spotData.status.slice(1)}
+          <span className={`status-${getSpotStatus().toLowerCase()}`}>
+            {getSpotStatus()}
           </span>
         </div>
         <div className="spot-card-subtitle">
@@ -433,7 +497,7 @@ const SpotDetails = ({ spotId, onClose, onReserve, onGetDirections, minWalkTime,
 
       {/* Footer Buttons */}
       <div className="spot-card-footer">
-        <button className="spot-card-btn spot-back-btn" onClick={onClose}>
+        <button className="back-button-details" onClick={onClose}>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="18"
