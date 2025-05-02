@@ -3,20 +3,15 @@ import axios from 'axios';
 // axios.defaults.baseURL = 'https://p4sbu.onrender.com';
 axios.defaults.baseURL = 'http://localhost:8000';
 
-const fetchFilteredAvailableSpots = async (filters, startTime, endTime) => {
-  const res = await axios.post("/api/parking/filtered-available-spots", {
-    ...filters,
-    startTime,
-    endTime,
-  });
-  return res.data.spots;
-};
-
-const fetchAllAvailableSpots = async (startTime, endTime) => {
-  const res = await axios.get("/api/parking/all-available-spots", {
-    params: { startTime, endTime },
-  });
-  return res.data.spots;
+const fetchClosestSpots = async (buildingId, filters, startTime, endTime, { limit, signal } = {}) => {
+  try {
+    const data = { buildingId, filters, startTime, endTime, ...(limit ? { limit } : {}) };
+    const response = await axios.post('/api/parking/closest-spots', data, { signal });
+    return response.data;
+  } catch (error) {
+    const errMsg = error.response?.data?.error || error.message;
+    throw new Error(errMsg);
+  }
 };
 
 const fetchLotAvailability = async (lotId, start, end) => {
@@ -24,16 +19,6 @@ const fetchLotAvailability = async (lotId, start, end) => {
     params: { startTime: start, endTime: end }
   });
   return res.data;
-};
-
-
-const fetchClosestSpots = async (buildingId, filters, startTime, endTime, config = {}) => {
-  const response = await axios.post(
-    '/api/parking/closest-spots',
-    { buildingId, filters, startTime, endTime },
-    config
-  );
-  return response.data;
 };
 
 const fetchSpotDetails = async (spotId) => {
@@ -90,6 +75,7 @@ const fetchPopularTimes = async (lotId) => {
   return response.json();
 }
 
+
 const fetchSpotReservations = async (spotId, start, end) => {
   const res = await axios.get(`/api/parking/spot/${spotId}/reservations`, {
     params: { startTime: start, endTime: end }
@@ -104,8 +90,6 @@ export default {
   fetchParkingOverlay,
   searchBuildings,
   fetchPopularTimes,
-  fetchAllAvailableSpots,
-  fetchFilteredAvailableSpots,
   fetchLotAvailability,
   fetchSpotReservations,
 };

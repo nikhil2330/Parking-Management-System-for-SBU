@@ -63,7 +63,7 @@ exports.getClosestSpots = async (req, res) => {
     if (!buildingId || !startTime || !endTime) {
       return res.status(400).json({ error: 'Missing buildingId, startTime, or endTime' });
     }
-
+    const limit = parseInt(req.query.limit, 10) || 5;
     // Build spot query from filters
     let spotQuery = {};
     if (filters.categories) {
@@ -106,9 +106,11 @@ exports.getClosestSpots = async (req, res) => {
     const availableSpots = allSpots.filter(s => !reservedIds.has(s._id.toString()));
     
 
+    
+
     // Use wayfinding service to get the 4 closest available spots
     const availableSpotIds = new Set(availableSpots.map(s => s.spotId));
-    const closestSpots = await wayfindingService.findClosestAvailableSpots(buildingId, availableSpotIds);
+    const closestSpots = await wayfindingService.findClosestAvailableSpots(buildingId, availableSpotIds, limit);
 
     // Fetch full spot details for the returned spotIds
     const spotDetails = await ParkingSpot.find({ spotId: { $in: closestSpots.map(s => s.spotId) } });

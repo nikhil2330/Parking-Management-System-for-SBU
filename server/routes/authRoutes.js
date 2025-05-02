@@ -1,38 +1,37 @@
 // server/routes/authRoutes.js
 const express = require('express');
-const router = express.Router();
 const { check } = require('express-validator');
-const authController = require('../controllers/authControllers');
+const authController = require('../controllers/authController');  // singular!
 
-// Registration route
-router.post('/register', [
-  check('username', 'Username is required and must be at least 5 characters').isLength({ min: 5 }),
-  check('email', 'Please include a valid email').isEmail(),
-  check('password', 'Password must be at least 8 characters').isLength({ min: 8 }),
-  check('driversLicense', 'Driver\'s license is required').not().isEmpty(),
-  check('userType')
-    .isIn(['student','faculty','visitor'])
-    .withMessage('User type is required and must be student, faculty, or visitor'),
-  check('vehicles').custom((value) => {
-    if (!Array.isArray(value) || value.length < 1) {
-      throw new Error('At least one vehicle is required');
-    }
-    if (value.length > 5) {
-      throw new Error('You can register a maximum of 5 vehicles');
-    }
-    return true;
-  }),
-  check('vehicles.*.model', 'Vehicle model is required').not().isEmpty(),
-  check('vehicles.*.year', 'Vehicle year is required').not().isEmpty(),
-  check('vehicles.*.plate', 'Vehicle plate is required').not().isEmpty(),
-  check('contactInfo', 'Contact information is required').not().isEmpty(),
-  check('address', 'Address is required').not().isEmpty()
-], authController.register);
+const router = express.Router();
 
-// Login route
-router.post('/login', [
-  check('email', 'Please include a valid email').isEmail(),
-  check('password', 'Password is required').exists()
-], authController.login);
+// /api/auth/register
+router.post(
+  '/register',
+  [
+    check('username').isLength({min:5}),
+    check('email').isEmail(),
+    check('password').isLength({min:8}),
+    check('userType').isIn(['student','faculty','visitor']),
+    check('vehicles').isArray({min:1,max:5}),
+    check('vehicles.*.model').notEmpty(),
+    check('vehicles.*.year').notEmpty(),
+    check('vehicles.*.plate').notEmpty(),
+    check('driversLicense').notEmpty(),
+    check('contactInfo').notEmpty(),
+    check('address').notEmpty()
+  ],
+  authController.register
+);
+
+// /api/auth/login
+router.post(
+  '/login',
+  [
+    check('email').isEmail(),
+    check('password').exists()
+  ],
+  authController.login
+);
 
 module.exports = router;

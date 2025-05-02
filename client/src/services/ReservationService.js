@@ -4,6 +4,7 @@ import axios from 'axios';
 // const API = axios.create({
 //   baseURL: 'https://p4sbu.onrender.com/api' 
 // });
+// Create axios instance with auth header
 const API = axios.create({
   baseURL: 'http://localhost:8000/api' 
 });

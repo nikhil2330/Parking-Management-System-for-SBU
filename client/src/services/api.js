@@ -1,210 +1,129 @@
-// src/services/api.js
+// src/services/ApiService.js - updated version
+
 import axios from 'axios';
 
-// Create axios instance with base URL
+/* ------------------------------------------------------------------ */
+/* Axios instance with auth header                                    */
+/* ------------------------------------------------------------------ */
 const API = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || '/api',
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  baseURL: process.env.REACT_APP_API_URL,
+  headers: { 'Content-Type': 'application/json' }
 });
 
-// Add request interceptor for authentication
 API.interceptors.request.use((config) => {
   const token = localStorage.getItem('token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
+  if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
 
-// Error handling helper
+/* ------------- generic error helper ------------ */
 const handleApiError = (error) => {
   console.error('API Error:', error);
-  
+
   if (error.response) {
-    // Server responded with non-2xx status
     if (error.response.status === 401) {
-      // Handle unauthorized (e.g., token expired)
       localStorage.removeItem('token');
       localStorage.removeItem('p4sbuUsername');
-      localStorage.removeItem('isAdmin'); // Also remove admin flag
-      window.location.href = '/'; // Redirect to login
+      localStorage.removeItem('isAdmin');
+      window.location.href = '/';
     }
     return Promise.reject(error.response.data);
-  } else if (error.request) {
-    // Request made but no response received
-    return Promise.reject({ message: 'Server not responding. Please try again later.' });
-  } else {
-    // Something happened in setting up the request
-    return Promise.reject({ message: 'Error setting up request.' });
   }
+
+  if (error.request) {
+    return Promise.reject({ message: 'Server not responding. Please try again later.' });
+  }
+
+  return Promise.reject({ message: 'Error setting up request.' });
 };
 
-// Helper to save user data in localStorage
-const saveUserData = (userData) => {
+/* ----- helpers for storing lightweight profile in localStorage ---- */
+const saveUserData = (userData) =>
   localStorage.setItem('userData', JSON.stringify(userData));
-};
 
-// Helper to get user data from localStorage
 const getUserData = () => {
   const data = localStorage.getItem('userData');
   return data ? JSON.parse(data) : null;
 };
 
+/* ------------------------------------------------------------------ */
+/* Exported service                                                   */
+/* ------------------------------------------------------------------ */
 const ApiService = {
-  // Auth related endpoints
+  /* ======================= AUTH ======================= */
   auth: {
+    /** POST /auth/login */
     login: async (credentials) => {
       try {
-        // DEMO MODE: Skip actual API call and simulate success
-        // In a real app, this would be: const response = await API.post('/auth/login', credentials);
-        
-        // Basic validation
-        const { email, password } = credentials;
-        
-        // Check for admin credentials
-        if (email === 'admin@gmail.com' && password === 'admin@P4SBU') {
-          // Create admin session
-          const response = {
-            data: {
-              success: true,
-              token: 'admin-token-' + Date.now(),
-              username: 'Administrator',
-              isAdmin: true
-            }
-          };
-          
-          // Store auth data with admin flag
-          localStorage.setItem('token', response.data.token);
-          localStorage.setItem('p4sbuUsername', response.data.username);
-          localStorage.setItem('userEmail', email);
-          localStorage.setItem('isAdmin', 'true');
-          
-          return response.data;
-        }
-        
-        // For demo purposes, accept any valid-looking email with password
-        if (email && password && password.length >= 4) {
-          // Create a simulated successful response
-          const response = {
-            data: {
-              success: true,
-              token: 'demo-token-' + Date.now(),
-              username: email.split('@')[0] // Extract username from email
-            }
-          };
-          
-          // Store auth data
-          localStorage.setItem('token', response.data.token);
-          localStorage.setItem('p4sbuUsername', response.data.username);
-          localStorage.setItem('userEmail', email);
-          localStorage.removeItem('isAdmin'); // Ensure admin flag is removed
-          
-          // If we don't have user data yet, initialize with email
-          if (!getUserData()) {
-            saveUserData({
-              email: email,
-              username: response.data.username
-            });
+        const response = await API.post('/auth/login', credentials);
+        const data = response.data;
+
+        if (data && data.token) {
+          localStorage.setItem('token', data.token);
+          localStorage.setItem('p4sbuUsername', data.username || 'User');
+
+          if (data.role === 'admin') {
+            localStorage.setItem('isAdmin', 'true');
+          } else {
+            localStorage.removeItem('isAdmin');
           }
-          
-          return response.data;
-        } else {
-          // Simulate authentication failure
-          return Promise.reject({ message: 'Invalid credentials' });
         }
+        return data;
       } catch (error) {
         return handleApiError(error);
       }
     },
-    
+
+    /** POST /auth/register */
     register: async (userData) => {
       try {
-        // DEMO MODE: Skip actual API call and simulate success
-        // In a real app: const response = await API.post('/auth/register', userData);
-        
-        // Create a simulated successful response
-        const response = {
-          data: {
-            success: true,
-            token: 'demo-token-' + Date.now(),
-            username: userData.username
-          }
-        };
-        
-        // Store auth data
-        localStorage.setItem('token', response.data.token);
-        localStorage.setItem('p4sbuUsername', userData.username);
-        
-        // Save user data to localStorage for retrieval in profile
-        saveUserData(userData);
-        
-        return response.data;
+        const { data } = await API.post('/auth/register', userData);
+        return data; // backend responds with success + message
       } catch (error) {
         return handleApiError(error);
       }
     },
-    
+
     logout: () => {
       localStorage.removeItem('token');
       localStorage.removeItem('p4sbuUsername');
       localStorage.removeItem('userData');
       localStorage.removeItem('paymentMethods');
-      localStorage.removeItem('isAdmin'); // Also remove admin flag
+      localStorage.removeItem('isAdmin');
       return Promise.resolve({ success: true });
     },
-    
-    // Check if user is an admin
-    isAdmin: () => {
-      return localStorage.getItem('isAdmin') === 'true';
-    }
+
+    isAdmin: () => localStorage.getItem('isAdmin') === 'true'
   },
-  
-  // User related endpoints
+
+  /* ======================= USER ======================= */
   user: {
     getProfile: async () => {
       try {
-        // DEMO MODE: Return user data from localStorage
-        const userData = getUserData();
-        
-        if (userData) {
-          return userData;
-        }
-        
-        // If no data, return minimal info based on email/username
-        const username = localStorage.getItem('p4sbuUsername');
-        const email = localStorage.getItem('userEmail');
-        
-        return {
-          username: username || 'User',
-          email: email || 'user@example.com'
-        };
+        // simple client‑side cache first
+        const cached = getUserData();
+        if (cached) return cached;
+
+        const { data } = await API.get('/users/me');
+        saveUserData(data);
+        return data;
       } catch (error) {
         return handleApiError(error);
       }
     },
-    
-    updateProfile: async (userData) => {
+
+    updateProfile: async (payload) => {
       try {
-        // DEMO MODE: Store updated profile in localStorage
-        const currentData = getUserData() || {};
-        const updatedData = { ...currentData, ...userData };
-        
-        saveUserData(updatedData);
-        
-        return {
-          success: true,
-          message: 'Profile updated successfully',
-          user: updatedData
-        };
+        const { data } = await API.put('/users/me', payload);
+        saveUserData(data.user);
+        return data;
       } catch (error) {
         return handleApiError(error);
       }
     }
   },
   
-  // Map related endpoints
+  // Map related endpoints - RESTORING MOCK DATA FOR PARKING SEARCH
   map: {
     getParkingSpots: async (lotId) => {
       try {

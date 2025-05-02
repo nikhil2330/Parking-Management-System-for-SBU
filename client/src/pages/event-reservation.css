@@ -1,0 +1,353 @@
+/* Event Reservation specific styles */
+.event-reservation-page .filters-panel {
+    min-width: 260px;
+  }
+  
+  .event-reservation-header {
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    margin-bottom: 15px;
+  }
+  
+  .event-reservation-header h2 {
+    margin: 0 0 5px 0;
+    color: #0A2541;
+  }
+  
+  .event-reservation-header p {
+    margin: 0;
+    color: #666;
+  }
+  
+  .lot-card {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 15px;
+    margin-bottom: 15px;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  
+  .lot-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  .lot-card-header {
+    margin-bottom: 10px;
+  }
+  
+  .lot-card-title {
+    margin: 0 0 5px 0;
+    font-size: 1.2rem;
+    color: #0A2541;
+  }
+  
+  .lot-card-subtitle {
+    color: #666;
+    font-size: 0.9rem;
+  }
+  
+  .lot-detail {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  
+  .lot-detail-icon {
+    margin-right: 10px;
+    color: #0A2541;
+  }
+  
+  .lot-detail-label {
+    font-weight: 500;
+    margin-right: 5px;
+  }
+  
+  .lot-select-btn {
+    background-color: #0A2541;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s;
+  }
+  
+  .lot-select-btn svg {
+    margin-right: 8px;
+  }
+  
+  .lot-select-btn:hover {
+    background-color: #0d3154;
+  }
+  
+  /* Event Lot View Styles */
+  .event-selection-instructions {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 15px;
+    max-width: 600px;
+  }
+  
+  .event-selection-instructions h3 {
+    margin: 0 0 8px 0;
+    color: #0A2541;
+    font-size: 1.1rem;
+  }
+  
+  .event-selection-instructions p {
+    margin: 0 0 10px 0;
+    color: #555;
+    font-size: 0.9rem;
+  }
+  
+  .spot-legend {
+    display: flex;
+    gap: 15px;
+    margin-top: 10px;
+  }
+  
+  .spot-legend-item {
+    display: flex;
+    align-items: center;
+    font-size: 0.85rem;
+  }
+  
+  .spot-legend-color {
+    width: 15px;
+    height: 15px;
+    border-radius: 3px;
+    margin-right: 5px;
+  }
+  
+  .spot-legend-color.available {
+    background-color: #c4ccd6;
+  }
+  
+  .spot-legend-color.selected {
+    background-color: #4CAF50;
+  }
+  
+  .spot-legend-color.reserved {
+    background-color: #ffcccc;
+  }
+  
+  /* Spot Selection Actions */
+  .spot-selection-actions {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: #fff;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .spots-counter {
+    background-color: #0A2541;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 30px;
+    font-weight: 500;
+  }
+  
+  .continue-reservation-btn {
+    background-color: #2E7D32;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .continue-reservation-btn:hover {
+    background-color: #1B5E20;
+  }
+  
+  /* Event Form Modal */
+  .event-form-modal {
+    max-width: 600px;
+    width: 100%;
+  }
+  
+  .event-form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+  }
+  
+  .event-form-header h2 {
+    margin: 0;
+    color: #0A2541;
+  }
+  
+  .close-modal-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #666;
+  }
+  
+  .event-form-group {
+    margin-bottom: 20px;
+  }
+  
+  .event-form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #333;
+  }
+  
+  .event-form-group input,
+  .event-form-group textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+  }
+  
+  .form-info-text {
+    background-color: #f9f9f9;
+    padding: 10px;
+    border-radius: 4px;
+    border-left: 3px solid #0A2541;
+  }
+  
+  .price-info {
+    font-weight: bold;
+    color: #2E7D32;
+    font-size: 1.1rem;
+  }
+  
+  .price-note {
+    font-size: 0.85rem;
+    color: #666;
+    margin-top: 5px;
+  }
+  
+  .selected-spots-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 10px;
+  }
+  
+  .selected-spot-badge {
+    background-color: #e8f5e9;
+    color: #2E7D32;
+    padding: 3px 8px;
+    border-radius: 15px;
+    font-size: 0.85rem;
+    border: 1px solid #4CAF50;
+  }
+  
+  .event-form-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 30px;
+  }
+  
+  .event-form-btn {
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .cancel-btn {
+    background-color: #f5f5f5;
+    color: #333;
+    border: 1px solid #ddd;
+  }
+  
+  .submit-btn {
+    background-color: #0A2541;
+    color: white;
+    border: none;
+  }
+  
+  .cancel-btn:hover {
+    background-color: #e5e5e5;
+  }
+  
+  .submit-btn:hover {
+    background-color: #0d3154;
+  }
+
+  /* Fix for button being hidden behind map */
+.spot-selection-actions {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #fff;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+  padding: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 1000; /* Added high z-index to stay on top */
+}
+
+/* Make sure map container respects boundaries */
+.map-container {
+  position: relative;
+  height: calc(100vh - 200px); /* Adjust height to leave space for the button */
+  overflow: hidden;
+  margin-bottom: 60px; /* Add bottom margin to prevent content from being hidden */
+}
+
+/* Ensure that the EventLotView respects container boundaries */
+.event-lot-view {
+  height: 100%;
+  max-height: calc(100vh - 260px); /* Adjust to ensure visibility of the button */
+  overflow: auto;
+}
+
+/* Ensure SVG container doesn't overflow */
+.svg-container {
+  max-height: calc(100vh - 300px);
+}
+
+/* Fix for button being hidden behind map */
+.spot-selection-actions {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #fff;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+  padding: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 1000; /* Added high z-index to stay on top */
+}
+
+/* Make sure map container respects boundaries */
+.map-container {
+  position: relative;
+  height: calc(100vh - 200px);
+  overflow: hidden;
+  margin-bottom: 60px; /* Add bottom margin to prevent content from being hidden */
+}
