@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import Header from '../components/Header';
+import Header from '../components/Header'; // Using the standard Header component with isAdmin prop
 import Footer from '../components/Footer';
 import './admin-dashboard.css';
 
@@ -68,6 +68,9 @@ function AdminDashboard() {
 
   // ticket filter
   const [ticketFilter, setTicketFilter] = useState('all'); // 'all', 'pending', 'paid', 'overdue'
+
+  // user filter - NEW STATE
+  const [userFilterStatus, setUserFilterStatus] = useState('all'); // 'all', 'pending', 'approved', 'rejected'
 
   // stats counters
   const [stats, setStats] = useState({
@@ -390,7 +393,14 @@ function AdminDashboard() {
   const getCurrentItems = () => {
     let arr;
     
-    if (activeTab === 'users') arr = userRequests;
+    if (activeTab === 'users') {
+      // Filter user requests based on selected filter
+      if (userFilterStatus === 'all') {
+        arr = userRequests;
+      } else {
+        arr = userRequests.filter(user => user.status === userFilterStatus);
+      }
+    }
     else if (activeTab === 'bookings') arr = bookingRequests;
     else if (activeTab === 'tickets') {
       // Filter tickets based on selected filter
@@ -406,7 +416,9 @@ function AdminDashboard() {
   const totalPages = Math.max(
     1,
     Math.ceil(
-      (activeTab === 'users' ? userRequests.length : 
+      (activeTab === 'users' ? 
+        (userFilterStatus === 'all' ? userRequests.length : 
+         userRequests.filter(u => u.status === userFilterStatus).length) : 
        activeTab === 'bookings' ? bookingRequests.length :
        activeTab === 'tickets' ? (ticketFilter === 'all' ? tickets.length : 
                                tickets.filter(t => t.status === ticketFilter).length) : 0) /
@@ -999,8 +1011,8 @@ function AdminDashboard() {
       <div className="bg-shape shape-1" aria-hidden="true" />
       <div className="bg-shape shape-2" aria-hidden="true" />
 
-      {/* Global header */}
-      <Header onLogout={handleLogout} />
+      {/* Use the standard Header with isAdmin prop */}
+      <Header isAdmin={true} onLogout={handleLogout} />
 
       <div className="dashboard-content">
         <div className="dashboard-grid">
@@ -1426,10 +1438,30 @@ function AdminDashboard() {
                     <div className="filter-group">
                       <label>Status:</label>
                       <div className="filter-options">
-                        <span className="filter-option active">All</span>
-                        <span className="filter-option">Pending</span>
-                        <span className="filter-option">Approved</span>
-                        <span className="filter-option">Rejected</span>
+                        <span 
+                          className={`filter-option ${userFilterStatus === 'all' ? 'active' : ''}`}
+                          onClick={() => setUserFilterStatus('all')}
+                        >
+                          All
+                        </span>
+                        <span 
+                          className={`filter-option ${userFilterStatus === 'pending' ? 'active' : ''}`}
+                          onClick={() => setUserFilterStatus('pending')}
+                        >
+                          Pending
+                        </span>
+                        <span 
+                          className={`filter-option ${userFilterStatus === 'approved' ? 'active' : ''}`}
+                          onClick={() => setUserFilterStatus('approved')}
+                        >
+                          Approved
+                        </span>
+                        <span 
+                          className={`filter-option ${userFilterStatus === 'rejected' ? 'active' : ''}`}
+                          onClick={() => setUserFilterStatus('rejected')}
+                        >
+                          Rejected
+                        </span>
                       </div>
                     </div>
                     <div className="bulk-actions">
