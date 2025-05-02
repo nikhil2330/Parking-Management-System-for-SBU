@@ -10,6 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@faker-js/faker": "^9.7.0",
     "@turf/turf": "^7.2.0",
     "axios": "^1.8.4",
     "bcryptjs": "^3.0.2",
@@ -18,10 +19,12 @@
     "csvtojson": "^2.0.10",
     "express": "^4.21.2",
     "express-validator": "^7.2.1",
+    "faker": "^6.6.6",
     "js-priority-queue": "^0.1.5",
     "jsonwebtoken": "^9.0.2",
     "mongodb": "^6.15.0",
     "mongoose": "^8.12.1",
+    "node-cron": "^3.0.3",
     "path": "^0.12.7"
   },
   "devDependencies": {

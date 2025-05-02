@@ -8,6 +8,8 @@ import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import SpotDetails from "../components/SpotDetails";
 import GoogleMapsService from "../services/GoogleMapService";
 import "./premium-search-parking.css";
+import dayjs from "dayjs"; 
+
 
 const DEFAULT_FILTERS = {
   price: [0, 20],
@@ -48,15 +50,58 @@ function SearchParkingPage() {
     useState(null);
   const [isCollapsed, setIsCollapsed] = useState(true);
   const [mapCenter, setMapCenter] = useState(undefined);
-  const [autoCenter, setAutoCenter] = useState(true);
+  const [autoCenter, setAutoCenter] = useState(true); 
   const [spotWalkTimes, setSpotWalkTimes] = useState({});
-
   const [draftFilters, setDraftFilters] = useState(DEFAULT_FILTERS);
   // "Active" filters are only set when you click Apply Filters
   const [activeFilters, setActiveFilters] = useState(DEFAULT_FILTERS);
-  const [filteredAvailableSpots, setFilteredAvailableSpots] = useState([]); // Spot objects with spotId
 
-
+  function getNextHourDate() {
+    const now = new Date();
+    now.setMinutes(0, 0, 0);
+    now.setHours(now.getHours() + 1);
+    return now;
+  }
+  function formatDateForInput(date) {
+    const pad = (n) => n.toString().padStart(2, "0");
+    return (
+      date.getFullYear() +
+      "-" +
+      pad(date.getMonth() + 1) +
+      "-" +
+      pad(date.getDate()) +
+      "T" +
+      pad(date.getHours()) +
+      ":" +
+      pad(date.getMinutes())
+    );
+  }
+  const defaultStart = getNextHourDate();
+  const defaultEnd = new Date(defaultStart);
+  defaultEnd.setHours(defaultEnd.getHours() + 1);
+  
+  const [dateTimeRange, setDateTimeRange] = useState({
+    start: formatDateForInput(defaultStart),
+    end: formatDateForInput(defaultEnd),
+  });
+  const [appliedDateTimeRange, setAppliedDateTimeRange] = useState({
+    start: formatDateForInput(defaultStart),
+    end: formatDateForInput(defaultEnd),
+  });
+  
+  const handleDateTimeRangeChange = (field, value) => {
+    setDateTimeRange((prev) => {
+      const updated = { ...prev, [field]: value };
+      setAppliedDateTimeRange(updated); // Immediately apply
+      return updated;
+    });
+  };
+  
+  const handleApplyDateTimeRange = () => {
+    setAppliedDateTimeRange({ ...dateTimeRange });
+    // Optionally, trigger a search or update map here
+  };
+  
   // Helper to get filter labels for tags
   const getActiveFilterLabels = () => {
     const labels = [];
@@ -71,59 +116,6 @@ function SearchParkingPage() {
     return labels;
   };
   const activeFilterLabels = getActiveFilterLabels();
-
-  // ...existing code...
-  const removeFilterTag = async (idx) => {
-    let i = 0;
-    let newFilters = JSON.parse(JSON.stringify(activeFilters));
-    let newDraft = JSON.parse(JSON.stringify(draftFilters));
-    // Price
-    if (activeFilters.price[1] !== 20) {
-      if (i === idx) {
-        newFilters.price = [0, 20];
-        newDraft.price = [0, 20];
-        setDraftFilters(newDraft);
-        await applyFiltersAndFetch(newFilters);
-        return;
-      }
-      i++;
-    }
-    // Covered
-    if (activeFilters.covered) {
-      if (i === idx) {
-        newFilters.covered = "";
-        newDraft.covered = "";
-        setDraftFilters(newDraft);
-        await applyFiltersAndFetch(newFilters);
-        return;
-      }
-      i++;
-    }
-    // Zone
-    if (activeFilters.zone) {
-      if (i === idx) {
-        newFilters.zone = "";
-        newDraft.zone = "";
-        setDraftFilters(newDraft);
-        await applyFiltersAndFetch(newFilters);
-        return;
-      }
-      i++;
-    }
-    // Categories
-    for (const [cat, checked] of Object.entries(activeFilters.categories)) {
-      if (checked) {
-        if (i === idx) {
-          newFilters.categories[cat] = false;
-          newDraft.categories[cat] = false;
-          setDraftFilters(newDraft);
-          await applyFiltersAndFetch(newFilters);
-          return;
-        }
-        i++;
-      }
-    }
-  };
 
 
   useEffect(() => {
@@ -174,17 +166,16 @@ function SearchParkingPage() {
     return () => clearTimeout(delayDebounceFn);
   }, [searchQuery, searchedBuilding]);
 
-  const applyFiltersAndFetch = async (filtersToApply = draftFilters) => {
-    setActiveFilters(filtersToApply);
-    console.log(filtersToApply)
-    try {
-      const spots = await ParkingService.fetchFilteredAvailableSpots(filtersToApply);
-      console.log(spots[0])
-      setFilteredAvailableSpots(spots);
-    } catch (err) {
-      setFilteredAvailableSpots([]);
-    }
-  };
+  function isValidDateTimeRange(range) {
+    if (!range || !range.start || !range.end) return false;
+    const start = new Date(range.start);
+    const end = new Date(range.end);
+    return (
+      !isNaN(start.getTime()) &&
+      !isNaN(end.getTime()) &&
+      end > start
+    );
+  }
 
   // Only updates draft filters (UI), not active filters
   const handleFilterClear = () => {
@@ -194,28 +185,78 @@ function SearchParkingPage() {
   // Copies draft filters to active filters and fetches filtered spots (but does NOT search)
   const handleApplyFilters = async (e) => {
     if (e) e.preventDefault();
-    await applyFiltersAndFetch(draftFilters);
+    setActiveFilters(draftFilters);
+    // Optionally, trigger a search here:
+    // performSearch();
   };
 
   // Remove a filter tag and update active filters (acts as apply)
   const handleRemoveFilterTag = async (idx) => {
-    await removeFilterTag(idx);
+    let i = 0;
+    let newFilters = JSON.parse(JSON.stringify(activeFilters));
+    let newDraft = JSON.parse(JSON.stringify(draftFilters));
+    // Price
+    if (activeFilters.price[1] !== 20) {
+      if (i === idx) {
+        newFilters.price = [0, 20];
+        newDraft.price = [0, 20];
+        setDraftFilters(newDraft);
+        setActiveFilters(newFilters);
+        return;
+      }
+      i++;
+    }
+    // Covered
+    if (activeFilters.covered) {
+      if (i === idx) {
+        newFilters.covered = "";
+        newDraft.covered = "";
+        setDraftFilters(newDraft);
+        setActiveFilters(newFilters);
+        return;
+      }
+      i++;
+    }
+    // Zone
+    if (activeFilters.zone) {
+      if (i === idx) {
+        newFilters.zone = "";
+        newDraft.zone = "";
+        setDraftFilters(newDraft);
+        setActiveFilters(newFilters);
+        return;
+      }
+      i++;
+    }
+    // Categories
+    for (const [cat, checked] of Object.entries(activeFilters.categories)) {
+      if (checked) {
+        if (i === idx) {
+          newFilters.categories[cat] = false;
+          newDraft.categories[cat] = false;
+          setDraftFilters(newDraft);
+          setActiveFilters(newFilters);
+          return;
+        }
+        i++;
+      }
+    }
   };
 
   const performSearch = async (selectedBuilding = null) => {
     console.log(
       "Performing search with building:",
       searchedBuilding || selectedBuilding
-    ); // Log the building used for search
+    );
     setClosestSpots([]);
     setLoading(true);
     setIsCollapsed(false);
     setError(null);
-
+  
     let buildingId = "";
     let buildingToUse = null;
-
-    // If a building is passed (from suggestion click), use it
+  
+    // Determine which building to use
     if (selectedBuilding) {
       buildingToUse = selectedBuilding;
       buildingId = selectedBuilding.buildingID;
@@ -223,7 +264,6 @@ function SearchParkingPage() {
       buildingToUse = searchedBuilding;
       buildingId = searchedBuilding.buildingID;
     } else if (buildingSuggestions.length > 0) {
-      // Try to find an exact match first
       const exactMatch = buildingSuggestions.find(
         (b) => b.name.toLowerCase() === searchQuery.trim().toLowerCase()
       );
@@ -233,7 +273,6 @@ function SearchParkingPage() {
         setSearchedBuilding(exactMatch);
         setSearchQuery(exactMatch.name);
       } else {
-        // Fallback to the first suggestion
         buildingToUse = buildingSuggestions[0];
         buildingId = buildingSuggestions[0].buildingID;
         setSearchedBuilding(buildingSuggestions[0]);
@@ -244,64 +283,46 @@ function SearchParkingPage() {
       setLoading(false);
       return;
     }
-
-    // Clear suggestions once search is triggered
+  
     setBuildingSuggestions([]);
-
-    // Recenter if autoCenter is enabled and building has a centroid.
+  
+    // Recenter map if building has centroid
     if (buildingToUse && buildingToUse.centroid) {
       setAutoCenter(true);
       setMapCenter([buildingToUse.centroid.y, buildingToUse.centroid.x]);
     }
-
+  
+    // Abort previous search if any
     if (spotsAbortControllerRef.current) {
       spotsAbortControllerRef.current.abort();
     }
     const controller = new AbortController();
     spotsAbortControllerRef.current = controller;
-
-    let spotIdsToUse = [];
-    console.log("yoyo")
-    try {
-      if (
-        activeFilterLabels.length > 0 &&
-        filteredAvailableSpots.length > 0
-      ) {
-        spotIdsToUse = filteredAvailableSpots.map((s) => s.spotId);
-        console.log("yo")
-      } else {
-        console.log("yoyoyo")
-        const allAvailableSpots = await ParkingService.fetchAllAvailableSpots();
-        spotIdsToUse = allAvailableSpots.map((s) => s.spotId);
-      } 
-    } catch (err) {
-      setError("Failed to load available spots for filtering.");
-      setLoading(false);
-      return;
-    }
-    
   
-
     try {
       navigate(
         getSearchParkingUrl({
           buildingId: buildingToUse.buildingID,
-          lotId: selectedLotId || undefined, // Include lotId if present
+          lotId: selectedLotId || undefined,
         })
       );
-      const data = await ParkingService.fetchClosestSpots(buildingId, {
-        signal: controller.signal, spotIds: spotIdsToUse,
-      });
-      console.log("Closest spots:", data.spots); // Log closest spots
+      // Only call fetchClosestSpots, passing filters, time, and signal
+      const data = await ParkingService.fetchClosestSpots(
+        buildingId,
+        activeFilters,
+        appliedDateTimeRange.start,
+        appliedDateTimeRange.end,
+        { signal: controller.signal }
+      );
+      console.log("Closest spots:", data.spots);
       setSelectedBuildingCoordinates([
         buildingToUse.centroid.y,
         buildingToUse.centroid.x,
       ]);
       setClosestSpots(data.spots);
     } catch (err) {
-      if (err.name === "AbortError") {
+      if (err.name === "CanceledError" || err.name === "AbortError") {
         console.log("Request aborted for current search.");
-        // Do not update error or loading state here.
         return;
       } else {
         setError("Failed to load closest spots");
@@ -313,6 +334,7 @@ function SearchParkingPage() {
       }
     }
   };
+
   useEffect(() => {
     // Only run when closestSpots changes
     if (closestSpots.length > 0) {
@@ -355,7 +377,12 @@ function SearchParkingPage() {
   const handleReserveSpot = (spotInfo) => {
     setSelectedSpotForReservation(spotInfo);
     navigate(`/reservations/${spotInfo.spotId}`, {
-      state: { spotInfo, searchedBuilding },
+      state: {
+        spotInfo,
+        searchedBuilding,
+        startTime: appliedDateTimeRange.start,
+        endTime: appliedDateTimeRange.end,
+      },
     });
   };
 
@@ -545,112 +572,158 @@ function SearchParkingPage() {
 
       <div className="search-container">
         {/* Filters Panel */}
-        <div className="filters-panel">
-          <div className="filters-header">
-            <svg
-              className="filters-icon"
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
-            </svg>
-            <h2>Search Filters</h2>
-          </div>
-          <div className="filters-body">
-            {/* Price Slider */}
-            <div className="filter-group">
-              <label className="filter-label">Price ($/hr)</label>
+        <div className="filters-sidebar">
+          <div className="reservation-datetime-bar vertical">
+            <div className="reservation-datetime-row">
+              <label
+                className="reservation-datetime-label inline"
+                htmlFor="searchStartTime"
+              >
+                Start
+              </label>
               <input
-                type="range"
-                min={0}
-                max={20}
-                value={draftFilters.price[1]}
+                className="reservation-datetime-input wide"
+                type="datetime-local"
+                id="searchStartTime"
+                value={dateTimeRange.start}
                 onChange={(e) =>
-                  setDraftFilters((f) => ({
-                    ...f,
-                    price: [0, Number(e.target.value)],
-                  }))
+                  handleDateTimeRangeChange("start", e.target.value)
                 }
+                max={dateTimeRange.end}
               />
-              <div>Up to ${draftFilters.price[1]}</div>
             </div>
-
-            {/* Covered/Uncovered */}
-            <div className="filter-group">
-              <label className="filter-label">Covered / Uncovered</label>
-              <select
-                className="filter-select"
-                value={draftFilters.covered}
-                onChange={(e) =>
-                  setDraftFilters((f) => ({ ...f, covered: e.target.value }))
-                }
+            <div className="reservation-datetime-row">
+              <label
+                className="reservation-datetime-label inline"
+                htmlFor="searchEndTime"
               >
-                <option value="">All types</option>
-                <option value="covered">Covered</option>
-                <option value="uncovered">Uncovered</option>
-              </select>
-            </div>
-
-            {/* Zone */}
-            <div className="filter-group">
-              <label className="filter-label">Zone</label>
-              <select
-                className="filter-select"
-                value={draftFilters.zone}
+                End
+              </label>
+              <input
+                className="reservation-datetime-input wide"
+                type="datetime-local"
+                id="searchEndTime"
+                value={dateTimeRange.end}
                 onChange={(e) =>
-                  setDraftFilters((f) => ({ ...f, zone: e.target.value }))
+                  handleDateTimeRangeChange("end", e.target.value)
                 }
-              >
-                <option value="">All</option>
-                <option value="faculty">Faculty</option>
-                <option value="student">Student</option>
-                <option value="visitor">Visitor</option>
-              </select>
+                min={dateTimeRange.start}
+              />
             </div>
-
-            {/* Categories */}
-            <div className="filter-group">
-              <div className="filter-checkbox-group">
-                {Object.keys(draftFilters.categories).map((cat) => (
-                  <div className="filter-checkbox-item" key={cat}>
-                    <input
-                      type="checkbox"
-                      id={cat}
-                      checked={draftFilters.categories[cat]}
-                      onChange={(e) =>
-                        setDraftFilters((f) => ({
-                          ...f,
-                          categories: {
-                            ...f.categories,
-                            [cat]: e.target.checked,
-                          },
-                        }))
-                      }
-                    />
-                    <label htmlFor={cat}>
-                      {cat
-                        .replace(/([A-Z])/g, " $1")
-                        .replace(/^./, (s) => s.toUpperCase())}
-                    </label>
-                  </div>
-                ))}
+          </div>
+          <div className="filters-panel">
+            <div className="filters-header">
+              <svg
+                className="filters-icon"
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+              </svg>
+              <h2>Search Filters</h2>
+            </div>
+            <div className="filters-body">
+              {/* Price Slider */}
+              <div className="filter-group">
+                <label className="filter-label">Price ($/hr)</label>
+                <input
+                  type="range"
+                  min={0}
+                  max={20}
+                  value={draftFilters.price[1]}
+                  onChange={(e) =>
+                    setDraftFilters((f) => ({
+                      ...f,
+                      price: [0, Number(e.target.value)],
+                    }))
+                  }
+                />
+                <div>Up to ${draftFilters.price[1]}</div>
               </div>
-            </div>
 
-            <div className="filter-actions">
-              <button className="filter-clear-btn" onClick={handleFilterClear}>
-                Clear All
-              </button>
-              <button className="filter-apply-btn" onClick={handleApplyFilters}>
-                Apply Filters
-              </button>
+              {/* Covered/Uncovered */}
+              <div className="filter-group">
+                <label className="filter-label">Covered / Uncovered</label>
+                <select
+                  className="filter-select"
+                  value={draftFilters.covered}
+                  onChange={(e) =>
+                    setDraftFilters((f) => ({ ...f, covered: e.target.value }))
+                  }
+                >
+                  <option value="">All types</option>
+                  <option value="covered">Covered</option>
+                  <option value="uncovered">Uncovered</option>
+                </select>
+              </div>
+
+              {/* Zone */}
+              <div className="filter-group">
+                <label className="filter-label">Zone</label>
+                <select
+                  className="filter-select"
+                  value={draftFilters.zone}
+                  onChange={(e) =>
+                    setDraftFilters((f) => ({ ...f, zone: e.target.value }))
+                  }
+                >
+                  <option value="">All</option>
+                  <option value="faculty">Faculty</option>
+                  <option value="student">Student</option>
+                  <option value="visitor">Visitor</option>
+                </select>
+              </div>
+
+              {/* Categories */}
+              <div className="filter-group">
+                <div className="filter-checkbox-group">
+                  {Object.keys(draftFilters.categories).map((cat) => (
+                    <div className="filter-checkbox-item" key={cat}>
+                      <input
+                        type="checkbox"
+                        id={cat}
+                        checked={draftFilters.categories[cat]}
+                        onChange={(e) =>
+                          setDraftFilters((f) => ({
+                            ...f,
+                            categories: {
+                              ...f.categories,
+                              [cat]: e.target.checked,
+                            },
+                          }))
+                        }
+                      />
+                      <label htmlFor={cat}>
+                        {cat
+                          .replace(/([A-Z])/g, " $1")
+                          .replace(/^./, (s) => s.toUpperCase())}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="filter-actions">
+                <button
+                  className="filter-clear-btn"
+                  onClick={handleFilterClear}
+                >
+                  Clear All
+                </button>
+                <button
+                  className="filter-apply-btn"
+                  onClick={handleApplyFilters}
+                >
+                  Apply Filters
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -733,21 +806,21 @@ function SearchParkingPage() {
                 </button>
               </div>
               {buildingSuggestions.length > 0 && (
-              <div className="suggestions">
-                {buildingSuggestions.map((building, idx) => (
-                  <div
-                    key={idx}
-                    className="suggestion-item"
-                    onClick={() => {
-                      handleSuggestionSelect(building);
-                      console.log("Suggestion clicked:", building);
-                    }}
-                  >
-                    {building.name}
-                  </div>
-                ))}
-              </div>
-            )}
+                <div className="suggestions">
+                  {buildingSuggestions.map((building, idx) => (
+                    <div
+                      key={idx}
+                      className="suggestion-item"
+                      onClick={() => {
+                        handleSuggestionSelect(building);
+                        console.log("Suggestion clicked:", building);
+                      }}
+                    >
+                      {building.name}
+                    </div>
+                  ))}
+                </div>
+              )}
             </form>
             {activeFilterLabels.length > 0 && (
               <div className="active-filters-tags">
@@ -1026,11 +1099,22 @@ function SearchParkingPage() {
                   />
                 </div>
               ) : selectedLotId ? (
-                <LotMapView
-                  lotId={selectedLotId}
-                  onBack={handleBackFromLot}
-                  highlightedSpot={highlightedSpot}
-                />
+                isValidDateTimeRange(appliedDateTimeRange) ? (
+                  <LotMapView
+                    lotId={selectedLotId}
+                    onBack={handleBackFromLot}
+                    highlightedSpot={highlightedSpot}
+                    dateTimeRange={appliedDateTimeRange}
+                  />
+                ) : (
+                  <div
+                    className="error-message"
+                    style={{ color: "red", margin: "1rem" }}
+                  >
+                    Please select a valid start and end time before viewing lot
+                    details.
+                  </div>
+                )
               ) : (
                 <MapOverview
                   onLotClick={handleLotClick}
@@ -1079,7 +1163,8 @@ function SearchParkingPage() {
                 setIsCollapsed(true);
               }}
               minWalkTime={spotWalkTimes[selectedDetailSpot]?.min}
-              maxWalkTime={spotWalkTimes[selectedDetailSpot]?.max}  
+              maxWalkTime={spotWalkTimes[selectedDetailSpot]?.max}
+              dateTimeRange={appliedDateTimeRange}
               // minWalkTime={selectedWalkTimes.minWalkTime}
               // maxWalkTime={selectedWalkTimes.maxWalkTime}
             />

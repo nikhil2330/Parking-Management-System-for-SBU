@@ -68,13 +68,15 @@ function ReservationsPage() {
       
       // Extract building ID if available
       const buildingId = searchedBuilding?._id || null;
+      const navStart = location.state?.startTime;
+      const navEnd = location.state?.endTime;
       
       setNewReservation({
         lotId: lotId,
         spotId: spotId,
         building: buildingId,
-        startTime: formatDateForInput(now),
-        endTime: formatDateForInput(end),
+        startTime: navStart || formatDateForInput(now),
+        endTime: navEnd || formatDateForInput(end),
         totalPrice: 5.00 // Default price, will be calculated based on duration
       });
       
@@ -104,6 +106,22 @@ function ReservationsPage() {
     }
   };
 
+  function formatLocalDateTimeInput(date) {
+    // Returns YYYY-MM-DDTHH:mm in local time
+    const pad = (n) => n.toString().padStart(2, '0');
+    return (
+      date.getFullYear() +
+      '-' +
+      pad(date.getMonth() + 1) +
+      '-' +
+      pad(date.getDate()) +
+      'T' +
+      pad(date.getHours()) +
+      ':' +
+      pad(date.getMinutes())
+    );
+  }
+
   const handleCreateReservation = async (e) => {
     e.preventDefault();
     
@@ -117,11 +135,11 @@ function ReservationsPage() {
     const endDate = new Date(newReservation.endTime);
     const now = new Date();
     
-    if (startDate < now) {
-      alert('Start time cannot be in the past.');
+    if (startDate < new Date(now.getTime() + 10 * 60000)) {
+      alert('Start time must be at least 10 minutes from now.');
       return;
     }
-    
+  
     if (startDate >= endDate) {
       alert('End time must be after start time.');
       return;
@@ -343,7 +361,7 @@ function ReservationsPage() {
                         startTime: e.target.value,
                       })
                     }
-                    min={new Date().toISOString().slice(0, 16)}
+                    min={formatLocalDateTimeInput(new Date())}
                     required
                   />
                 </div>
