@@ -37,6 +37,7 @@ async function findClosestAvailableSpots(buildingId, availableSpotIds, limit = 4
 
       if (current.node.labels.includes('Spot')) {
         const spotId = current.node.properties.id;
+
         if (availableSpotIds.has(spotId)) {
           foundSpots.push({ spotId, distance: current.distance });
           if (foundSpots.length === n) break;

@@ -4,7 +4,7 @@ import ParkingService from "../services/ParkingService";
 import PanZoomControls from "./PanZoomControls";
 import "./LotView.css";
 
-const LotMapView = ({ lotId, onBack, highlightedSpot }) => {
+const LotMapView = ({ lotId, onBack, highlightedSpot, dateTimeRange }) => {
   const [lotDetails, setLotDetails] = useState(null);
   const [SvgComponent, setSvgComponent] = useState(null);
   const [scale, setScale] = useState(1);
@@ -13,12 +13,25 @@ const LotMapView = ({ lotId, onBack, highlightedSpot }) => {
   const [startDrag, setStartDrag] = useState({ x: 0, y: 0 });
   const [svgDimensions, setSvgDimensions] = useState(null);
   const containerRef = useRef(null);
+  const [lotAvailability, setLotAvailability] = useState(null);
+
 
   useEffect(() => {
     ParkingService.fetchParkingLotDetails(lotId)
       .then((data) => setLotDetails(data))
       .catch((err) => console.error("Error fetching lot details", err));
   }, [lotId]);
+  useEffect(() => {
+    // Fetch lot availability for the selected time window
+    const fetchAvailability = async () => {
+      const start = encodeURIComponent(dateTimeRange.start);
+      const end = encodeURIComponent(dateTimeRange.end);
+      const data = await ParkingService.fetchLotAvailability(lotId, dateTimeRange.start, dateTimeRange.end);
+      setLotAvailability(data);
+    };
+    fetchAvailability();
+  }, [lotId, dateTimeRange]);
+
 
   useEffect(() => {
     import(`../assets/svgs/${lotId}.jsx`)
@@ -217,11 +230,10 @@ const LotMapView = ({ lotId, onBack, highlightedSpot }) => {
           // Assuming lotId is available in the parent scope as a prop
           const spotId = `${currentLotId}-${paddedNum}`;
           const spotData =
-            lotDetails.spots &&
-            lotDetails.spots.find((s) => s.spotId === spotId);
-          spot.style.cursor = "pointer";
-          // Set default fill colors
-          if (spotData && spotData.status === "reserved") {
+            lotAvailability?.spots &&
+            lotAvailability.spots.find((s) => s.spotId === spotId);
+
+          if (spotData && !spotData.available) {
             spot.style.fill = "#ffcccc";
             spot.onmouseover = () => {
               spot.style.fill = "#cc6666";
@@ -253,7 +265,7 @@ const LotMapView = ({ lotId, onBack, highlightedSpot }) => {
         }
       });
     }
-  }, [SvgComponent, lotDetails, lotId, highlightedSpot]);
+  }, [SvgComponent, lotDetails, lotId, highlightedSpot, lotAvailability]);
 
   if (!SvgComponent) {
     return <div>Loading SVG...</div>;

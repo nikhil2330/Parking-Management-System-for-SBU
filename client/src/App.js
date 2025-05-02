@@ -58,14 +58,17 @@ function App() {
       {/* Public routes */}
       <Route path="/" element={<SignInPage />} />
       <Route path="/create" element={<CreateAccountPage />} />
-      
+
       {/* Admin routes */}
-      <Route path="/admin" element={
-        <AdminRoute>
-          <AdminDashboard />
-        </AdminRoute>
-      } />
-      
+      <Route
+        path="/admin"
+        element={
+          <AdminRoute>
+            <AdminDashboard />
+          </AdminRoute>
+        }
+      />
+
       {/* Protected routes */}
       <Route path="/home" element={
         <ProtectedRoute>

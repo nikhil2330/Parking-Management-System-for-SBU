@@ -84,12 +84,13 @@
   margin: 0 auto;
   width: 100%;
   position: relative;
+  align-items: stretch; 
   min-height: 0; 
 }
 
 /* Sidebar filter panel */
 .filters-panel {
-  width: 300px;
+  width: 320px;
   background-color: var(--white);
   border-radius: 16px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
@@ -247,6 +248,46 @@
   box-shadow: 0 4px 6px rgba(153, 0, 0, 0.2);
 }
 
+.active-filters-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0.75rem 0 0 0.5rem;
+  align-items: center;
+}
+
+.filter-tag {
+  background: #ffe5e5;
+  color: var(--primary-red);
+  border-radius: 999px;
+  padding: 0.15rem 0.7rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 1px 4px rgba(153,0,0,0.04);
+  transition: background 0.2s;
+  margin-bottom: 0.1rem;
+}
+
+.filter-tag .remove-tag-btn {
+  background: none;
+  border: none;
+  color: var(--primary-red);
+  font-size: 1.1em;
+  margin-left: 0.5em;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+}
+
+.filter-tag .remove-tag-btn:hover {
+  color: #7a0000;
+}
+
 /* Main content area */
 .main-content {
   flex: 1;
@@ -256,6 +297,7 @@
   max-width: 1200px;
   width: 100%;
   min-height: 0;
+  
 
 }
 
@@ -292,7 +334,7 @@
   z-index: 9999;      /* keep it above other elements (like the map) */
   max-height: 300px;  /* limit how tall the dropdown can get */
   overflow-y: auto;   /* scroll if too many suggestions */
-  padding: 0.5rem 0;
+  padding: 0.5rem 0; 
 }
 
 /* Each suggestion item */
@@ -482,7 +524,7 @@
   display: flex;
   flex: 1;
   width: 100%;
-  max-height: 660px;
+  /* max-height: 660px; */
   overflow: hidden;
   position: relative;
   transition: all 0.5s ease-in-out;
@@ -998,6 +1040,8 @@
   box-shadow: 0 2px 4px rgba(153, 0, 0, 0.1);
 }
 
+
+
 .reserve-btn:hover {
   background-color: #7a0000;
   transform: translateY(-1px);
@@ -1217,6 +1261,13 @@
   margin-top: 1.5rem;
 }
 
+.categories-inline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
 .categories-container {
   display: flex;
   flex-wrap: wrap;
@@ -1232,3 +1283,89 @@
   font-weight: 600;
   text-transform: uppercase;
 }
+
+.filters-sidebar {
+  width: 320px; /* Match your .filters-panel width */
+  min-width: 320px;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  flex-shrink: 0;
+  height: 100%;
+}
+
+.reservation-datetime-bar.vertical {
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  background: var(--white);
+  border-radius: 14px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  padding: 0.7rem 1rem 0.7rem 1rem; /* less vertical padding */
+  gap: 0.6rem; /* less gap between rows */
+  font-size: 1rem;
+  min-width: 0;
+  margin-bottom: 1rem; /* gap below container */
+}
+
+.reservation-datetime-row {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  width: 100%;
+  margin-bottom: 0.1rem;
+}
+
+.reservation-datetime-label.inline {
+  font-size: 0.98rem;
+  font-weight: 600;
+  color: var(--primary-red);
+  min-width: 44px;
+  margin-bottom: 0;
+  margin-right: 0.4rem;
+  text-align: left;
+}
+
+.reservation-datetime-input.wide {
+  border: 1.5px solid var(--gray-200);
+  border-radius: 8px;
+  padding: 0.25rem 0.7rem;
+  font-size: 0.98rem;
+  background: var(--white);
+  color: var(--primary-dark);
+  outline: none;
+  transition: border 0.2s;
+  width: 220px; /* increased width for full date/time visibility */
+  height: 32px;
+}
+
+.reservation-datetime-input.wide:focus {
+  border-color: var(--primary-red);
+}
+
+
+.back-button-details {
+  background-color: #237fe0; /* Blue background */
+  color: var(--white);
+  border: none;
+  padding: 0.75rem 1.25rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.back-button-details:hover {
+  background-color: #0b325a;
+  transform: translateY(-1px);
+}
+
+
+
+

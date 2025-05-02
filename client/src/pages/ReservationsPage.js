@@ -1,14 +1,17 @@
 // src/pages/ReservationsPage.js
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import Header from '../components/Header';
 import ReservationService from '../services/ReservationService';
+import GoogleMapService from '../services/GoogleMapService';
+// ...existing imports...
 import EventReservationService from '../services/EventReservationService';
 import './ReservationsPage.css';
 
 function ReservationsPage() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { spotId: routeSpotId } = useParams();
   const [regularReservations, setRegularReservations] = useState([]);
   const [eventReservations, setEventReservations] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -19,6 +22,8 @@ function ReservationsPage() {
     endTime: '',
     totalPrice: 0
   });
+  const [showMapModal, setShowMapModal] = useState(false);
+  const [mapUrl, setMapUrl] = useState('');
   
   // Pagination and display control
   const [activeTab, setActiveTab] = useState('all'); // all, regular, event
@@ -31,7 +36,7 @@ function ReservationsPage() {
 
   useEffect(() => {
     // If we have spotInfo from search page, prepare to create a new reservation
-    if (spotInfo) {
+    if (spotInfo || routeSpotId) {
       // Log the spotInfo to see what we're working with
       console.log('Received spot info:', spotInfo);
       console.log('Received building info:', searchedBuilding);
@@ -49,30 +54,36 @@ function ReservationsPage() {
       const formatDateForInput = (date) => {
         return date.toISOString().slice(0, 16);
       };
-      
+      let info = spotInfo;
+      if (!info && routeSpotId) {
+        info = { spotId: routeSpotId };
+      }
+
       // Get spot details from the spotInfo
       let lotId, spotId;
       
-      if (spotInfo.spotId && typeof spotInfo.spotId === 'string' && spotInfo.spotId.includes('-')) {
+      if (info.spotId && typeof info.spotId === 'string' && info.spotId.includes('-')) {
         // If spotId is in format "lotId-spotNum", we need to extract lotId differently
-        const [extractedLotId, spotNum] = spotInfo.spotId.split('-');
+        const [extractedLotId, spotNum] = info.spotId.split('-');
         lotId = extractedLotId;
-        spotId = spotInfo.spotId; // Keep the full spotId
+        spotId = info.spotId; // Keep the full spotId
       } else {
         // Extract from spot details if available
-        lotId = spotInfo.lot?._id || '';
-        spotId = spotInfo._id || spotInfo.spotId || '';
+        lotId = info.lot?._id || '';
+        spotId = info._id || info.spotId || '';
       }
       
       // Extract building ID if available
       const buildingId = searchedBuilding?._id || null;
+      const navStart = location.state?.startTime;
+      const navEnd = location.state?.endTime;
       
       setNewReservation({
         lotId: lotId,
         spotId: spotId,
         building: buildingId,
-        startTime: formatDateForInput(now),
-        endTime: formatDateForInput(end),
+        startTime: navStart || formatDateForInput(now),
+        endTime: navEnd || formatDateForInput(end),
         totalPrice: 5.00 // Default price, will be calculated based on duration
       });
       
@@ -85,7 +96,7 @@ function ReservationsPage() {
     
     // Fetch existing reservations
     fetchReservations();
-  }, [spotInfo, searchedBuilding]);
+  }, [spotInfo, searchedBuilding, routeSpotId]);
 
   const fetchReservations = async () => {
     setLoading(true);
@@ -110,6 +121,22 @@ function ReservationsPage() {
     }
   };
 
+  function formatLocalDateTimeInput(date) {
+    // Returns YYYY-MM-DDTHH:mm in local time
+    const pad = (n) => n.toString().padStart(2, '0');
+    return (
+      date.getFullYear() +
+      '-' +
+      pad(date.getMonth() + 1) +
+      '-' +
+      pad(date.getDate()) +
+      'T' +
+      pad(date.getHours()) +
+      ':' +
+      pad(date.getMinutes())
+    );
+  }
+
   const handleCreateReservation = async (e) => {
     e.preventDefault();
     
@@ -123,11 +150,11 @@ function ReservationsPage() {
     const endDate = new Date(newReservation.endTime);
     const now = new Date();
     
-    if (startDate < now) {
-      alert('Start time cannot be in the past.');
+    if (startDate < new Date(now.getTime() + 10 * 60000)) {
+      alert('Start time must be at least 10 minutes from now.');
       return;
     }
-    
+  
     if (startDate >= endDate) {
       alert('End time must be after start time.');
       return;
@@ -189,14 +216,23 @@ function ReservationsPage() {
     }
   };
 
-  const loadMoreReservations = () => {
-    setLoadingMore(true);
-    setTimeout(() => {
-      setVisibleCount(prev => prev + 5);
-      setLoadingMore(false);
-    }, 500); // Simulated loading delay
+  const handleViewDirections = (reservation) => {
+    if (reservation.spot && reservation.spot.location && reservation.building) {
+      const spotCoords = reservation.spot.location.coordinates; // [lon, lat]
+      const buildingCentroid = reservation.building.centroid;   // { x, y }
+      const origin = `${spotCoords[1]},${spotCoords[0]}`;
+      const destination = `${buildingCentroid.y},${buildingCentroid.x}`;
+      const embedUrl = GoogleMapService.getDirectionsEmbedUrl(origin, destination, 'walking');
+      setMapUrl(embedUrl);
+      setShowMapModal(true);
+    } else if (reservation.spot && reservation.spot.location) {
+      const [lon, lat] = reservation.spot.location.coordinates;
+      const embedUrl = GoogleMapService.getDirectionsEmbedUrl(`${lat},${lon}`, `${lat},${lon}`, 'walking');
+      setMapUrl(embedUrl);
+      setShowMapModal(true);
+    }
   };
-
+  
   // Format date for display
   const formatDateForDisplay = (dateString) => {
     const options = { 
@@ -208,6 +244,7 @@ function ReservationsPage() {
     };
     return new Date(dateString).toLocaleDateString('en-US', options);
   };
+
 
   // Calculate reservation status
   const getReservationStatus = (reservation) => {
@@ -339,6 +376,145 @@ function ReservationsPage() {
                 </>
               )}
             </button>
+
+        {error && (
+          <div className="error-message">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            {error}
+          </div>
+        )}
+
+        {!showReservationForm && !loading && reservations.length > 0 && (
+          <button
+            className="new-reservation-btn"
+            onClick={() => navigate("/search-parking")}
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="16"></line>
+              <line x1="8" y1="12" x2="16" y2="12"></line>
+            </svg>
+            Find Parking to Reserve
+          </button>
+        )}
+
+        {showReservationForm && (
+          <div className="new-reservation-form">
+            <div className="reservation-form-header">
+              <h2>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="16" y1="2" x2="16" y2="6"></line>
+                  <line x1="8" y1="2" x2="8" y2="6"></line>
+                  <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+                Create New Reservation
+              </h2>
+            </div>
+            <div className="reservation-form-body">
+              <form onSubmit={handleCreateReservation}>
+                <div className="reservation-form-group">
+                  <label className="reservation-form-label" htmlFor="startTime">
+                    Start Time:
+                  </label>
+                  <input
+                    className="reservation-form-input"
+                    type="datetime-local"
+                    id="startTime"
+                    value={newReservation.startTime}
+                    onChange={(e) =>
+                      setNewReservation({
+                        ...newReservation,
+                        startTime: e.target.value,
+                      })
+                    }
+                    min={formatLocalDateTimeInput(new Date())}
+                    required
+                  />
+                </div>
+
+                <div className="reservation-form-group">
+                  <label className="reservation-form-label" htmlFor="endTime">
+                    End Time:
+                  </label>
+                  <input
+                    className="reservation-form-input"
+                    type="datetime-local"
+                    id="endTime"
+                    value={newReservation.endTime}
+                    onChange={(e) =>
+                      setNewReservation({
+                        ...newReservation,
+                        endTime: e.target.value,
+                      })
+                    }
+                    min={newReservation.startTime}
+                    required
+                  />
+                </div>
+
+                <div className="reservation-form-footer">
+                  <div className="reservation-form-note">
+                    <strong>Note:</strong> Price is calculated at $2.50 per hour
+                    based on your selected timeframe.
+                  </div>
+
+                  <div className="reservation-form-actions">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowReservationForm(false);
+                        navigate("/reservations", { replace: true });
+                      }}
+                      className="reservation-form-btn reservation-cancel-btn"
+                    >
+                      Cancel
+                    </button>
+
+                    <button
+                      type="submit"
+                      className="reservation-form-btn reservation-submit-btn"
+                    >
+                      Create Reservation
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
           </div>
         )}
       </div>
@@ -364,6 +540,24 @@ function ReservationsPage() {
                 stroke="currentColor" 
                 strokeWidth="2" 
                 strokeLinecap="round" 
+
+        {loading ? (
+          <div className="loading-container">
+            <div className="loading-spinner"></div>
+            <p className="loading-text">Loading your reservations...</p>
+          </div>
+        ) : reservations.length === 0 && !showReservationForm ? (
+          <div className="no-reservations">
+            <div className="no-reservations-icon">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
                 strokeLinejoin="round"
               >
                 <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
@@ -1089,6 +1283,42 @@ function ReservationsPage() {
           )
         )}
       </div>
+      {showMapModal && (
+        <div
+          className="modal-backdrop"
+          onClick={(e) => {
+            if (e.target.className === "modal-backdrop") setShowMapModal(false);
+          }}
+        >
+          <div
+            className="modal-content"
+            style={{
+              maxWidth: 700,
+              width: "95vw",
+              padding: 0,
+              position: "relative",
+            }}
+          >
+            {/* Back button overlays the map, top-right */}
+            <button
+              className="spot-back-btn"
+              onClick={() => setShowMapModal(false)}
+            >
+              ← Back
+            </button>
+            <iframe
+              src={mapUrl}
+              title="Google Maps"
+              width="100%"
+              height="450"
+              style={{ border: 0, display: "block" }}
+              allowFullScreen
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

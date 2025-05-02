@@ -1,7 +1,7 @@
 // client/src/services/UserService.js
 
 import axios from 'axios';
-
+// 
 const API = axios.create({
   baseURL: process.env.REACT_APP_API_URL,
   headers: { 'Content-Type': 'application/json' }
@@ -21,6 +21,7 @@ API.interceptors.request.use(
  * GET /api/users/profile
  * Returns the full user object from the server.
  */
+axios.defaults.baseURL = 'http://localhost:8000';
 const getProfile = async () => {
   try {
     const { data } = await API.get('/users/profile');
