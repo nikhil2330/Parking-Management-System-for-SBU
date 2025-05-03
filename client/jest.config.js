@@ -14,4 +14,8 @@ module.exports = {
   transformIgnorePatterns: [
     '/node_modules/(?!(react-router-dom)/)',
   ],
+  reporters: [
+    "default",
+    ["jest-html-reporter", { pageTitle: "Test Report" }]
+  ]
 };

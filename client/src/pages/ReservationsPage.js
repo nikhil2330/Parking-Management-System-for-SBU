@@ -1,16 +1,18 @@
 // src/pages/ReservationsPage.js
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation, useParams } from 'react-router-dom';
+import { useNavigate, useLocation, useParams, useSearchParams } from 'react-router-dom';
 import Header from '../components/Header';
 import ReservationService from '../services/ReservationService';
+import ApiService from '../services/api';    
 import GoogleMapService from '../services/GoogleMapService';
-// ...existing imports...
 import EventReservationService from '../services/EventReservationService';
 import './ReservationsPage.css';
 
 function ReservationsPage() {
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchParams] = useSearchParams();
+  const sessionId = searchParams.get('session_id');
   const { spotId: routeSpotId } = useParams();
   const [regularReservations, setRegularReservations] = useState([]);
   const [eventReservations, setEventReservations] = useState([]);
@@ -121,6 +123,19 @@ function ReservationsPage() {
     }
   };
 
+  useEffect(() => {
+    if (!sessionId) return;
+
+    (async () => {
+      try {
+        await ApiService.payment.confirm(sessionId); // add this helper
+        await fetchReservations();                   // refresh UI
+      } catch (err) {
+        console.error('Payment confirm failed', err);
+      }
+    })();
+  }, [sessionId]);
+
   function formatLocalDateTimeInput(date) {
     // Returns YYYY-MM-DDTHH:mm in local time
     const pad = (n) => n.toString().padStart(2, '0');
@@ -136,7 +151,6 @@ function ReservationsPage() {
       pad(date.getMinutes())
     );
   }
-
   const handleCreateReservation = async (e) => {
     e.preventDefault();
     
@@ -454,18 +468,79 @@ function ReservationsPage() {
             )}
           </div>
           <div className="reservation-payment">
-            <div className="payment-status">
-              <span className="payment-label">Payment:</span>
-              {reservation.paymentStatus === 'paid' ? (
-                <span className="paid-status">Paid</span>
-              ) : (
-                <span className="unpaid-status">Unpaid</span>
-              )}
-            </div>
-            <span className="reservation-detail-value">${reservation.totalPrice?.toFixed(2) ?? '0.00'}</span>
-            {reservation.paymentStatus === 'unpaid' &&
-              !(status === 'cancelled' || status === 'rejected') && (
-                <button className="pay-now-btn">
+              <div className="payment-status">
+                <span className="payment-label">Payment:</span>
+                {reservation.paymentStatus === 'paid' ? (
+                  <span className="paid-status">
+                    <svg 
+                      xmlns="http://www.w3.org/2000/svg" 
+                      width="24" 
+                      height="24" 
+                      viewBox="0 0 24 24" 
+                      fill="none" 
+                      stroke="currentColor" 
+                      strokeWidth="2" 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round"
+                    >
+                      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                      <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                    Paid
+                  </span>
+                ) : (
+                  <span className="unpaid-status">
+                    <svg 
+                      xmlns="http://www.w3.org/2000/svg" 
+                      width="24" 
+                      height="24" 
+                      viewBox="0 0 24 24" 
+                      fill="none" 
+                      stroke="currentColor" 
+                      strokeWidth="2" 
+                      strokeLinecap="round" 
+                      strokeLinejoin="round"
+                    >
+                      <circle cx="12" cy="12" r="10"></circle>
+                      <line x1="12" y1="8" x2="12" y2="12"></line>
+                      <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                    Unpaid
+                  </span>
+                )}
+              </div>
+              
+              <span className="reservation-detail-value">${reservation.totalPrice.toFixed(2)}</span>
+              
+              {reservation.paymentStatus === 'unpaid' && (
+                <button
+                    className="pay-now-btn"
+                      onClick={async () => {
+                        try {
+                          const { url } = await ApiService.payment.createCheckoutSession(
+                            reservation._id
+                          );
+                          window.location.href = url;           // hand-off to Stripe Checkout
+                        } catch (err) {
+                          console.error(err);
+                          alert(err.message || 'Could not start checkout');
+                        }
+                      }}
+                    >
+                  <svg 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    width="24" 
+                    height="24" 
+                    viewBox="0 0 24 24" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    strokeWidth="2" 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round"
+                  >
+                    <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                    <line x1="1" y1="10" x2="23" y2="10"></line>
+                  </svg>
                   Pay Now
                 </button>
               )}
