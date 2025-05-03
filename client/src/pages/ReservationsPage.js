@@ -517,9 +517,11 @@ function ReservationsPage() {
                     className="pay-now-btn"
                       onClick={async () => {
                         try {
-                          const { url } = await ApiService.payment.createCheckoutSession(
-                            reservation._id
-                          );
+                          const { url } = reservation.isEventReservation
+                           ? await ApiService.payment.createEventReservationCheckoutSession(
+                             reservation._id
+                             )
+                            : await ApiService.payment.createCheckoutSession(reservation._id);
                           window.location.href = url;           // hand-off to Stripe Checkout
                         } catch (err) {
                           console.error(err);
