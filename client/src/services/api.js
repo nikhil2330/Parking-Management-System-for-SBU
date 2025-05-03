@@ -429,6 +429,15 @@ const ApiService = {
               return data;
             } catch (error) { return handleApiError(error); }
           },
+      createEventReservationCheckoutSession: async (eventReservationId) => {
+                  try {
+                    const { data } = await API.post(
+                      '/payments/event-reservations/checkout',
+                      { eventReservationId }
+                    );
+                    return data;          // { url }
+                  } catch (err) { return handleApiError(err); }
+                },          
      confirm: async (sessionId) => {
             try {
               const { data } = await API.get(`/payments/confirm/${sessionId}`);
@@ -437,7 +446,14 @@ const ApiService = {
               return handleApiError(error);
             }
           },
-      
+      confirmEventReservation: async (sessionId) => {
+                  try {
+                    const { data } = await API.get(
+                      `/payments/event-reservations/confirm/${sessionId}`
+                    );
+                    return data;
+                  } catch (err) { return handleApiError(err); }
+                },
       
     getMethods: async () => {
       try {

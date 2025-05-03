@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import Header from '../components/Header';
 import ParkingService from '../services/ParkingService';
 import EventReservationService from '../services/EventReservationService';
 import MapOverview from '../components/MapOverview';
 import EventLotView from '../components/EventLotView';
+import ApiService from '../services/api'; 
 import EventFilterOptions from '../components/EventFilterOptions';
 import GoogleMapsService from '../services/GoogleMapService';
 import './premium-search-parking.css';
@@ -53,6 +54,18 @@ function formatDateForInput(date) {
 
 function EventReservationPage() {
   const navigate = useNavigate();
+  const [params] = useSearchParams();
+  const sid = params.get('session_id');
+
+  useEffect(() => {
+    if (!sid) return;
+    ApiService.payment.confirmEventReservation(sid)
+      .then(() => {
+        // optional: bounce the user back to “My Reservations”
+        navigate('/reservations', { replace: true });
+      })
+      .catch(console.error);
+  }, [sid]);
   const location = useLocation();
   const [searchQuery, setSearchQuery] = useState('');
   const [searchedBuilding, setSearchedBuilding] = useState(null);
