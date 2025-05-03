@@ -36,7 +36,7 @@ async function getPopularTimes(lotId) {
     const hoursArray = [];
     for (let hour = 0; hour < 24; hour++) {
       // Historical average from snapshot
-      const snap = snapshots.find(s => Number(s.dayOfWeek) === Number(day) && Number(s.hour) === Number(hour));      console.log(snap)
+      const snap = snapshots.find(s => Number(s.dayOfWeek) === Number(day) && Number(s.hour) === Number(hour)); 
       const histAvg = snap ? snap.avgReserved : 0;
 
       // Future reservations for this hour

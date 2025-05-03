@@ -94,107 +94,107 @@ exports.getClosestSpots = async (req, res) => {
   }
 };
 
-exports.getClosestLotsWithEnoughSpots = async (req, res) => {
-  try {
-    const { buildingId, filters = {}, startTime, endTime } = req.body;
-    const spotsNeeded = filters.spotsNeeded ? parseInt(filters.spotsNeeded) : 1;
-    if (!buildingId || !startTime || !endTime) {
-      return res.status(400).json({ error: 'Missing buildingId, startTime, or endTime' });
-    }
+// exports.getClosestLotsWithEnoughSpots = async (req, res) => {
+//   try {
+//     const { buildingId, filters = {}, startTime, endTime } = req.body;
+//     const spotsNeeded = filters.spotsNeeded ? parseInt(filters.spotsNeeded) : 1;
+//     if (!buildingId || !startTime || !endTime) {
+//       return res.status(400).json({ error: 'Missing buildingId, startTime, or endTime' });
+//     }
 
-    // 1. Get all lots (optionally filter by campus, etc.)
-    const allLots = await ParkingLot.find({});
-    const lotResults = [];
+//     // 1. Get all lots (optionally filter by campus, etc.)
+//     const allLots = await ParkingLot.find({});
+//     const lotResults = [];
 
-    // 2. For each lot, count available spots and compute wayfinding distance
-    for (const lot of allLots) {
-      // Build spot query for this lot
-      let spotQuery = { lot: lot._id };
-      if (filters.categories) {
-        const checkedCategories = Object.entries(filters.categories)
-          .filter(([cat, checked]) => checked)
-          .map(([cat]) => cat);
-        if (checkedCategories.length > 0) {
-          spotQuery.type = { $in: checkedCategories };
-        }
-      }
-      if (filters.covered) spotQuery.covered = filters.covered;
-      if (filters.zone) spotQuery.zone = filters.zone;
-      // Price filter
-      if (filters.price) {
-        if (
-          (lot.price && lot.price > filters.price[1]) ||
-          (lot.baseRate && lot.baseRate > filters.price[1])
-        ) {
-          continue; // skip this lot
-        }
-      }
+//     // 2. For each lot, count available spots and compute wayfinding distance
+//     for (const lot of allLots) {
+//       // Build spot query for this lot
+//       let spotQuery = { lot: lot._id };
+//       if (filters.categories) {
+//         const checkedCategories = Object.entries(filters.categories)
+//           .filter(([cat, checked]) => checked)
+//           .map(([cat]) => cat);
+//         if (checkedCategories.length > 0) {
+//           spotQuery.type = { $in: checkedCategories };
+//         }
+//       }
+//       if (filters.covered) spotQuery.covered = filters.covered;
+//       if (filters.zone) spotQuery.zone = filters.zone;
+//       // Price filter
+//       if (filters.price) {
+//         if (
+//           (lot.price && lot.price > filters.price[1]) ||
+//           (lot.baseRate && lot.baseRate > filters.price[1])
+//         ) {
+//           continue; // skip this lot
+//         }
+//       }
 
-      // Find all spots in this lot matching filters
-      const allSpots = await ParkingSpot.find(spotQuery);
-      if (allSpots.length === 0) continue;
-      const spotIds = allSpots.map(s => s._id);
+//       // Find all spots in this lot matching filters
+//       const allSpots = await ParkingSpot.find(spotQuery);
+//       if (allSpots.length === 0) continue;
+//       const spotIds = allSpots.map(s => s._id);
 
-      // Exclude reserved spots (regular + event)
-      const reserved = await Reservation.find({
-        spot: { $in: spotIds },
-        status: { $in: ['pending', 'active'] },
-        startTime: { $lt: new Date(endTime) },
-        endTime: { $gt: new Date(startTime) }
-      }).select('spot');
-      const eventReserved = await EventReservation.find({
-        spots: { $in: spotIds },
-        status: { $in: ['pending', 'approved', 'active'] },
-        startTime: { $lt: new Date(endTime) },
-        endTime: { $gt: new Date(startTime) }
-      }).select('spots');
-      const reservedIds = new Set([
-        ...reserved.map(r => r.spot.toString()),
-        ...eventReserved.flatMap(er => er.spots.map(s => s.toString()))
-      ]);
-      const availableSpots = allSpots.filter(s => !reservedIds.has(s._id.toString()));
+//       // Exclude reserved spots (regular + event)
+//       const reserved = await Reservation.find({
+//         spot: { $in: spotIds },
+//         status: { $in: ['pending', 'active'] },
+//         startTime: { $lt: new Date(endTime) },
+//         endTime: { $gt: new Date(startTime) }
+//       }).select('spot');
+//       const eventReserved = await EventReservation.find({
+//         spots: { $in: spotIds },
+//         status: { $in: ['pending', 'approved', 'active'] },
+//         startTime: { $lt: new Date(endTime) },
+//         endTime: { $gt: new Date(startTime) }
+//       }).select('spots');
+//       const reservedIds = new Set([
+//         ...reserved.map(r => r.spot.toString()),
+//         ...eventReserved.flatMap(er => er.spots.map(s => s.toString()))
+//       ]);
+//       const availableSpots = allSpots.filter(s => !reservedIds.has(s._id.toString()));
 
-      if (availableSpots.length >= spotsNeeded) {
-        // Use wayfindingService to get distance from building to lot centroid
-        let distance = Infinity;
-        if (lot.centroid && lot.centroid.x != null && lot.centroid.y != null) {
-          // You need a Neo4j node for the lot centroid or a representative spot in the lot
-          // Let's assume you have a Spot node in Neo4j for the first available spot in the lot:
-          const repSpot = availableSpots[0];
-          if (repSpot && repSpot.spotId) {
-            // Use your wayfindingService to get distance from buildingId to repSpot.spotId
+//       if (availableSpots.length >= spotsNeeded) {
+//         // Use wayfindingService to get distance from building to lot centroid
+//         let distance = Infinity;
+//         if (lot.centroid && lot.centroid.x != null && lot.centroid.y != null) {
+//           // You need a Neo4j node for the lot centroid or a representative spot in the lot
+//           // Let's assume you have a Spot node in Neo4j for the first available spot in the lot:
+//           const repSpot = availableSpots[0];
+//           if (repSpot && repSpot.spotId) {
+//             // Use your wayfindingService to get distance from buildingId to repSpot.spotId
 
-            const wayfindingResult = await wayfindingService.findClosestAvailableSpots(
-              buildingId,
-              new Set([repSpot.spotId]),
-              1
-            );
-            if (wayfindingResult.length > 0) {
-              distance = wayfindingResult[0].distance;
-            }
+//             const wayfindingResult = await wayfindingService.findClosestAvailableSpots(
+//               buildingId,
+//               new Set([repSpot.spotId]),
+//               1
+//             );
+//             if (wayfindingResult.length > 0) {
+//               distance = wayfindingResult[0].distance;
+//             }
 
-          }
-        }
-        lotResults.push({
-          lotId: lot.lotId,
-          officialLotName: lot.officialLotName,
-          availableSpots: availableSpots.length,
-          totalSpots: allSpots.length,
-          centroid: lot.centroid,
-          distance,
-        });
-      }
-    }
+//           }
+//         }
+//         lotResults.push({
+//           lotId: lot.lotId,
+//           officialLotName: lot.officialLotName,
+//           availableSpots: availableSpots.length,
+//           totalSpots: allSpots.length,
+//           centroid: lot.centroid,
+//           distance,
+//         });
+//       }
+//     }
 
-    // Sort by wayfinding distance
-    lotResults.sort((a, b) => a.distance - b.distance);
+//     // Sort by wayfinding distance
+//     lotResults.sort((a, b) => a.distance - b.distance);
 
-    res.json({ lots: lotResults });
-  } catch (err) {
-    console.error('Error in getClosestLotsWithEnoughSpots:', err);
-    res.status(500).json({ error: 'Server error' });
-  }
-};
+//     res.json({ lots: lotResults });
+//   } catch (err) {
+//     console.error('Error in getClosestLotsWithEnoughSpots:', err);
+//     res.status(500).json({ error: 'Server error' });
+//   }
+// };
 
 exports.getLotAvailability = async (req, res) => {
   try {
@@ -361,7 +361,6 @@ exports.searchBuildings = async (req, res) => {
 exports.getPopularTimesController = async (req, res) => {
   try {
     const { lotId } = req.params;
-    console.log('[PopularTimes] lotId:', lotId); // Debug log
     const popularTimes = await getPopularTimes(lotId);
     return res.json(popularTimes);
   } catch (error) {
@@ -370,40 +369,3 @@ exports.getPopularTimesController = async (req, res) => {
   }
 }
 
-async function getMatchingLotIds(filters) {
-  const lotQuery = {};
-
-  if (filters.price) {
-    lotQuery.$or = [
-      { price: { $exists: true, $lte: filters.price[1] } },
-      { baseRate: { $exists: true, $lte: filters.price[1] } }
-    ];
-  }
-
-  if (filters.covered) {
-    lotQuery.types = filters.covered;
-  }
-
-  if (filters.zone) {
-    if (filters.zone === "faculty") {
-      lotQuery["categories.facultyStaff"] = { $gt: 0 };
-    } else if (filters.zone === "student") {
-      lotQuery["categories.commuter"] = { $gt: 0 };
-    } else if (filters.zone === "visitor") {
-      lotQuery["categories.metered"] = { $gt: 0 };
-    } else {
-      lotQuery.zone = filters.zone;
-    }
-  }
-
-  if (filters.categories) {
-    Object.entries(filters.categories).forEach(([cat, checked]) => {
-      if (checked) lotQuery[`categories.${cat}`] = { $gt: 0 };
-    });
-  }
-
-  if (Object.keys(lotQuery).length === 0) return null;
-
-  const lots = await ParkingLot.find(lotQuery).select('_id');
-  return lots.map(lot => lot._id);
-}

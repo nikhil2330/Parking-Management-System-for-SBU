@@ -6,6 +6,7 @@
 
 const router = require('express').Router();
 const User   = require('../models/User');
+const mongoose = require('mongoose'); 
 const Stats  = require('../models/Stats');
 const authenticateJWT = require('../middleware/authenticateJWT');
 const requireAdmin    = require('../middleware/requireAdmin');
@@ -163,6 +164,9 @@ router.post('/users/bulk/approve', async (req, res) => {
     if (!Array.isArray(userIds) || !userIds.length) {
       return res.status(400).json({ ok: false, message: 'Invalid user IDs' });
     }
+    if (!userIds.every(id => mongoose.Types.ObjectId.isValid(id))) {
+      return res.status(400).json({ ok: false, message: 'One or more user IDs are invalid' });
+    }
 
     await User.updateMany({ _id: { $in: userIds } }, { status: 'approved' });
 
@@ -196,6 +200,9 @@ router.post('/users/bulk/reject', async (req, res) => {
     const { userIds, updateStats } = req.body;
     if (!Array.isArray(userIds) || !userIds.length) {
       return res.status(400).json({ ok: false, message: 'Invalid user IDs' });
+    }
+    if (!userIds.every(id => mongoose.Types.ObjectId.isValid(id))) {
+      return res.status(400).json({ ok: false, message: 'One or more user IDs are invalid' });
     }
 
     await User.updateMany({ _id: { $in: userIds } }, { status: 'rejected' });
