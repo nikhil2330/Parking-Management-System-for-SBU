@@ -1,11 +1,10 @@
-// client/src/components/UserProfileModal.js
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AuthService from '../services/AuthService';
 import UserService from '../services/UserService';
 import './UserProfileModal.css';
 
-function UserProfileModal({ onClose }) {
+function UserProfileModal({ onClose, customLogout }) {
   // Basic user fields
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -125,9 +124,14 @@ function UserProfileModal({ onClose }) {
   // ----------------------------------------------------------------------
   // 5) Logout
   const handleLogout = () => {
-    AuthService.logout();
+    // Use the custom logout handler if provided (for admin mode)
+    if (customLogout) {
+      customLogout();
+    } else {
+      AuthService.logout();
+      navigate('/'); // Redirect to sign-in page
+    }
     onClose();
-    navigate('/'); // Redirect to sign-in page
   };
 
   if (loading && !successMessage) {
