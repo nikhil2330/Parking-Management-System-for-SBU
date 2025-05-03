@@ -134,22 +134,25 @@ exports.createReservation = async (req, res) => {
     return res.status(400).json({ error: 'Error processing parking IDs', details: idError.message });
   }
 
-  // Overlap checker
-  const overlap = await Reservation.findOne({
-    spot: spotObjectId,
-    status: { $in: ['pending', 'active'] },
-    $or: [
-      { startTime: { $lt: new Date(endTime) }, endTime: { $gt: new Date(startTime) } }
-    ]
-  });
-  if (overlap) {
-    return res.status(409).json({ error: 'Spot already reserved for this time window.' });
-  }
-
   const session = await mongoose.startSession();
-  session.startTransaction();
-
   try {
+    session.startTransaction();
+
+    // Overlap checker INSIDE the transaction
+    const overlap = await Reservation.findOne({
+      spot: spotObjectId,
+      status: { $in: ['pending', 'active'] },
+      $or: [
+        { startTime: { $lt: new Date(endTime) }, endTime: { $gt: new Date(startTime) } }
+      ]
+    }).session(session);
+
+    if (overlap) {
+      await session.abortTransaction();
+      return res.status(409).json({ error: 'Spot already reserved for this time window.' });
+    }
+
+    // Create reservation INSIDE the transaction
     const reservationData = {
       lot: lotObjectId,
       spot: spotObjectId,
@@ -166,11 +169,11 @@ exports.createReservation = async (req, res) => {
     await updateSpotAndLotStatus(spotObjectId, lotObjectId);
 
     await session.commitTransaction();
-    session.endSession();
     return res.status(201).json(newRes);
   } catch (err) {
-    await session.abortTransaction();
-    session.endSession();
+    if (session.inTransaction()) {
+      await session.abortTransaction();
+    }
     console.error('Error creating reservation:', err);
 
     // Enhanced error response
@@ -195,6 +198,8 @@ exports.createReservation = async (req, res) => {
       message: err.message,
       stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
     });
+  } finally {
+    session.endSession();
   }
 };
 
@@ -260,6 +265,17 @@ exports.cancelReservation = async (req, res) => {
       return res.status(404).json({ error: 'Reservation not found' });
     }
 
+    // Only allow the owner or admin to cancel
+    const userId = req.user.id;
+    if (
+      reservation.user.toString() !== userId &&
+      (!req.user.role || req.user.role !== 'admin')
+    ) {
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(403).json({ error: 'Forbidden: Not your reservation' });
+    }
+
     reservation.status = 'cancelled';
     await reservation.save({ session });
 
@@ -270,7 +286,9 @@ exports.cancelReservation = async (req, res) => {
 
     return res.json({ success: true, message: 'Reservation cancelled' });
   } catch (err) {
-    await session.abortTransaction();
+    if (session.inTransaction()) {
+      await session.abortTransaction();
+    }
     session.endSession();
     console.error('Error cancelling reservation:', err);
     return res.status(500).json({ error: 'Internal server error', details: err.message });

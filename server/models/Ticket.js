@@ -20,6 +20,9 @@ const ticketSchema = new mongoose.Schema({
     enum: ['pending', 'paid', 'overdue'],
     default: 'pending'
   },
+  stripeSessionId: {              
+        type: String
+      },
   issueDate: {
     type: Date,
     default: Date.now

@@ -23,6 +23,8 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
+// webhook route needs the raw body, so mouunting it before the normal json parser
+app.use('/api/payments', require('./routes/stripeRoutes'));
 
 // Parse JSON and URL‑encoded bodies
 app.use(bodyParser.json());
