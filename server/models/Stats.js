@@ -1,7 +1,7 @@
-// models/Stats.js
 const mongoose = require('mongoose');
 
 const StatsSchema = new mongoose.Schema({
+  // User account statistics
   pendingUsers: {
     type: Number,
     default: 0
@@ -14,6 +14,8 @@ const StatsSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
+  
+  // Booking statistics
   pendingBookings: {
     type: Number,
     default: 0
@@ -26,10 +28,45 @@ const StatsSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
+  
+  // Ticket statistics
+  pendingTickets: {
+    type: Number,
+    default: 0
+  },
+  paidTickets: {
+    type: Number,
+    default: 0
+  },
+  overdueTickets: {
+    type: Number,
+    default: 0
+  },
+  totalTicketRevenue: {
+    type: Number,
+    default: 0
+  },
+  
+  // Feedback statistics
+  pendingFeedback: {
+    type: Number,
+    default: 0
+  },
+  reviewedFeedback: {
+    type: Number,
+    default: 0
+  },
+  resolvedFeedback: {
+    type: Number,
+    default: 0
+  },
+  
+  // Total items managed
   totalManaged: {
     type: Number,
     default: 0
   },
+  
   lastUpdated: {
     type: Date,
     default: Date.now

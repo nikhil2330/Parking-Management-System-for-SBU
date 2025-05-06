@@ -639,3 +639,28 @@
       padding: 2rem;
     }
   }
+  /* Add this to your existing HelpPage.css */
+
+.help-feedback-section {
+  margin-bottom: 3rem;
+  animation: fadeIn 0.5s ease-out;
+}
+
+.feedback-card {
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.feedback-card:hover {
+  background-color: var(--red-50);
+}
+
+.feedback-card:hover .help-link-icon {
+  background-color: var(--primary-red);
+  color: var(--white);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}

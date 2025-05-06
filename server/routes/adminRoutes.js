@@ -57,10 +57,43 @@ router.get('/pending', async (_req, res) => {
 /* ──────────────────────────────────────────────────────────────── */
 /* GET  /api/admin/stats                                           */
 /* ──────────────────────────────────────────────────────────────── */
+/* ──────────────────────────────────────────────────────────────── */
+/* GET  /api/admin/stats                                           */
+/* ──────────────────────────────────────────────────────────────── */
 router.get('/stats', async (_req, res) => {
   try {
     let stats = await Stats.findOne();
     if (!stats) stats = await new Stats().save();
+    
+    // Recalculate feedback stats to ensure accuracy
+    try {
+      const pendingFeedback = await Feedback.countDocuments({ status: 'pending' });
+      const reviewedFeedback = await Feedback.countDocuments({ status: 'reviewed' });
+      const resolvedFeedback = await Feedback.countDocuments({ status: 'resolved' });
+      
+      // Only update if counts are different (to avoid unnecessary saves)
+      let updated = false;
+      if (stats.pendingFeedback !== pendingFeedback) {
+        stats.pendingFeedback = pendingFeedback;
+        updated = true;
+      }
+      if (stats.reviewedFeedback !== reviewedFeedback) {
+        stats.reviewedFeedback = reviewedFeedback;
+        updated = true;
+      }
+      if (stats.resolvedFeedback !== resolvedFeedback) {
+        stats.resolvedFeedback = resolvedFeedback;
+        updated = true;
+      }
+      
+      if (updated) {
+        await stats.save();
+      }
+    } catch (feedbackError) {
+      console.error('Error recalculating feedback stats:', feedbackError);
+      // Don't fail the request if feedback stats update fails
+    }
+    
     res.json(stats);
   } catch (err) {
     console.error('Stats fetch error:', err);

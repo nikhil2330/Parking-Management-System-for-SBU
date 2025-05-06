@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import { FaSearch, FaRegLightbulb, FaRegQuestionCircle, FaHeadset, FaArrowRight, FaChevronDown, FaChevronUp, FaCalendarAlt, FaCreditCard, FaDesktop, FaInfoCircle, FaPhone } from 'react-icons/fa';
+import FeedbackForm from '../components/FeedbackForm';
+import { FaSearch, FaRegLightbulb, FaRegQuestionCircle, FaHeadset, FaArrowRight, FaChevronDown, FaChevronUp, FaCalendarAlt, FaCreditCard, FaDesktop, FaInfoCircle, FaPhone, FaCommentAlt } from 'react-icons/fa';
 import { FiUser } from 'react-icons/fi';
 import { IoDocumentTextOutline } from 'react-icons/io5';
 import { MdOutlineEmail } from 'react-icons/md';
@@ -12,6 +13,7 @@ function HelpPage() {
   const [activeCategory, setActiveCategory] = useState('all');
   const [loading, setLoading] = useState(true);
   const [expandedFaq, setExpandedFaq] = useState(null);
+  const [showFeedbackForm, setShowFeedbackForm] = useState(false);
 
   // Simulate loading
   useEffect(() => {
@@ -105,6 +107,17 @@ function HelpPage() {
     setExpandedFaq(expandedFaq === id ? null : id);
   };
 
+  const toggleFeedbackForm = () => {
+    setShowFeedbackForm(!showFeedbackForm);
+  };
+
+  const handleFeedbackSubmitSuccess = () => {
+    // Automatically hide the form after successful submission
+    setTimeout(() => {
+      setShowFeedbackForm(false);
+    }, 3000);
+  };
+
   return (
     <div className="premium-help-page">
       {/* Decorative blobs */}
@@ -158,17 +171,24 @@ function HelpPage() {
             </div>
           </div>
           
-          <div className="help-link-card">
+          <div className="help-link-card feedback-card" onClick={toggleFeedbackForm}>
             <div className="help-link-icon">
-              <MdOutlineEmail />
+              <FaCommentAlt />
             </div>
-            <h3>Contact Support</h3>
-            <p>Get in touch with our dedicated support team</p>
+            <h3>Share Feedback</h3>
+            <p>Help us improve your parking experience</p>
             <div className="help-link-action">
-              Contact Us <FaArrowRight className="help-arrow-icon" />
+              Give Feedback <FaArrowRight className="help-arrow-icon" />
             </div>
           </div>
         </section>
+
+        {/* Feedback Form (toggleable) */}
+        {showFeedbackForm && (
+          <section className="help-feedback-section">
+            <FeedbackForm onSubmitSuccess={handleFeedbackSubmitSuccess} />
+          </section>
+        )}
         
         {/* FAQ section */}
         <section className="help-faq-section">
