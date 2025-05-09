@@ -6,6 +6,7 @@
 
 const router = require('express').Router();
 const User   = require('../models/User');
+const mongoose = require('mongoose'); 
 const Stats  = require('../models/Stats');
 const authenticateJWT = require('../middleware/authenticateJWT');
 const requireAdmin    = require('../middleware/requireAdmin');
@@ -56,10 +57,43 @@ router.get('/pending', async (_req, res) => {
 /* ──────────────────────────────────────────────────────────────── */
 /* GET  /api/admin/stats                                           */
 /* ──────────────────────────────────────────────────────────────── */
+/* ──────────────────────────────────────────────────────────────── */
+/* GET  /api/admin/stats                                           */
+/* ──────────────────────────────────────────────────────────────── */
 router.get('/stats', async (_req, res) => {
   try {
     let stats = await Stats.findOne();
     if (!stats) stats = await new Stats().save();
+    
+    // Recalculate feedback stats to ensure accuracy
+    try {
+      const pendingFeedback = await Feedback.countDocuments({ status: 'pending' });
+      const reviewedFeedback = await Feedback.countDocuments({ status: 'reviewed' });
+      const resolvedFeedback = await Feedback.countDocuments({ status: 'resolved' });
+      
+      // Only update if counts are different (to avoid unnecessary saves)
+      let updated = false;
+      if (stats.pendingFeedback !== pendingFeedback) {
+        stats.pendingFeedback = pendingFeedback;
+        updated = true;
+      }
+      if (stats.reviewedFeedback !== reviewedFeedback) {
+        stats.reviewedFeedback = reviewedFeedback;
+        updated = true;
+      }
+      if (stats.resolvedFeedback !== resolvedFeedback) {
+        stats.resolvedFeedback = resolvedFeedback;
+        updated = true;
+      }
+      
+      if (updated) {
+        await stats.save();
+      }
+    } catch (feedbackError) {
+      console.error('Error recalculating feedback stats:', feedbackError);
+      // Don't fail the request if feedback stats update fails
+    }
+    
     res.json(stats);
   } catch (err) {
     console.error('Stats fetch error:', err);
@@ -163,6 +197,9 @@ router.post('/users/bulk/approve', async (req, res) => {
     if (!Array.isArray(userIds) || !userIds.length) {
       return res.status(400).json({ ok: false, message: 'Invalid user IDs' });
     }
+    if (!userIds.every(id => mongoose.Types.ObjectId.isValid(id))) {
+      return res.status(400).json({ ok: false, message: 'One or more user IDs are invalid' });
+    }
 
     await User.updateMany({ _id: { $in: userIds } }, { status: 'approved' });
 
@@ -196,6 +233,9 @@ router.post('/users/bulk/reject', async (req, res) => {
     const { userIds, updateStats } = req.body;
     if (!Array.isArray(userIds) || !userIds.length) {
       return res.status(400).json({ ok: false, message: 'Invalid user IDs' });
+    }
+    if (!userIds.every(id => mongoose.Types.ObjectId.isValid(id))) {
+      return res.status(400).json({ ok: false, message: 'One or more user IDs are invalid' });
     }
 
     await User.updateMany({ _id: { $in: userIds } }, { status: 'rejected' });

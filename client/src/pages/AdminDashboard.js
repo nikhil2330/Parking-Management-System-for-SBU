@@ -3,6 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import AdminFeedbackPanel from '../components/AdminFeedbackPanel';
+import AdminEventApproval from '../components/AdminEventApproval';
+import { FaCommentAlt } from 'react-icons/fa';
 import './admin-dashboard.css';
 
 // Recharts components
@@ -15,8 +18,6 @@ import {
   AreaChart, Area,
   RadialBarChart, RadialBar
 } from 'recharts';
-
-import AdminEventApproval from '../components/AdminEventApproval';
 
 /* ------------------------------------------------------------------ */
 /* axios helper – base URL & token header                             */
@@ -33,7 +34,7 @@ function AdminDashboard() {
   const analyticsRef = useRef(null);
 
   /* ----------------------------- state ---------------------------- */
-  const [activeTab, setActiveTab] = useState('users');   // 'users' | 'bookings' | 'analytics' | 'tickets' | 'events'
+  const [activeTab, setActiveTab] = useState('users');   // 'users' | 'bookings' | 'analytics' | 'tickets' | 'events' | 'feedback'
   const [isLoading, setIsLoading] = useState(true);
 
   const [userRequests, setUserRequests] = useState([]);
@@ -69,6 +70,9 @@ function AdminDashboard() {
   // ticket filter
   const [ticketFilter, setTicketFilter] = useState('all'); // 'all', 'pending', 'paid', 'overdue'
 
+  // user filter
+  const [userFilterStatus, setUserFilterStatus] = useState('all'); // 'all', 'pending', 'approved', 'rejected'
+
   // stats counters
   const [stats, setStats] = useState({
     pendingUsers: 0,
@@ -81,42 +85,86 @@ function AdminDashboard() {
     pendingTickets: 0,
     paidTickets: 0,
     overdueTickets: 0,
-    totalTicketRevenue: 0
+    totalTicketRevenue: 0,
+    pendingFeedback: 0,
+    reviewedFeedback: 0,
+    resolvedFeedback: 0
   });
 
   /* ------------------------ initial fetch ------------------------- */
-  useEffect(() => {
-    (async () => {
-      setIsLoading(true);
+  // Updated initial fetch section in AdminDashboard.js
+/* ------------------------ initial fetch ------------------------- */
+useEffect(() => {
+  (async () => {
+    setIsLoading(true);
+    try {
+      // Fetch stats
+      const { data: statsData } = await api.get('/admin/stats');
+      if (statsData) setStats(statsData);
+
+      // Fetch pending users
+      const { data: pendingUsers } = await api.get('/admin/pending');
+      setUserRequests(pendingUsers.map(u => ({
+        id: u._id,
+        name: u.username,
+        email: u.email,
+        department: u.userType,
+        requestDate: u.createdAt,
+        status: 'pending'
+      })));
+
+      // Fetch all users for tickets dropdown
+      const { data: allUsers } = await api.get('/admin/users');
+      setUsers(allUsers);
+
+      // Fetch tickets for stats
       try {
-        // Fetch stats
-        const { data: statsData } = await api.get('/admin/stats');
-        if (statsData) setStats(statsData);
-
-        // Fetch pending users
-        const { data: pendingUsers } = await api.get('/admin/pending');
-        setUserRequests(pendingUsers.map(u => ({
-          id: u._id,
-          name: u.username,
-          email: u.email,
-          department: u.userType,
-          requestDate: u.createdAt,
-          status: 'pending'
-        })));
-
-        // Fetch all users for tickets dropdown
-        const { data: allUsers } = await api.get('/admin/users');
-        setUsers(allUsers);
-
-        // Placeholder for bookings
-        setBookingRequests([]);
-      } catch (error) {
-        console.error('Admin load error:', error);
-      } finally {
-        setIsLoading(false);
+        const { data: ticketsData } = await api.get('/tickets/all');
+        // Update stats from ticket data
+        const pendingCount = ticketsData.filter(t => t.status === 'pending').length;
+        const paidCount = ticketsData.filter(t => t.status === 'paid').length;
+        const overdueCount = ticketsData.filter(t => t.status === 'overdue').length;
+        const totalRevenue = ticketsData.reduce((sum, ticket) => {
+          return sum + (ticket.status === 'paid' ? ticket.amount : 0);
+        }, 0);
+        
+        setStats(prev => ({
+          ...prev,
+          pendingTickets: pendingCount,
+          paidTickets: paidCount,
+          overdueTickets: overdueCount,
+          totalTicketRevenue: totalRevenue
+        }));
+      } catch (err) {
+        console.error('Error fetching ticket stats:', err);
       }
-    })();
-  }, []);
+
+      // Fetch feedback for stats
+      try {
+        const { data: feedbackData } = await api.get('/feedback/all');
+        const pendingFeedbackCount = feedbackData.filter(f => f.status === 'pending').length;
+        const reviewedFeedbackCount = feedbackData.filter(f => f.status === 'reviewed').length;
+        const resolvedFeedbackCount = feedbackData.filter(f => f.status === 'resolved').length;
+        
+        setStats(prev => ({
+          ...prev,
+          pendingFeedback: pendingFeedbackCount,
+          reviewedFeedback: reviewedFeedbackCount,
+          resolvedFeedback: resolvedFeedbackCount
+        }));
+      } catch (err) {
+        console.error('Error fetching feedback stats:', err);
+      }
+
+      // Placeholder for bookings
+      setBookingRequests([]);
+    } catch (error) {
+      console.error('Admin load error:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  })();
+}, []);
 
   /* ---------- fetch analytics on first analytics tab load --------- */
   useEffect(() => {
@@ -390,7 +438,14 @@ function AdminDashboard() {
   const getCurrentItems = () => {
     let arr;
     
-    if (activeTab === 'users') arr = userRequests;
+    if (activeTab === 'users') {
+      // Filter user requests based on selected filter
+      if (userFilterStatus === 'all') {
+        arr = userRequests;
+      } else {
+        arr = userRequests.filter(user => user.status === userFilterStatus);
+      }
+    }
     else if (activeTab === 'bookings') arr = bookingRequests;
     else if (activeTab === 'tickets') {
       // Filter tickets based on selected filter
@@ -406,7 +461,9 @@ function AdminDashboard() {
   const totalPages = Math.max(
     1,
     Math.ceil(
-      (activeTab === 'users' ? userRequests.length : 
+      (activeTab === 'users' ? 
+        (userFilterStatus === 'all' ? userRequests.length : 
+         userRequests.filter(u => u.status === userFilterStatus).length) : 
        activeTab === 'bookings' ? bookingRequests.length :
        activeTab === 'tickets' ? (ticketFilter === 'all' ? tickets.length : 
                                tickets.filter(t => t.status === ticketFilter).length) : 0) /
@@ -999,8 +1056,8 @@ function AdminDashboard() {
       <div className="bg-shape shape-1" aria-hidden="true" />
       <div className="bg-shape shape-2" aria-hidden="true" />
 
-      {/* Global header */}
-      <Header onLogout={handleLogout} />
+      {/* Use the standard Header with isAdmin prop */}
+      <Header isAdmin={true} onLogout={handleLogout} />
 
       <div className="dashboard-content">
         <div className="dashboard-grid">
@@ -1036,8 +1093,8 @@ function AdminDashboard() {
                 </div>
                 <div className="stat-content">
                   <h4>Pending Requests</h4>
-                  <div className="stat-value">{stats.pendingUsers + stats.pendingBookings}</div>
-                  <div className="stat-trend"><span className="trend-icon">⏱️</span> Awaiting approval</div>
+                  <div className="stat-value">{stats.pendingUsers + stats.pendingBookings + stats.pendingFeedback}</div>
+                  <div className="stat-trend"><span className="trend-icon">⏱️</span> Awaiting action</div>
                 </div>
               </div>
 
@@ -1051,26 +1108,29 @@ function AdminDashboard() {
                 </div>
                 <div className="stat-content">
                   <h4>Approved Requests</h4>
-                  <div className="stat-value">{stats.approvedUsers + stats.approvedBookings}</div>
+                  <div className="stat-value">{stats.approvedUsers + stats.approvedBookings + stats.reviewedFeedback}</div>
                   <div className="stat-trend trend-up"><span className="trend-icon">✅</span> Successfully processed</div>
                 </div>
               </div>
 
-              {/* Rejected Requests */}
-              <div className="stat-card">
-                <div className="stat-icon" style={{ backgroundColor: 'var(--red-50)', color: 'var(--primary-red)' }}>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="12" cy="12" r="10"/>
-                    <line x1="15" y1="9" x2="9" y2="15"/>
-                    <line x1="9" y1="9" x2="15" y2="15"/>
-                  </svg>
-                </div>
-                <div className="stat-content">
-                  <h4>Rejected Requests</h4>
-                  <div className="stat-value">{stats.rejectedUsers + stats.rejectedBookings}</div>
-                  <div className="stat-trend trend-down"><span className="trend-icon">❌</span> Denied access</div>
-                </div>
-              </div>
+              {/* Resolved Items */}
+<div className="stat-card">
+  <div className="stat-icon" style={{ backgroundColor: 'var(--blue-50)', color: 'var(--info-blue)' }}>
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+      <polyline points="22 4 12 14.01 9 11.01"/>
+    </svg>
+  </div>
+  <div className="stat-content">
+    <h4>Resolved Items</h4>
+    <div className="stat-value">
+      {(stats.paidTickets || 0) + (stats.resolvedFeedback || 0)}
+    </div>
+    <div className="stat-trend trend-up">
+      <span className="trend-icon">🔄</span> Completed
+    </div>
+  </div>
+</div>
 
               {/* Total Managed */}
               <div className="stat-card">
@@ -1089,21 +1149,23 @@ function AdminDashboard() {
           </div>
 
           {/* ===== Tabs Navigation ===== */}
-<div className="admin-tabs">
-  <button className={`admin-tab ${activeTab === 'users' ? 'active' : ''}`} onClick={() => setActiveTab('users')}>
-    User Requests {stats.pendingUsers > 0 && <span className="badge">{stats.pendingUsers}</span>}
-  </button>
-  {/* Remove the Booking Requests tab */}
-  <button className={`admin-tab ${activeTab === 'tickets' ? 'active' : ''}`} onClick={() => setActiveTab('tickets')}>
-    Tickets {stats.pendingTickets > 0 && <span className="badge">{stats.pendingTickets}</span>}
-  </button>
-  <button className={`admin-tab ${activeTab === 'events' ? 'active' : ''}`} onClick={() => setActiveTab('events')}>
-    Event Reservations
-  </button>
-  <button className={`admin-tab ${activeTab === 'analytics' ? 'active' : ''}`} onClick={() => setActiveTab('analytics')}>
-    Analytics
-  </button>
-</div>
+          <div className="admin-tabs">
+            <button className={`admin-tab ${activeTab === 'users' ? 'active' : ''}`} onClick={() => setActiveTab('users')}>
+              User Requests {stats.pendingUsers > 0 && <span className="badge">{stats.pendingUsers}</span>}
+            </button>
+            <button className={`admin-tab ${activeTab === 'tickets' ? 'active' : ''}`} onClick={() => setActiveTab('tickets')}>
+              Tickets {stats.pendingTickets > 0 && <span className="badge">{stats.pendingTickets}</span>}
+            </button>
+            <button className={`admin-tab ${activeTab === 'events' ? 'active' : ''}`} onClick={() => setActiveTab('events')}>
+              Event Reservations
+            </button>
+            <button className={`admin-tab ${activeTab === 'feedback' ? 'active' : ''}`} onClick={() => setActiveTab('feedback')}>
+              Feedback {stats.pendingFeedback > 0 && <span className="badge">{stats.pendingFeedback}</span>}
+            </button>
+            <button className={`admin-tab ${activeTab === 'analytics' ? 'active' : ''}`} onClick={() => setActiveTab('analytics')}>
+              Analytics
+            </button>
+          </div>
 
           {/* ===== Content Area ===== */}
           <div className="admin-content-area">
@@ -1143,63 +1205,63 @@ function AdminDashboard() {
                   <div className="analytics-summary-card revenue-card">
                     <div className="card-icon">
                       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <line x1="12" y1="1" x2="12" y2="23"></line>
-        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
-      </svg>
-    </div>
-    <h3>Total Revenue</h3>
-    <div className="card-value">${analytics.totalRevenue.toFixed(2)}</div>
-  </div>
-  
-  <div className="analytics-summary-card reservations-card">
-    <div className="card-icon">
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="1" y="3" width="15" height="13"></rect>
-        <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
-        <circle cx="5.5" cy="18.5" r="2.5"></circle>
-        <circle cx="18.5" cy="18.5" r="2.5"></circle>
-      </svg>
-    </div>
-    <h3>Total Reservations</h3>
-    <div className="card-value">
-      {analytics.reservationsByDate.reduce((sum, day) => sum + day.count, 0)}
-    </div>
-  </div>
-  
-  <div className="analytics-summary-card average-card">
-    <div className="card-icon">
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-        <line x1="16" y1="2" x2="16" y2="6"></line>
-        <line x1="8" y1="2" x2="8" y2="6"></line>
-        <line x1="3" y1="10" x2="21" y2="10"></line>
-      </svg>
-    </div>
-    <h3>Average Daily</h3>
-    <div className="card-value">
-      {derivedAnalytics.avgDailyReservations.toFixed(1)}
-    </div>
-    <div className="card-info">
-      Reservations per day
-    </div>
-  </div>
-  
-  <div className="analytics-summary-card peak-card">
-    <div className="card-icon">
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
-        <polyline points="17 6 23 6 23 12"></polyline>
-      </svg>
-    </div>
-    <h3>Peak Day</h3>
-    <div className="card-value">
-      {derivedAnalytics.peakDay.count}
-    </div>
-    <div className="card-info">
-      on {derivedAnalytics.peakDay.date}
-    </div>
-  </div>
-</div>
+                        <line x1="12" y1="1" x2="12" y2="23"></line>
+                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                      </svg>
+                    </div>
+                    <h3>Total Revenue</h3>
+                    <div className="card-value">${analytics.totalRevenue.toFixed(2)}</div>
+                  </div>
+                  
+                  <div className="analytics-summary-card reservations-card">
+                    <div className="card-icon">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="1" y="3" width="15" height="13"></rect>
+                        <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
+                        <circle cx="5.5" cy="18.5" r="2.5"></circle>
+                        <circle cx="18.5" cy="18.5" r="2.5"></circle>
+                      </svg>
+                    </div>
+                    <h3>Total Reservations</h3>
+                    <div className="card-value">
+                      {analytics.reservationsByDate.reduce((sum, day) => sum + day.count, 0)}
+                    </div>
+                  </div>
+                  
+                  <div className="analytics-summary-card average-card">
+                    <div className="card-icon">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                      </svg>
+                    </div>
+                    <h3>Average Daily</h3>
+                    <div className="card-value">
+                      {derivedAnalytics.avgDailyReservations.toFixed(1)}
+                    </div>
+                    <div className="card-info">
+                      Reservations per day
+                    </div>
+                  </div>
+                  
+                  <div className="analytics-summary-card peak-card">
+                    <div className="card-icon">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                        <polyline points="17 6 23 6 23 12"></polyline>
+                      </svg>
+                    </div>
+                    <h3>Peak Day</h3>
+                    <div className="card-value">
+                      {derivedAnalytics.peakDay.count}
+                    </div>
+                    <div className="card-info">
+                      on {derivedAnalytics.peakDay.date}
+                    </div>
+                  </div>
+                </div>
 
                 {/* Main Charts */}
                 <div className="analytics-charts">
@@ -1426,10 +1488,30 @@ function AdminDashboard() {
                     <div className="filter-group">
                       <label>Status:</label>
                       <div className="filter-options">
-                        <span className="filter-option active">All</span>
-                        <span className="filter-option">Pending</span>
-                        <span className="filter-option">Approved</span>
-                        <span className="filter-option">Rejected</span>
+                        <span 
+                          className={`filter-option ${userFilterStatus === 'all' ? 'active' : ''}`}
+                          onClick={() => setUserFilterStatus('all')}
+                        >
+                          All
+                        </span>
+                        <span 
+                          className={`filter-option ${userFilterStatus === 'pending' ? 'active' : ''}`}
+                          onClick={() => setUserFilterStatus('pending')}
+                        >
+                          Pending
+                        </span>
+                        <span 
+                          className={`filter-option ${userFilterStatus === 'approved' ? 'active' : ''}`}
+                          onClick={() => setUserFilterStatus('approved')}
+                        >
+                          Approved
+                        </span>
+                        <span 
+                          className={`filter-option ${userFilterStatus === 'rejected' ? 'active' : ''}`}
+                          onClick={() => setUserFilterStatus('rejected')}
+                        >
+                          Rejected
+                        </span>
                       </div>
                     </div>
                     <div className="bulk-actions">
@@ -1877,6 +1959,13 @@ function AdminDashboard() {
             {activeTab === 'events' && (
               <div className="admin-table-container">
                 <AdminEventApproval />
+              </div>
+            )}
+
+            {/* Feedback Tab Content */}
+            {activeTab === 'feedback' && (
+              <div className="admin-table-container">
+                <AdminFeedbackPanel />
               </div>
             )}
           </div>

@@ -51,4 +51,9 @@ const ReservationSchema = new Schema({
   },
 }, { timestamps: true });
 
+ReservationSchema.index(
+  { spot: 1, startTime: 1, endTime: 1, status: 1 },
+  { unique: true, partialFilterExpression: { status: { $in: ['pending', 'active'] } } }
+);
+
 module.exports = mongoose.model('Reservation', ReservationSchema);

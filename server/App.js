@@ -12,7 +12,8 @@ const parkingRoutes = require('./routes/parkingRoutes');
 const authenticateJWT = require('./middleware/authenticateJWT');
 const adminRoutes = require('./routes/adminRoutes');
 const ticketRoutes = require('./routes/ticketRoutes');
-const eventReservationRoutes = require('./routes/eventReservationRoutes'); // Import the new routes
+const eventReservationRoutes = require('./routes/eventReservationRoutes');
+const feedbackRoutes = require('./routes/feedbackRoutes'); // Import the feedback routes
 
 const app = express();
 
@@ -38,7 +39,8 @@ app.use('/api/payment', authenticateJWT, paymentRoutes);
 app.use('/api/parking', parkingRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/tickets', ticketRoutes);
-app.use('/api/event-reservation', authenticateJWT, eventReservationRoutes); // Register the new routes
+app.use('/api/event-reservation', authenticateJWT, eventReservationRoutes);
+app.use('/api/feedback', feedbackRoutes); // Register the feedback routes
 
 // Health check or status endpoint
 if (process.env.NODE_ENV === 'production') {

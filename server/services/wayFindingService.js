@@ -42,7 +42,7 @@ async function findClosestAvailableSpots(buildingId, availableSpotIds, limit = 4
           foundSpots.push({ spotId, distance: current.distance });
           if (foundSpots.length === n) break;
         } else {
-          console.log(`Spot ${spotId} is NOT available.`);
+          continue; // Skip if the spot is not available
         }
       }
 
@@ -65,8 +65,6 @@ async function findClosestAvailableSpots(buildingId, availableSpotIds, limit = 4
         }
       });
     }
-
-    console.log('Found spots:', foundSpots);
     return foundSpots;
   } catch (err) {
     console.error('Error in findClosestAvailableSpots:', err);
