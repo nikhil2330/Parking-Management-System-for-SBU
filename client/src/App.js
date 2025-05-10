@@ -14,7 +14,13 @@ import ClaimOfferPage from './pages/ClaimOfferPage';
 import AdminDashboard from './pages/AdminDashboard';
 import HelpPage from './pages/HelpPage';
 import TicketsPage from './pages/TicketsPage';
-import EventReservationPage from './pages/EventReservationPage'; // Import the new event reservation page
+import EventReservationPage from './pages/EventReservationPage';
+
+// New Pages
+import AboutPage from './pages/AboutPage';
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
+import CookiePolicyPage from './pages/CookiePolicyPage';
+import SecurityPage from './pages/SecurityPage';
 
 // Auth guard component to protect routes
 const ProtectedRoute = ({ children }) => {
@@ -58,6 +64,12 @@ function App() {
       {/* Public routes */}
       <Route path="/" element={<SignInPage />} />
       <Route path="/create" element={<CreateAccountPage />} />
+
+      {/* Public information pages */}
+      <Route path="/about" element={<AboutPage />} />
+      <Route path="/privacy" element={<PrivacyPolicyPage />} />
+      <Route path="/cookies" element={<CookiePolicyPage />} />
+      <Route path="/security" element={<SecurityPage />} />
 
       {/* Admin routes */}
       <Route

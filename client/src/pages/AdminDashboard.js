@@ -5,7 +5,7 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import AdminFeedbackPanel from '../components/AdminFeedbackPanel';
 import AdminEventApproval from '../components/AdminEventApproval';
-import { FaCommentAlt } from 'react-icons/fa';
+import { FaCommentAlt, FaParking, FaPlusCircle, FaTrashAlt, FaEdit, FaSave, FaTimes } from 'react-icons/fa';
 import './admin-dashboard.css';
 
 // Recharts components
@@ -32,9 +32,10 @@ api.interceptors.request.use((config) => {
 function AdminDashboard() {
   const navigate = useNavigate();
   const analyticsRef = useRef(null);
+  const fileInputRef = useRef(null);
 
   /* ----------------------------- state ---------------------------- */
-  const [activeTab, setActiveTab] = useState('users');   // 'users' | 'bookings' | 'analytics' | 'tickets' | 'events' | 'feedback'
+  const [activeTab, setActiveTab] = useState('users');   // 'users' | 'bookings' | 'analytics' | 'tickets' | 'events' | 'feedback' | 'lots'
   const [isLoading, setIsLoading] = useState(true);
 
   const [userRequests, setUserRequests] = useState([]);
@@ -42,6 +43,7 @@ function AdminDashboard() {
   const [analytics, setAnalytics] = useState(null);
   const [tickets, setTickets] = useState([]);
   const [users, setUsers] = useState([]);
+  const [parkingLots, setParkingLots] = useState([]);
 
   const [newTicket, setNewTicket] = useState({
     userEmail: '',
@@ -49,6 +51,37 @@ function AdminDashboard() {
     reason: '',
     dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] // 30 days from now
   });
+
+  // Parking lot management state
+  const [newLot, setNewLot] = useState({
+    officialName: '',
+    lotId: '',
+    capacity: '',
+    boundingBox: {
+      topLeft: { lat: '', lng: '' },
+      bottomRight: { lat: '', lng: '' }
+    },
+    categories: [],
+    svgImage: null,
+    geojsonCoordinates: ''
+  });
+
+  const [availableLotIds, setAvailableLotIds] = useState([
+    'A1', 'A2', 'B1', 'B2', 'C1', 'C2', 'D1', 'D2'
+  ]);
+
+  const [availableCategories, setAvailableCategories] = useState([
+    'Standard', 'Compact', 'Accessible', 'Electric Vehicle', 'Reserved', 'VIP', 'Staff', 'Visitor'
+  ]);
+
+  const [newCategory, setNewCategory] = useState({
+    type: 'Standard',
+    range: ''
+  });
+
+  const [editingLot, setEditingLot] = useState(null);
+  const [showLotForm, setShowLotForm] = useState(false);
+  const [lotToDelete, setLotToDelete] = useState(null);
 
   // Ticket management enhancements
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -88,7 +121,9 @@ function AdminDashboard() {
     totalTicketRevenue: 0,
     pendingFeedback: 0,
     reviewedFeedback: 0,
-    resolvedFeedback: 0
+    resolvedFeedback: 0,
+    totalParkingLots: 0,
+    totalParkingSpots: 0
   });
 
   /* ------------------------ initial fetch ------------------------- */
@@ -154,6 +189,58 @@ useEffect(() => {
         }));
       } catch (err) {
         console.error('Error fetching feedback stats:', err);
+      }
+
+      // Fetch parking lots
+      try {
+        const { data: parkingLotsData } = await api.get('/admin/parking-lots');
+        setParkingLots(parkingLotsData);
+        
+        // Calculate parking lot stats
+        const totalLots = parkingLotsData.length;
+        const totalSpots = parkingLotsData.reduce((sum, lot) => {
+          return sum + (lot.capacity || 0);
+        }, 0);
+        
+        setStats(prev => ({
+          ...prev,
+          totalParkingLots: totalLots,
+          totalParkingSpots: totalSpots
+        }));
+      } catch (err) {
+        console.error('Error fetching parking lots:', err);
+        // Set some demo data for now
+        setParkingLots([
+          {
+            id: '1',
+            officialName: 'North Campus Main Lot',
+            lotId: 'A1',
+            capacity: 250,
+            boundingBox: {
+              topLeft: { lat: 37.7749, lng: -122.4194 },
+              bottomRight: { lat: 37.7647, lng: -122.4094 }
+            },
+            categories: [
+              { type: 'Standard', spots: '1-200' },
+              { type: 'Accessible', spots: '201-220' },
+              { type: 'Electric Vehicle', spots: '221-250' }
+            ]
+          },
+          {
+            id: '2',
+            officialName: 'South Campus Visitor Lot',
+            lotId: 'B1',
+            capacity: 150,
+            boundingBox: {
+              topLeft: { lat: 37.7649, lng: -122.4184 },
+              bottomRight: { lat: 37.7547, lng: -122.4084 }
+            },
+            categories: [
+              { type: 'Visitor', spots: '1-100' },
+              { type: 'Staff', spots: '101-150' }
+            ]
+          }
+        ]);
       }
 
       // Placeholder for bookings
@@ -433,6 +520,341 @@ useEffect(() => {
     }
   };
 
+  /* ----------------- parking lot handling functions ----------------- */
+  const handleLotFormChange = (e) => {
+    const { name, value } = e.target;
+    
+    // Handle nested properties
+    if (name.includes('.')) {
+      const [parent, child, subChild] = name.split('.');
+      if (subChild) {
+        setNewLot(prev => ({
+          ...prev,
+          [parent]: {
+            ...prev[parent],
+            [child]: {
+              ...prev[parent][child],
+              [subChild]: value
+            }
+          }
+        }));
+      } else {
+        setNewLot(prev => ({
+          ...prev,
+          [parent]: {
+            ...prev[parent],
+            [child]: value
+          }
+        }));
+      }
+    } else {
+      setNewLot(prev => ({ ...prev, [name]: value }));
+    }
+  };
+
+  const handleCategoryChange = (e) => {
+    const { name, value } = e.target;
+    setNewCategory(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleAddCategory = () => {
+    // Validate category input
+    if (!newCategory.type || !newCategory.range) {
+      alert('Please select a category type and enter a spot range.');
+      return;
+    }
+    
+    // Add category to the list
+    setNewLot(prev => ({
+      ...prev,
+      categories: [...prev.categories, { type: newCategory.type, spots: newCategory.range }]
+    }));
+    
+    // Reset the category input
+    setNewCategory({ type: 'Standard', range: '' });
+  };
+
+  const handleRemoveCategory = (index) => {
+    setNewLot(prev => ({
+      ...prev,
+      categories: prev.categories.filter((_, i) => i !== index)
+    }));
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setNewLot(prev => ({ ...prev, svgImage: file }));
+    }
+  };
+
+  const handleCreateLot = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    
+    try {
+      // Validate form
+      if (!newLot.officialName || !newLot.lotId || !newLot.capacity) {
+        throw new Error('Please fill in all required fields.');
+      }
+      
+      if (newLot.categories.length === 0) {
+        throw new Error('Please add at least one category.');
+      }
+      
+      // Create FormData for file upload
+      const formData = new FormData();
+      formData.append('officialName', newLot.officialName);
+      formData.append('lotId', newLot.lotId);
+      formData.append('capacity', newLot.capacity);
+      formData.append('boundingBox', JSON.stringify(newLot.boundingBox));
+      formData.append('categories', JSON.stringify(newLot.categories));
+      
+      if (newLot.svgImage) {
+        formData.append('svgImage', newLot.svgImage);
+      }
+      
+      if (newLot.geojsonCoordinates) {
+        formData.append('geojsonCoordinates', newLot.geojsonCoordinates);
+      }
+
+      // Create parking lot
+      const { data } = await api.post('/admin/parking-lots', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+      
+      // Add to list with ID from response
+      const newLotWithId = {
+        ...newLot,
+        id: data.id || Date.now().toString(),
+        svgImage: newLot.svgImage ? URL.createObjectURL(newLot.svgImage) : null
+      };
+      
+      setParkingLots(prev => [...prev, newLotWithId]);
+      
+      // Update stats
+      setStats(prev => ({
+        ...prev,
+        totalParkingLots: prev.totalParkingLots + 1,
+        totalParkingSpots: prev.totalParkingSpots + parseInt(newLot.capacity)
+      }));
+      
+      // Reset form
+      setNewLot({
+        officialName: '',
+        lotId: '',
+        capacity: '',
+        boundingBox: {
+          topLeft: { lat: '', lng: '' },
+          bottomRight: { lat: '', lng: '' }
+        },
+        categories: [],
+        svgImage: null,
+        geojsonCoordinates: ''
+      });
+      
+      // Hide form
+      setShowLotForm(false);
+      
+      // Show success notification
+      setNotificationTitle('Parking Lot Created');
+      setNotificationMessage('The parking lot was successfully added.');
+      setShowNotification(true);
+      
+      // Auto hide notification after 4 seconds
+      setTimeout(() => {
+        setShowNotification(false);
+      }, 4000);
+      
+    } catch (error) {
+      console.error('Error creating parking lot:', error);
+      let errorMessage = 'Failed to create parking lot. Please try again.';
+      if (error.response && error.response.data && error.response.data.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      alert(errorMessage);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDeleteLot = async (lotId) => {
+    try {
+      await api.delete(`/admin/parking-lots/${lotId}`);
+      
+      // Find lot before removing
+      const lot = parkingLots.find(l => l.id === lotId);
+      
+      // Remove from list
+      setParkingLots(prev => prev.filter(l => l.id !== lotId));
+      
+      // Update stats
+      if (lot) {
+        setStats(prev => ({
+          ...prev,
+          totalParkingLots: prev.totalParkingLots - 1,
+          totalParkingSpots: prev.totalParkingSpots - parseInt(lot.capacity)
+        }));
+      }
+      
+      // Show success notification
+      setNotificationTitle('Parking Lot Deleted');
+      setNotificationMessage('The parking lot has been permanently removed.');
+      setShowNotification(true);
+      
+      // Auto hide notification after 4 seconds
+      setTimeout(() => {
+        setShowNotification(false);
+      }, 4000);
+      
+    } catch (error) {
+      console.error('Error deleting parking lot:', error);
+      alert('Failed to delete parking lot. Please try again.');
+    } finally {
+      setLotToDelete(null);
+    }
+  };
+
+  const handleEditLot = (lot) => {
+    setEditingLot(lot.id);
+    setNewLot({
+      officialName: lot.officialName,
+      lotId: lot.lotId,
+      capacity: lot.capacity,
+      boundingBox: lot.boundingBox || {
+        topLeft: { lat: '', lng: '' },
+        bottomRight: { lat: '', lng: '' }
+      },
+      categories: lot.categories || [],
+      svgImage: null,
+      geojsonCoordinates: lot.geojsonCoordinates || ''
+    });
+    setShowLotForm(true);
+  };
+
+  const handleUpdateLot = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    
+    try {
+      // Validate form
+      if (!newLot.officialName || !newLot.lotId || !newLot.capacity) {
+        throw new Error('Please fill in all required fields.');
+      }
+      
+      if (newLot.categories.length === 0) {
+        throw new Error('Please add at least one category.');
+      }
+      
+      // Create FormData for file upload
+      const formData = new FormData();
+      formData.append('officialName', newLot.officialName);
+      formData.append('lotId', newLot.lotId);
+      formData.append('capacity', newLot.capacity);
+      formData.append('boundingBox', JSON.stringify(newLot.boundingBox));
+      formData.append('categories', JSON.stringify(newLot.categories));
+      
+      if (newLot.svgImage) {
+        formData.append('svgImage', newLot.svgImage);
+      }
+      
+      if (newLot.geojsonCoordinates) {
+        formData.append('geojsonCoordinates', newLot.geojsonCoordinates);
+      }
+
+      // Update parking lot
+      await api.put(`/admin/parking-lots/${editingLot}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+      
+      // Find the original lot to calculate capacity change
+      const originalLot = parkingLots.find(l => l.id === editingLot);
+      const capacityDifference = parseInt(newLot.capacity) - parseInt(originalLot.capacity);
+      
+      // Update in list
+      setParkingLots(prev => prev.map(l => 
+        l.id === editingLot ? {
+          ...l,
+          ...newLot,
+          svgImage: newLot.svgImage ? URL.createObjectURL(newLot.svgImage) : l.svgImage
+        } : l
+      ));
+      
+      // Update stats if capacity changed
+      if (capacityDifference !== 0) {
+        setStats(prev => ({
+          ...prev,
+          totalParkingSpots: prev.totalParkingSpots + capacityDifference
+        }));
+      }
+      
+      // Reset form and editing state
+      setNewLot({
+        officialName: '',
+        lotId: '',
+        capacity: '',
+        boundingBox: {
+          topLeft: { lat: '', lng: '' },
+          bottomRight: { lat: '', lng: '' }
+        },
+        categories: [],
+        svgImage: null,
+        geojsonCoordinates: ''
+      });
+      setEditingLot(null);
+      setShowLotForm(false);
+      
+      // Show success notification
+      setNotificationTitle('Parking Lot Updated');
+      setNotificationMessage('The parking lot was successfully updated.');
+      setShowNotification(true);
+      
+      // Auto hide notification after 4 seconds
+      setTimeout(() => {
+        setShowNotification(false);
+      }, 4000);
+      
+    } catch (error) {
+      console.error('Error updating parking lot:', error);
+      let errorMessage = 'Failed to update parking lot. Please try again.';
+      if (error.response && error.response.data && error.response.data.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      alert(errorMessage);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleCancel = () => {
+    setNewLot({
+      officialName: '',
+      lotId: '',
+      capacity: '',
+      boundingBox: {
+        topLeft: { lat: '', lng: '' },
+        bottomRight: { lat: '', lng: '' }
+      },
+      categories: [],
+      svgImage: null,
+      geojsonCoordinates: ''
+    });
+    setEditingLot(null);
+    setShowLotForm(false);
+  };
+
+  const triggerFileInput = () => {
+    fileInputRef.current.click();
+  };
+
   /* ------------------- pagination helpers ------------------------ */
   const paginate = n => setCurrentPage(n);
   const getCurrentItems = () => {
@@ -452,6 +874,7 @@ useEffect(() => {
       if (ticketFilter === 'all') arr = tickets;
       else arr = tickets.filter(t => t.status === ticketFilter);
     }
+    else if (activeTab === 'lots') arr = parkingLots;
     else arr = [];
     
     const end = currentPage * itemsPerPage;
@@ -466,7 +889,8 @@ useEffect(() => {
          userRequests.filter(u => u.status === userFilterStatus).length) : 
        activeTab === 'bookings' ? bookingRequests.length :
        activeTab === 'tickets' ? (ticketFilter === 'all' ? tickets.length : 
-                               tickets.filter(t => t.status === ticketFilter).length) : 0) /
+                               tickets.filter(t => t.status === ticketFilter).length) : 
+       activeTab === 'lots' ? parkingLots.length : 0) /
       itemsPerPage
     )
   );
@@ -1149,23 +1573,27 @@ useEffect(() => {
           </div>
 
           {/* ===== Tabs Navigation ===== */}
-          <div className="admin-tabs">
-            <button className={`admin-tab ${activeTab === 'users' ? 'active' : ''}`} onClick={() => setActiveTab('users')}>
-              User Requests {stats.pendingUsers > 0 && <span className="badge">{stats.pendingUsers}</span>}
-            </button>
-            <button className={`admin-tab ${activeTab === 'tickets' ? 'active' : ''}`} onClick={() => setActiveTab('tickets')}>
-              Tickets {stats.pendingTickets > 0 && <span className="badge">{stats.pendingTickets}</span>}
-            </button>
-            <button className={`admin-tab ${activeTab === 'events' ? 'active' : ''}`} onClick={() => setActiveTab('events')}>
-              Event Reservations
-            </button>
-            <button className={`admin-tab ${activeTab === 'feedback' ? 'active' : ''}`} onClick={() => setActiveTab('feedback')}>
-              Feedback {stats.pendingFeedback > 0 && <span className="badge">{stats.pendingFeedback}</span>}
-            </button>
-            <button className={`admin-tab ${activeTab === 'analytics' ? 'active' : ''}`} onClick={() => setActiveTab('analytics')}>
-              Analytics
-            </button>
-          </div>
+          {/* ===== Tabs Navigation ===== */}
+<div className="admin-tabs">
+  <button className={`admin-tab ${activeTab === 'users' ? 'active' : ''}`} onClick={() => setActiveTab('users')}>
+    User Requests {stats.pendingUsers > 0 && <span className="badge">{stats.pendingUsers}</span>}
+  </button>
+  <button className={`admin-tab ${activeTab === 'lots' ? 'active' : ''}`} onClick={() => setActiveTab('lots')}>
+    Parking Lots
+  </button>
+  <button className={`admin-tab ${activeTab === 'events' ? 'active' : ''}`} onClick={() => setActiveTab('events')}>
+    Event Reservations
+  </button>
+  <button className={`admin-tab ${activeTab === 'tickets' ? 'active' : ''}`} onClick={() => setActiveTab('tickets')}>
+    Tickets {stats.pendingTickets > 0 && <span className="badge">{stats.pendingTickets}</span>}
+  </button>
+  <button className={`admin-tab ${activeTab === 'feedback' ? 'active' : ''}`} onClick={() => setActiveTab('feedback')}>
+    Feedback {stats.pendingFeedback > 0 && <span className="badge">{stats.pendingFeedback}</span>}
+  </button>
+  <button className={`admin-tab ${activeTab === 'analytics' ? 'active' : ''}`} onClick={() => setActiveTab('analytics')}>
+    Analytics
+  </button>
+</div>
 
           {/* ===== Content Area ===== */}
           <div className="admin-content-area">
@@ -1572,10 +2000,13 @@ useEffect(() => {
                       ))
                     ) : (
                       <tr>
-                        <td colSpan="6" className="empty-state-message">
-                          <div className="no-data-message">No user requests found</div>
-                        </td>
-                      </tr>
+  <td colSpan="6" className="empty-state-message">
+    <div className="no-data-message">
+      <span className="message-text">No user requests found</span>
+    </div>
+  </td>
+</tr>
+
                     )}
                   </tbody>
                 </table>
@@ -1692,10 +2123,12 @@ useEffect(() => {
                       ))
                     ) : (
                       <tr>
-                        <td colSpan="7" className="empty-state-message">
-                          <div className="no-data-message">No booking requests found</div>
-                        </td>
-                      </tr>
+  <td colSpan="7" className="empty-state-message">
+    <div className="no-data-message">
+      <span className="message-text">No booking requests found</span>
+    </div>
+  </td>
+</tr>
                     )}
                   </tbody>
                 </table>
@@ -1918,10 +2351,405 @@ useEffect(() => {
                       ))
                     ) : (
                       <tr>
-                        <td colSpan="7" className="empty-state-message">
-                          <div className="no-data-message">No tickets found</div>
-                        </td>
-                      </tr>
+  <td colSpan="7" className="empty-state-message">
+    <div className="no-data-message">
+      <span className="message-text">No tickets found</span>
+    </div>
+  </td>
+</tr>
+                    )}
+                  </tbody>
+                </table>
+
+                {totalPages > 1 && (
+                  <div className="pagination-controls">
+                    <button onClick={() => paginate(1)} disabled={currentPage === 1}>First</button>
+                    <button onClick={() => paginate(currentPage - 1)} disabled={currentPage === 1}>Prev</button>
+                    <span>Page {currentPage} of {totalPages}</span>
+                    <button onClick={() => paginate(currentPage + 1)} disabled={currentPage === totalPages}>Next</button>
+                    <button onClick={() => paginate(totalPages)} disabled={currentPage === totalPages}>Last</button>
+                  </div>
+                )}
+
+                <div className="items-per-page-control">
+                  <label>Show per page:</label>
+                  <select
+                    value={itemsPerPage}
+                    onChange={e => {
+                      setItemsPerPage(Number(e.target.value));
+                      setCurrentPage(1);
+                    }}
+                  >
+                    <option value="5">5</option>
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                  </select>
+                </div>
+              </div>
+            )}
+
+            {/* Parking Lots Management Tab */}
+            {activeTab === 'lots' && (
+              <div className="admin-table-container">
+                <div className="admin-section-header">
+                  <h2 className="admin-section-title">Parking Lots Management</h2>
+                  <p className="admin-section-desc">Add, edit, and manage parking lots and their configurations</p>
+                  
+                  <div className="stats-mini-grid">
+                    <div className="stat-mini-card">
+                      <div className="stat-mini-icon">
+                        <FaParking />
+                      </div>
+                      <div className="stat-mini-content">
+                        <div className="stat-mini-label">Total Lots</div>
+                        <div className="stat-mini-value">{stats.totalParkingLots || 0}</div>
+                      </div>
+                    </div>
+                    <div className="stat-mini-card">
+                      <div className="stat-mini-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
+                          <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
+                          <line x1="6" y1="6" x2="6.01" y2="6"></line>
+                          <line x1="6" y1="18" x2="6.01" y2="18"></line>
+                        </svg>
+                      </div>
+                      <div className="stat-mini-content">
+                        <div className="stat-mini-label">Total Parking Spots</div>
+                        <div className="stat-mini-value">{stats.totalParkingSpots || 0}</div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {!showLotForm ? (
+                    <button 
+                      className="add-lot-btn"
+                      onClick={() => setShowLotForm(true)}
+                    >
+                      <FaPlusCircle /> Add New Parking Lot
+                    </button>
+                  ) : (
+                    <div className="lot-form-container">
+                      <h3 className="form-title">{editingLot ? 'Edit Parking Lot' : 'Add New Parking Lot'}</h3>
+                      <form className="lot-form" onSubmit={editingLot ? handleUpdateLot : handleCreateLot}>
+                        <div className="form-grid">
+                          <div className="form-group">
+                            <label htmlFor="officialName">
+                              <span className="label-icon">🏢</span> Official Lot Name*
+                            </label>
+                            <input
+                              type="text"
+                              id="officialName"
+                              name="officialName"
+                              value={newLot.officialName}
+                              onChange={handleLotFormChange}
+                              required
+                              className="form-input"
+                              placeholder="e.g. North Campus Main Lot"
+                            />
+                          </div>
+                          
+                          <div className="form-group">
+                            <label htmlFor="lotId">
+                              <span className="label-icon">🔢</span> Lot ID*
+                            </label>
+                            <select
+                              id="lotId"
+                              name="lotId"
+                              value={newLot.lotId}
+                              onChange={handleLotFormChange}
+                              required
+                              className="form-input"
+                            >
+                              <option value="">Select a Lot ID</option>
+                              {availableLotIds.map(id => (
+                                <option key={id} value={id}>{id}</option>
+                              ))}
+                            </select>
+                          </div>
+                          
+                          <div className="form-group">
+                            <label htmlFor="capacity">
+                              <span className="label-icon">🚗</span> Capacity*
+                            </label>
+                            <input
+                              type="number"
+                              id="capacity"
+                              name="capacity"
+                              value={newLot.capacity}
+                              onChange={handleLotFormChange}
+                              required
+                              min="1"
+                              className="form-input"
+                              placeholder="Total number of parking spots"
+                            />
+                          </div>
+                          
+                          <div className="form-group form-group-half">
+                            <label htmlFor="boundingBox.topLeft.lat">
+                              <span className="label-icon">📍</span> Top-Left Latitude*
+                            </label>
+                            <input
+                              type="text"
+                              id="boundingBox.topLeft.lat"
+                              name="boundingBox.topLeft.lat"
+                              value={newLot.boundingBox.topLeft.lat}
+                              onChange={handleLotFormChange}
+                              required
+                              className="form-input"
+                              placeholder="e.g. 37.7749"
+                            />
+                          </div>
+                          
+                          <div className="form-group form-group-half">
+                            <label htmlFor="boundingBox.topLeft.lng">
+                              <span className="label-icon">📍</span> Top-Left Longitude*
+                            </label>
+                            <input
+                              type="text"
+                              id="boundingBox.topLeft.lng"
+                              name="boundingBox.topLeft.lng"
+                              value={newLot.boundingBox.topLeft.lng}
+                              onChange={handleLotFormChange}
+                              required
+                              className="form-input"
+                              placeholder="e.g. -122.4194"
+                            />
+                          </div>
+                          
+                          <div className="form-group form-group-half">
+                            <label htmlFor="boundingBox.bottomRight.lat">
+                              <span className="label-icon">📍</span> Bottom-Right Latitude*
+                            </label>
+                            <input
+                              type="text"
+                              id="boundingBox.bottomRight.lat"
+                              name="boundingBox.bottomRight.lat"
+                              value={newLot.boundingBox.bottomRight.lat}
+                              onChange={handleLotFormChange}
+                              required
+                              className="form-input"
+                              placeholder="e.g. 37.7647"
+                            />
+                          </div>
+                          
+                          <div className="form-group form-group-half">
+                            <label htmlFor="boundingBox.bottomRight.lng">
+                              <span className="label-icon">📍</span> Bottom-Right Longitude*
+                            </label>
+                            <input
+                              type="text"
+                              id="boundingBox.bottomRight.lng"
+                              name="boundingBox.bottomRight.lng"
+                              value={newLot.boundingBox.bottomRight.lng}
+                              onChange={handleLotFormChange}
+                              required
+                              className="form-input"
+                              placeholder="e.g. -122.4094"
+                            />
+                          </div>
+                          
+                          <div className="form-group full-width">
+                            <label className="categories-label">
+                              <span className="label-icon">🏷️</span> Categories*
+                              <span className="required-note">(at least one category required)</span>
+                            </label>
+                            
+                            {newLot.categories.length > 0 && (
+                              <div className="categories-list">
+                                {newLot.categories.map((category, index) => (
+                                  <div key={index} className="category-item">
+                                    <div className="category-type">{category.type}</div>
+                                    <div className="category-spots">Spots: {category.spots}</div>
+                                    <button 
+                                      type="button"
+                                      className="remove-category-btn"
+                                      onClick={() => handleRemoveCategory(index)}
+                                    >
+                                      <FaTrashAlt />
+                                    </button>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                            
+                            <div className="add-category-container">
+                              <select
+                                name="type"
+                                value={newCategory.type}
+                                onChange={handleCategoryChange}
+                                className="category-select"
+                              >
+                                {availableCategories.map(cat => (
+                                  <option key={cat} value={cat}>{cat}</option>
+                                ))}
+                              </select>
+                              
+                              <input
+                                type="text"
+                                name="range"
+                                value={newCategory.range}
+                                onChange={handleCategoryChange}
+                                className="category-range-input"
+                                placeholder="e.g. 1-50 or 200"
+                              />
+                              
+                              <button 
+                                type="button"
+                                className="add-category-btn"
+                                onClick={handleAddCategory}
+                              >
+                                <FaPlusCircle /> Add
+                              </button>
+                            </div>
+                            <div className="category-hint">
+                              You can specify spot numbers as a single value (e.g. "200") or a range (e.g. "150-167")
+                            </div>
+                          </div>
+                          
+                          <div className="form-group full-width">
+                            <label htmlFor="svgImage" className="file-input-label">
+                              <span className="label-icon">🖼️</span> SVG Image of Parking Lot (Optional)
+                            </label>
+                            <div className="file-input-container">
+                              <button 
+                                type="button" 
+                                className="file-select-btn"
+                                onClick={triggerFileInput}
+                              >
+                                Select File
+                              </button>
+                              <span className="file-name">
+                                {newLot.svgImage ? newLot.svgImage.name : 'No file selected'}
+                              </span>
+                              <input
+                                type="file"
+                                id="svgImage"
+                                name="svgImage"
+                                accept=".svg"
+                                onChange={handleFileChange}
+                                ref={fileInputRef}
+                                style={{ display: 'none' }}
+                              />
+                            </div>
+                          </div>
+                          
+                          <div className="form-group full-width">
+                            <label htmlFor="geojsonCoordinates">
+                              <span className="label-icon">📍</span> GeoJSON Coordinates (Optional)
+                            </label>
+                            <textarea
+                              id="geojsonCoordinates"
+                              name="geojsonCoordinates"
+                              value={newLot.geojsonCoordinates}
+                              onChange={handleLotFormChange}
+                              className="form-textarea"
+                              placeholder="Paste GeoJSON coordinates for individual parking spots"
+                              rows={5}
+                            />
+                          </div>
+                          
+                          <div className="form-actions">
+                            <button 
+                              type="button"
+                              className="form-cancel-btn"
+                              onClick={handleCancel}
+                            >
+                              <FaTimes /> Cancel
+                            </button>
+                            <button 
+                              type="submit"
+                              className="form-submit-btn"
+                              disabled={isSubmitting}
+                            >
+                              {isSubmitting ? (
+                                <>
+                                  <span className="processing-spinner-small" aria-hidden="true"></span>
+                                  {editingLot ? 'Updating...' : 'Creating...'}
+                                </>
+                              ) : (
+                                <>
+                                  <FaSave />
+                                  {editingLot ? 'Update Lot' : 'Create Lot'}
+                                </>
+                              )}
+                            </button>
+                          </div>
+                        </div>
+                      </form>
+                    </div>
+                  )}
+                </div>
+
+                <table className="admin-table">
+                  <thead>
+                    <tr>
+                      <th>Lot Name</th>
+                      <th>Lot ID</th>
+                      <th>Capacity</th>
+                      <th>Categories</th>
+                      <th>SVG Map</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {getCurrentItems().length > 0 ? (
+                      getCurrentItems().map(lot => (
+                        <tr key={lot.id}>
+                          <td>{lot.officialName}</td>
+                          <td>
+                            <span className="lot-id-badge">{lot.lotId}</span>
+                          </td>
+                          <td>{lot.capacity}</td>
+                          <td>
+                            <div className="categories-display">
+                              {lot.categories.map((category, index) => (
+                                <div key={index} className="category-chip">
+                                  <span className="category-type">{category.type}</span>
+                                  <span className="category-count">({category.spots})</span>
+                                </div>
+                              ))}
+                            </div>
+                          </td>
+                          <td>
+                            {lot.svgImage ? (
+                              <div className="svg-thumbnail">
+                                <img src={lot.svgImage} alt={`${lot.officialName} layout`} width="60" />
+                              </div>
+                            ) : (
+                              <span className="no-svg">No SVG</span>
+                            )}
+                          </td>
+                          <td>
+                            <div className="lot-actions">
+                              <button 
+                                className="lot-btn edit-btn"
+                                onClick={() => handleEditLot(lot)}
+                                title="Edit Lot"
+                              >
+                                <FaEdit /> Edit
+                              </button>
+                              <button 
+                                className="lot-btn delete-btn"
+                                onClick={() => setLotToDelete(lot.id)}
+                                title="Delete Lot"
+                              >
+                                <FaTrashAlt /> Delete
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+  <td colSpan="6" className="empty-state-message">
+    <div className="no-data-message">
+      <span className="message-text">No parking lots found</span>
+    </div>
+  </td>
+</tr>
                     )}
                   </tbody>
                 </table>
@@ -1994,6 +2822,37 @@ useEffect(() => {
                   onClick={() => {
                     handleDeleteTicket(ticketToDelete);
                     setTicketToDelete(null);
+                  }}
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Lot Confirmation Dialog */}
+      {lotToDelete && (
+        <div className="confirmation-dialog-overlay">
+          <div className="confirmation-dialog" role="dialog" aria-labelledby="delete-lot-dialog-title">
+            <div className="confirmation-header">
+              <div className="confirmation-header-icon warning">!
+              </div>
+              <h3 id="delete-lot-dialog-title" className="confirmation-title">Confirm Parking Lot Deletion</h3>
+            </div>
+            <div className="confirmation-content">
+              <p className="confirmation-message">
+                Are you sure you want to delete this parking lot? All associated data will be permanently removed and this action cannot be undone.
+              </p>
+              <div className="confirmation-actions">
+                <button className="confirmation-cancel" onClick={() => setLotToDelete(null)}>
+                  Cancel
+                </button>
+                <button 
+                  className="confirmation-confirm" 
+                  onClick={() => {
+                    handleDeleteLot(lotToDelete);
                   }}
                 >
                   Delete
