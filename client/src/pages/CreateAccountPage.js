@@ -30,14 +30,25 @@ function CreateAccountPage() {
 
   // Password strength state
   const [passwordStrength, setPasswordStrength] = useState({ score: 0, label: '' });
+  
+  // Field touched state for real-time validation
+  const [touched, setTouched] = useState({});
 
   // Errors state
   const [errors, setErrors] = useState({});
   const [apiError, setApiError] = useState(null);
 
-  // Regex patterns
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  const passwordRegex = /^(?=.*[0-9])(?=.*[^a-zA-Z0-9]).{8,}$/;
+  // Regex patterns - Enhanced for better validation
+  const usernameRegex = /^[a-zA-Z0-9_-]{5,30}$/;
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  const sbuEmailRegex = /^[a-zA-Z0-9._%+-]+@stonybrook\.edu$/;
+  const passwordRegex = /^(?=.*[0-9])(?=.*[^a-zA-Z0-9])(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
+  const phoneRegex = /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/;
+  const plateRegex = /^[A-Z0-9]{1,8}$/;
+  const yearRegex = /^(19|20)\d{2}$/;
+
+  // Current year for validation
+  const currentYear = new Date().getFullYear();
 
   // Trigger subtle fade‑in animation on mount for key elements
   useEffect(() => {
@@ -69,6 +80,10 @@ function CreateAccountPage() {
     setPasswordStrength({ score, label });
   }, [password]);
 
+  // Mark a field as touched when it's blurred
+  const handleBlur = (field) => {
+    setTouched(prev => ({ ...prev, [field]: true }));
+  };
 
   const getPasswordStrengthClass = () => {
     return passwordStrength.label
@@ -95,53 +110,300 @@ function CreateAccountPage() {
     const updated = [...vehicles];
     updated[index][field] = value;
     setVehicles(updated);
+    
+    // Mark this vehicle field as touched
+    setTouched(prev => ({
+      ...prev,
+      [`vehicle_${index}_${field}`]: true
+    }));
+    
+    // Trigger validation for vehicle fields
+    validateField(`vehicle_${index}_${field}`, value);
+  };
+
+  // Validate a specific field
+  const validateField = (field, value) => {
+    let newErrors = { ...errors };
+    
+    switch (field) {
+      case 'username':
+        if (!value.trim()) {
+          newErrors.username = 'Username is required';
+        } else if (!usernameRegex.test(value)) {
+          newErrors.username = 'Username must be at least 5 characters, and contain only letters, numbers, underscore, or a hyphen.';
+        } else {
+          delete newErrors.username;
+        }
+        break;
+        
+      case 'email':
+        if (!value.trim()) {
+          newErrors.email = 'Email address is required';
+        } else if (!emailRegex.test(value)) {
+          newErrors.email = 'Please enter a valid email address';
+        } else if (userType !== 'visitor' && !sbuEmailRegex.test(value)) {
+          newErrors.email = 'Stony Brook email required for students and faculty';
+        } else {
+          delete newErrors.email;
+        }
+        break;
+        
+      case 'password':
+        if (!value) {
+          newErrors.password = 'Password is required';
+        } else if (!passwordRegex.test(value)) {
+          newErrors.password = 'Password must have at least 8 characters, one uppercase letter, one lowercase letter, one number, and one special character';
+        } else {
+          delete newErrors.password;
+        }
+        break;
+        
+      case 'confirmPassword':
+        if (value !== password) {
+          newErrors.confirmPassword = 'Passwords do not match';
+        } else {
+          delete newErrors.confirmPassword;
+        }
+        break;
+        
+      case 'userType':
+        if (!value) {
+          newErrors.userType = 'Please select a user type';
+        } else {
+          delete newErrors.userType;
+        }
+        break;
+        
+      case 'sbuId':
+        if (userType && (userType === 'student' || userType === 'faculty') && !value.trim()) {
+          newErrors.sbuId = 'SBU ID is required for students and faculty';
+        } else if (value.trim() && !/^\d{9}$/.test(value)) {
+          newErrors.sbuId = 'SBU ID must be exactly 9 digits';
+        } else {
+          delete newErrors.sbuId;
+        }
+        break;
+        
+      case 'driversLicense':
+        if (!value.trim()) {
+          newErrors.driversLicense = "Driver's license is required";
+        } else if (value.trim().length < 5 || value.trim().length > 20) {
+          newErrors.driversLicense = "Driver's license must be 5-20 characters";
+        } else {
+          delete newErrors.driversLicense;
+        }
+        break;
+        
+      case 'contactInfo':
+        if (!value.trim()) {
+          newErrors.contactInfo = 'Contact information is required';
+        } else if (!phoneRegex.test(value.replace(/\D/g, ''))) {
+          newErrors.contactInfo = 'Please enter a valid phone number (e.g., 123-456-7890)';
+        } else {
+          delete newErrors.contactInfo;
+        }
+        break;
+        
+      case 'address':
+        if (!value.trim()) {
+          newErrors.address = 'Address is required';
+        } else if (value.trim().length < 10) {
+          newErrors.address = 'Please enter a complete address';
+        } else {
+          delete newErrors.address;
+        }
+        break;
+        
+      default:
+        // Handle vehicle fields
+        if (field.startsWith('vehicle_')) {
+          const [, index, vehicleField] = field.split('_');
+          const idx = parseInt(index);
+          
+          // Create a vehicles error object if it doesn't exist
+          if (!newErrors.vehicleErrors) {
+            newErrors.vehicleErrors = {};
+          }
+          
+          // Create an error object for this specific vehicle if it doesn't exist
+          if (!newErrors.vehicleErrors[idx]) {
+            newErrors.vehicleErrors[idx] = {};
+          }
+          
+          if (vehicleField === 'model') {
+            if (!value.trim()) {
+              newErrors.vehicleErrors[idx].model = 'Vehicle model is required';
+            } else if (value.trim().length < 3) {
+              newErrors.vehicleErrors[idx].model = 'Please enter a valid vehicle model';
+            } else {
+              delete newErrors.vehicleErrors[idx].model;
+            }
+          } else if (vehicleField === 'year') {
+            if (!value.trim()) {
+              newErrors.vehicleErrors[idx].year = 'Vehicle year is required';
+            } else if (!yearRegex.test(value)) {
+              newErrors.vehicleErrors[idx].year = 'Please enter a valid 4-digit year (e.g., 2023)';
+            } else if (parseInt(value) > currentYear) {
+              newErrors.vehicleErrors[idx].year = 'Year cannot be in the future';
+            } else {
+              delete newErrors.vehicleErrors[idx].year;
+            }
+          } else if (vehicleField === 'plate') {
+            if (!value.trim()) {
+              newErrors.vehicleErrors[idx].plate = 'License plate is required';
+            } else if (!plateRegex.test(value.toUpperCase())) {
+              newErrors.vehicleErrors[idx].plate = 'Please enter a valid license plate (letters and numbers only)';
+            } else {
+              delete newErrors.vehicleErrors[idx].plate;
+            }
+          }
+          
+          // Clean up empty vehicle error objects
+          if (Object.keys(newErrors.vehicleErrors[idx]).length === 0) {
+            delete newErrors.vehicleErrors[idx];
+          }
+          if (Object.keys(newErrors.vehicleErrors).length === 0) {
+            delete newErrors.vehicleErrors;
+          }
+        }
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  // Handle input change with validation
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    
+    // Update state based on input name
+    switch (name) {
+      case 'username':
+        setUsername(value);
+        break;
+      case 'email':
+        setEmail(value);
+        break;
+      case 'password':
+        setPassword(value);
+        break;
+      case 'confirmPassword':
+        setConfirmPassword(value);
+        break;
+      case 'userType':
+        setUserType(value);
+        break;
+      case 'sbuId':
+        setSbuId(value);
+        break;
+      case 'driversLicense':
+        setDriversLicense(value);
+        break;
+      case 'contactInfo':
+        setContactInfo(value);
+        break;
+      case 'address':
+        setAddress(value);
+        break;
+      default:
+        return;
+    }
+    
+    // Mark field as touched
+    setTouched(prev => ({ ...prev, [name]: true }));
+    
+    // Validate the field
+    validateField(name, value);
+    
+    // Special case: also validate email if userType changes
+    if (name === 'userType' && email) {
+      validateField('email', email);
+    }
+    
+    // Special case: also validate sbuId if userType changes
+    if (name === 'userType' && sbuId) {
+      validateField('sbuId', sbuId);
+    }
   };
 
   // Validate only the fields for the current step
   const validateStep = () => {
-    const newErrors = {};
+    const newErrors = { ...errors };
 
     if (currentStep === 1) {
-      if (!username.trim()) newErrors.username = 'Username is required';
-      else if (username.trim().length < 5) newErrors.username = 'Must be at least 5 characters';
+      // Mark all step 1 fields as touched for validation
+      setTouched(prev => ({
+        ...prev,
+        username: true,
+        email: true,
+        password: true,
+        confirmPassword: true,
+        userType: true
+      }));
       
-      if (!email.trim()) newErrors.email = 'Email address is required';
-      else if (!emailRegex.test(email)) newErrors.email = 'Please enter a valid email address';
+      // Validate each field
+      validateField('username', username);
+      validateField('email', email);
+      validateField('password', password);
+      validateField('confirmPassword', confirmPassword);
+      validateField('userType', userType);
+    } 
+    else if (currentStep === 2) {
+      // Mark step 2 fields as touched
+      setTouched(prev => ({
+        ...prev,
+        sbuId: true
+      }));
       
-      if (!password) newErrors.password = 'Password is required';
-      else if (!passwordRegex.test(password))
-        newErrors.password = 'Password must be at least 8 characters and include a number and special character';
+      // Validate sbuId
+      validateField('sbuId', sbuId);
+    } 
+    else if (currentStep === 3) {
+      // Mark step 3 fields as touched
+      setTouched(prev => ({
+        ...prev,
+        driversLicense: true,
+        ...vehicles.reduce((acc, _, index) => {
+          acc[`vehicle_${index}_model`] = true;
+          acc[`vehicle_${index}_year`] = true;
+          acc[`vehicle_${index}_plate`] = true;
+          return acc;
+        }, {})
+      }));
       
-      if (password !== confirmPassword)
-        newErrors.confirmPassword = 'Passwords do not match';
+      // Validate driver's license
+      validateField('driversLicense', driversLicense);
       
-      // Validate userType
-      if (!userType) {
-        newErrors.userType = 'Please select a user type';
-      }
-    } else if (currentStep === 2) {
-      // Optional SBU ID: if provided, must be exactly 9 digits
-      if (sbuId.trim() && !/^[0-9]{9}$/.test(sbuId)) newErrors.sbuId = 'SBU ID must be exactly 9 digits';
-    } else if (currentStep === 3) {
-      if (!driversLicense.trim()) newErrors.driversLicense = "Driver's license is required";
+      // Validate each vehicle
+      vehicles.forEach((vehicle, index) => {
+        validateField(`vehicle_${index}_model`, vehicle.model);
+        validateField(`vehicle_${index}_year`, vehicle.year);
+        validateField(`vehicle_${index}_plate`, vehicle.plate);
+      });
+    } 
+    else if (currentStep === 4) {
+      // Mark step 4 fields as touched
+      setTouched(prev => ({
+        ...prev,
+        contactInfo: true,
+        address: true
+      }));
       
-      // Validate vehicles
-      const firstVehicle = vehicles[0];
-      if (!firstVehicle.model.trim() || !firstVehicle.year.trim() || !firstVehicle.plate.trim()) {
-        newErrors.vehicles = 'Vehicle model, year, and plate are required';
-      }
-    } else if (currentStep === 4) {
-      if (!contactInfo.trim()) newErrors.contactInfo = 'Contact information is required';
-      if (!address.trim()) newErrors.address = 'Address is required';
+      // Validate contact info and address
+      validateField('contactInfo', contactInfo);
+      validateField('address', address);
     }
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    
+    // Check if there are any errors
+    return Object.keys(errors).length === 0;
   };
 
   // Navigation handlers for the multi-step form
   const handleNext = (e) => {
     e.preventDefault();
     setApiError(null);
+    
+    // Set all fields of current step as touched
     if (validateStep()) {
       setCurrentStep(prev => prev + 1);
     }
@@ -287,16 +549,18 @@ function CreateAccountPage() {
                       User Type <span className="required-mark">*</span>
                     </label>
                     <select
-                      className="input-field"
+                      className={`input-field ${touched.userType && errors.userType ? 'input-error' : ''}`}
                       value={userType}
-                      onChange={(e) => setUserType(e.target.value)}
+                      onChange={handleInputChange}
+                      onBlur={() => handleBlur('userType')}
+                      name="userType"
                     >
                       <option value="" disabled>Select user type</option>
                       <option value="student">Student</option>
                       <option value="faculty">Faculty</option>
                       <option value="visitor">Visitor</option>
                     </select>
-                    {errors.userType && <div className="field-error">{errors.userType}</div>}
+                    {touched.userType && errors.userType && <div className="field-error">{errors.userType}</div>}
                     <span className="helper-text">Select your affiliation with Stony Brook University</span>
                   </div>
                 
@@ -306,13 +570,14 @@ function CreateAccountPage() {
                     </label>
                     <input
                       type="text"
-                      className="input-field"
+                      className={`input-field ${touched.username && errors.username ? 'input-error' : ''}`}
                       placeholder="Choose a username"
                       value={username}
-                      onChange={(e) => setUsername(e.target.value)}
+                      onChange={handleInputChange}
+                      onBlur={() => handleBlur('username')}
+                      name="username"
                     />
-                    {errors.username && <div className="field-error">{errors.username}</div>}
-                    <span className="helper-text">At least 5 characters</span>
+                    {touched.username && errors.username && <div className="field-error">{errors.username}</div>}
                   </div>
                   <div className="input-group">
                     <label className="input-label">
@@ -320,12 +585,17 @@ function CreateAccountPage() {
                     </label>
                     <input
                       type="email"
-                      className="input-field"
+                      className={`input-field ${touched.email && errors.email ? 'input-error' : ''}`}
                       placeholder="your.email@stonybrook.edu"
                       value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      onChange={handleInputChange}
+                      onBlur={() => handleBlur('email')}
+                      name="email"
                     />
-                    {errors.email && <div className="field-error">{errors.email}</div>}
+                    {touched.email && errors.email && <div className="field-error">{errors.email}</div>}
+                    {userType && userType !== 'visitor' && (
+                      <span className="helper-text highlight-text">Stony Brook email required for {userType}s</span>
+                    )}
                   </div>
                   <div className="input-group">
                     <label className="input-label">
@@ -333,10 +603,12 @@ function CreateAccountPage() {
                     </label>
                     <input
                       type="password"
-                      className="input-field"
+                      className={`input-field ${touched.password && errors.password ? 'input-error' : ''}`}
                       placeholder="Create a secure password"
                       value={password}
-                      onChange={(e) => setPassword(e.target.value)}
+                      onChange={handleInputChange}
+                      onBlur={() => handleBlur('password')}
+                      name="password"
                     />
                     {password && (
                       <div className={`password-strength ${getPasswordStrengthClass()}`}>
@@ -348,7 +620,8 @@ function CreateAccountPage() {
                         </div>
                       </div>
                     )}
-                    {errors.password && <div className="field-error">{errors.password}</div>}
+                    {touched.password && errors.password && <div className="field-error">{errors.password}</div>}
+                    <span className="helper-text">8+ characters with at least one uppercase letter, number, and special character.</span>
                   </div>
                   <div className="input-group">
                     <label className="input-label">
@@ -356,28 +629,41 @@ function CreateAccountPage() {
                     </label>
                     <input
                       type="password"
-                      className="input-field"
+                      className={`input-field ${touched.confirmPassword && errors.confirmPassword ? 'input-error' : ''}`}
                       placeholder="Confirm your password"
                       value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      onChange={handleInputChange}
+                      onBlur={() => handleBlur('confirmPassword')}
+                      name="confirmPassword"
                     />
-                    {errors.confirmPassword && <div className="field-error">{errors.confirmPassword}</div>}
+                    {touched.confirmPassword && errors.confirmPassword && (
+                      <div className="field-error">{errors.confirmPassword}</div>
+                    )}
                   </div>
                 </>
               )}
 
               {currentStep === 2 && (
                 <div className="input-group full-width">
-                  <label className="input-label">SBU ID (Optional)</label>
+                  <label className="input-label">
+                    SBU ID {userType && (userType === 'student' || userType === 'faculty') && <span className="required-mark">*</span>}
+                  </label>
                   <input
                     type="text"
-                    className="input-field"
+                    className={`input-field ${touched.sbuId && errors.sbuId ? 'input-error' : ''}`}
                     placeholder="9-digit SBU ID number"
                     value={sbuId}
-                    onChange={(e) => setSbuId(e.target.value)}
+                    onChange={handleInputChange}
+                    onBlur={() => handleBlur('sbuId')}
+                    name="sbuId"
+                    maxLength="9"
                   />
-                  {errors.sbuId && <div className="field-error">{errors.sbuId}</div>}
-                  <span className="helper-text">Enter your 9-digit ID if you are affiliated with SBU</span>
+                  {touched.sbuId && errors.sbuId && <div className="field-error">{errors.sbuId}</div>}
+                  <span className="helper-text">
+                    {userType && (userType === 'student' || userType === 'faculty') 
+                      ? 'Required 9-digit ID for students and faculty.' 
+                      : 'Enter your 9-digit ID if you are affiliated with SBU'}
+                  </span>
                 </div>
               )}
 
@@ -389,12 +675,17 @@ function CreateAccountPage() {
                     </label>
                     <input
                       type="text"
-                      className="input-field"
+                      className={`input-field ${touched.driversLicense && errors.driversLicense ? 'input-error' : ''}`}
                       placeholder="License number"
                       value={driversLicense}
-                      onChange={(e) => setDriversLicense(e.target.value)}
+                      onChange={handleInputChange}
+                      onBlur={() => handleBlur('driversLicense')}
+                      name="driversLicense"
                     />
-                    {errors.driversLicense && <div className="field-error">{errors.driversLicense}</div>}
+                    {touched.driversLicense && errors.driversLicense && (
+                      <div className="field-error">{errors.driversLicense}</div>
+                    )}
+                    <span className="helper-text">Enter driver's license number (5-20 characters).</span>
                   </div>
                   
                   {/* Enhanced Vehicle Section */}
@@ -419,11 +710,22 @@ function CreateAccountPage() {
                         </label>
                         <input
                           type="text"
-                          className="input-field"
+                          className={`input-field ${
+                            touched[`vehicle_${index}_model`] && 
+                            errors.vehicleErrors && 
+                            errors.vehicleErrors[index]?.model ? 'input-error' : ''
+                          }`}
                           placeholder="e.g. Honda Civic"
                           value={vehicle.model}
                           onChange={(e) => handleVehicleChange(index, 'model', e.target.value)}
+                          onBlur={() => handleBlur(`vehicle_${index}_model`)}
                         />
+                        {touched[`vehicle_${index}_model`] && 
+                         errors.vehicleErrors && 
+                         errors.vehicleErrors[index]?.model && (
+                          <div className="field-error">{errors.vehicleErrors[index].model}</div>
+                        )}
+                        <span className="helper-text">Enter complete make and model.</span>
                       </div>
 
                       <div className="input-group">
@@ -432,11 +734,23 @@ function CreateAccountPage() {
                         </label>
                         <input
                           type="text"
-                          className="input-field"
-                          placeholder="e.g. 2020"
+                          className={`input-field ${
+                            touched[`vehicle_${index}_year`] && 
+                            errors.vehicleErrors && 
+                            errors.vehicleErrors[index]?.year ? 'input-error' : ''
+                          }`}
+                          placeholder="e.g. 2023"
                           value={vehicle.year}
                           onChange={(e) => handleVehicleChange(index, 'year', e.target.value)}
+                          onBlur={() => handleBlur(`vehicle_${index}_year`)}
+                          maxLength="4"
                         />
+                        {touched[`vehicle_${index}_year`] && 
+                         errors.vehicleErrors && 
+                         errors.vehicleErrors[index]?.year && (
+                          <div className="field-error">{errors.vehicleErrors[index].year}</div>
+                        )}
+                        <span className="helper-text">4-digit year (1900-{currentYear})</span>
                       </div>
 
                       <div className="input-group">
@@ -445,11 +759,23 @@ function CreateAccountPage() {
                         </label>
                         <input
                           type="text"
-                          className="input-field"
-                          placeholder="e.g. ABC-1234"
+                          className={`input-field ${
+                            touched[`vehicle_${index}_plate`] && 
+                            errors.vehicleErrors && 
+                            errors.vehicleErrors[index]?.plate ? 'input-error' : ''
+                          }`}
+                          placeholder="e.g. ABC1234"
                           value={vehicle.plate}
                           onChange={(e) => handleVehicleChange(index, 'plate', e.target.value)}
+                          onBlur={() => handleBlur(`vehicle_${index}_plate`)}
+                          maxLength="8"
                         />
+                        {touched[`vehicle_${index}_plate`] && 
+                         errors.vehicleErrors && 
+                         errors.vehicleErrors[index]?.plate && (
+                          <div className="field-error">{errors.vehicleErrors[index].plate}</div>
+                        )}
+                        <span className="helper-text">Letters and numbers only, no spaces or special characters!</span>
                       </div>
 
                       <div className="vehicle-controls">
@@ -475,7 +801,6 @@ function CreateAccountPage() {
                       </div>
                     </div>
                   ))}
-                  {errors.vehicles && <div className="field-error">{errors.vehicles}</div>}
                 </>
               )}
 
@@ -483,16 +808,19 @@ function CreateAccountPage() {
                 <>
                   <div className="input-group">
                     <label className="input-label">
-                      Contact Information <span className="required-mark">*</span>
+                      Contact Phone <span className="required-mark">*</span>
                     </label>
                     <input
-                      type="text"
-                      className="input-field"
-                      placeholder="Phone number"
+                      type="tel"
+                      className={`input-field ${touched.contactInfo && errors.contactInfo ? 'input-error' : ''}`}
+                      placeholder="123-456-7890"
                       value={contactInfo}
-                      onChange={(e) => setContactInfo(e.target.value)}
+                      onChange={handleInputChange}
+                      onBlur={() => handleBlur('contactInfo')}
+                      name="contactInfo"
                     />
-                    {errors.contactInfo && <div className="field-error">{errors.contactInfo}</div>}
+                    {touched.contactInfo && errors.contactInfo && <div className="field-error">{errors.contactInfo}</div>}
+                    <span className="helper-text">Enter a valid US phone number.</span>
                   </div>
                   <div className="input-group">
                     <label className="input-label">
@@ -500,12 +828,15 @@ function CreateAccountPage() {
                     </label>
                     <input
                       type="text"
-                      className="input-field"
-                      placeholder="Your address"
+                      className={`input-field ${touched.address && errors.address ? 'input-error' : ''}`}
+                      placeholder="123 Main St, City, State, ZIP"
                       value={address}
-                      onChange={(e) => setAddress(e.target.value)}
+                      onChange={handleInputChange}
+                      onBlur={() => handleBlur('address')}
+                      name="address"
                     />
-                    {errors.address && <div className="field-error">{errors.address}</div>}
+                    {touched.address && errors.address && <div className="field-error">{errors.address}</div>}
+                    <span className="helper-text">Enter your complete mailing address.</span>
                   </div>
                 </>
               )}
