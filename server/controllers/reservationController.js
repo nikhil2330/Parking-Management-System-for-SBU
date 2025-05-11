@@ -3,7 +3,7 @@ const Reservation = require('../models/Reservation');
 const ParkingLot = require('../models/ParkingLot');
 const ParkingSpot = require('../models/ParkingSpot');
 const mongoose = require('mongoose');
-
+const VALID_TYPES = ['hourly','daily','semester'];
 
 async function updateSpotAndLotStatus(spotId, lotId) {
   const now = new Date();
@@ -86,6 +86,10 @@ exports.createReservation = async (req, res) => {
     console.log('User ID not found in JWT token');
     return res.status(401).json({ error: 'User not authenticated properly' });
   }
+  const reservationType = req.body.reservationType || 'hourly';
+  if(!VALID_TYPES.includes(reservationType)){
+     return res.status(400).json({error:'Invalid reservationType'});
+  }
 
   // Convert string IDs to ObjectIds if needed
   let lotObjectId, spotObjectId, buildingObjectId;
@@ -162,6 +166,7 @@ exports.createReservation = async (req, res) => {
       endTime: new Date(endTime),
       totalPrice,
       paymentStatus: 'unpaid',
+      reservationType,
       status: 'pending'
     };
     const [newRes] = await Reservation.create([reservationData], { session });

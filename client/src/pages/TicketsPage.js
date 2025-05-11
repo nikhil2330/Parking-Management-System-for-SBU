@@ -70,7 +70,7 @@ function TicketsPage() {
     if (!sessionId) return;
     (async () => {
       try {
-        await api.post('/auth/ping');        // optional keep-alive if you need it
+        // await api.post('/auth/ping');        // optional keep-alive if you need it
         await ApiService.payment.confirmTicket(sessionId);
         // refresh list
         const { data } = await api.get('/tickets/user');
@@ -142,14 +142,14 @@ function TicketsPage() {
     
     setActiveTicket(ticket);
     setShowModal(true);
-    try {
-          const { url } =
-            await ApiService.payment.createTicketCheckoutSession(ticket._id);
-          window.location.href = url;     
-        } catch (err) {
-          console.error(err);
-          alert(err.message || 'Could not start checkout');
-        }
+    // try {
+    //       const { url } =
+    //         await ApiService.payment.createTicketCheckoutSession(ticket._id);
+    //       window.location.href = url;     
+    //     } catch (err) {
+    //       console.error(err);
+    //       alert(err.message || 'Could not start checkout');
+    //     }
   };
 
   // Process payment
@@ -160,10 +160,11 @@ function TicketsPage() {
     
     try {
       // Simulate payment processing delay for a better user experience
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      await api.patch(`/tickets/${activeTicket._id}/status`, { status: 'paid' });
-      
+      // await new Promise(resolve => setTimeout(resolve, 1500));
+      // await api.patch(`/tickets/${activeTicket._id}/status`, { status: 'paid' });
+      const { url } =
+      await ApiService.payment.createTicketCheckoutSession(activeTicket._id);
+      window.location.href = url;          // Stripe will bring us back
       // Update local state
       setTickets(prev => prev.map(t => 
         t._id === activeTicket._id ? { ...t, status: 'paid', paymentDate: new Date() } : t

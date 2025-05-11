@@ -3,10 +3,11 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation, useParams, useSearchParams } from 'react-router-dom';
 import Header from '../components/Header';
 import ReservationService from '../services/ReservationService';
-import ApiService from '../services/api';    
+import ApiService from '../services/api';
 import GoogleMapService from '../services/GoogleMapService';
 import EventReservationService from '../services/EventReservationService';
 import './ReservationsPage.css';
+import ReservationTypeToggle from '../components/ReservationTypeToggle';
 
 function ReservationsPage() {
   const navigate = useNavigate();
@@ -24,14 +25,20 @@ function ReservationsPage() {
     endTime: '',
     totalPrice: 0
   });
+  const [reservationType, setReservationType] = useState('hourly');  // 'hourly' | 'daily' | 'semester'
+  const [dailyStartTime, setDailyStartTime] = useState('09:00');
+  const [dailyEndTime, setDailyEndTime] = useState('14:00');
+  const [dailyStartDate, setDailyStartDate] = useState('');
+  const [dailyEndDate, setDailyEndDate] = useState('');
+  const [semester, setSemester] = useState('spring');
   const [showMapModal, setShowMapModal] = useState(false);
   const [mapUrl, setMapUrl] = useState('');
-  
+
   // Pagination and display control
   const [activeTab, setActiveTab] = useState('all'); // all, regular, event
   const [visibleCount, setVisibleCount] = useState(5);
   const [loadingMore, setLoadingMore] = useState(false);
-  
+
   // Check if we're coming from the search page with spot info to create a new reservation
   const spotInfo = location.state?.spotInfo;
   const searchedBuilding = location.state?.searchedBuilding;
@@ -42,16 +49,16 @@ function ReservationsPage() {
       // Log the spotInfo to see what we're working with
       console.log('Received spot info:', spotInfo);
       console.log('Received building info:', searchedBuilding);
-      
+
       // Set default start time to current time rounded to nearest hour
       const now = new Date();
       now.setMinutes(0, 0, 0);
       now.setHours(now.getHours() + 1); // Start one hour from now
-      
+
       // Set default end time to 2 hours after start time
       const end = new Date(now);
       end.setHours(end.getHours() + 2);
-      
+
       // Format for datetime-local input
       const formatDateForInput = (date) => {
         return date.toISOString().slice(0, 16);
@@ -63,7 +70,7 @@ function ReservationsPage() {
 
       // Get spot details from the spotInfo
       let lotId, spotId;
-      
+
       if (info.spotId && typeof info.spotId === 'string' && info.spotId.includes('-')) {
         // If spotId is in format "lotId-spotNum", we need to extract lotId differently
         const [extractedLotId, spotNum] = info.spotId.split('-');
@@ -74,12 +81,12 @@ function ReservationsPage() {
         lotId = info.lot?._id || '';
         spotId = info._id || info.spotId || '';
       }
-      
+
       // Extract building ID if available
       const buildingId = searchedBuilding?._id || null;
       const navStart = location.state?.startTime;
       const navEnd = location.state?.endTime;
-      
+
       setNewReservation({
         lotId: lotId,
         spotId: spotId,
@@ -88,14 +95,14 @@ function ReservationsPage() {
         endTime: navEnd || formatDateForInput(end),
         totalPrice: 5.00 // Default price, will be calculated based on duration
       });
-      
+
       console.log('Setting new reservation with:', {
         lotId, spotId, building: buildingId
       });
-      
+
       setShowReservationForm(true);
     }
-    
+
     // Fetch existing reservations
     fetchReservations();
   }, [spotInfo, searchedBuilding, routeSpotId]);
@@ -108,10 +115,10 @@ function ReservationsPage() {
         ReservationService.getReservations(),
         EventReservationService.getEventReservations()
       ]);
-      
+
       console.log('Fetched regular reservations:', regularData);
       console.log('Fetched event reservations:', eventData);
-      
+
       setRegularReservations(regularData);
       setEventReservations(eventData);
       setError(null);
@@ -151,63 +158,85 @@ function ReservationsPage() {
       pad(date.getMinutes())
     );
   }
+
   const handleCreateReservation = async (e) => {
     e.preventDefault();
-    
-    if (!newReservation.startTime || !newReservation.endTime) {
-      alert('Please select both start and end times.');
-      return;
-    }
-    
-    // Validate times
-    const startDate = new Date(newReservation.startTime);
-    const endDate = new Date(newReservation.endTime);
-    const now = new Date();
-    
-    if (startDate < new Date(now.getTime() + 10 * 60000)) {
-      alert('Start time must be at least 10 minutes from now.');
-      return;
-    }
-  
-    if (startDate >= endDate) {
-      alert('End time must be after start time.');
-      return;
-    }
-    
-    // Calculate price based on duration
-    const durationHours = (endDate - startDate) / (1000 * 60 * 60);
-    const totalPrice = (durationHours * 2.50).toFixed(2); // $2.50 per hour
-    
+
     try {
-      // Create the reservation data according to what the server expects
-      const reservationData = {
-        lotId: newReservation.lotId,
-        spotId: newReservation.spotId,
-        building: newReservation.building, // optional
-        startTime: startDate.toISOString(),
-        endTime: endDate.toISOString(),
-        totalPrice: parseFloat(totalPrice)
-      };
-      
-      console.log('Creating reservation with data:', reservationData);
-      
-      try {
-        const result = await ReservationService.createReservation(reservationData);
-        console.log('Reservation created successfully:', result);
-        
-        // Refresh reservations list and hide form
-        fetchReservations();
-        setShowReservationForm(false);
-        
-        // Clear location state to prevent re-creating the same reservation
-        navigate('/reservations', { replace: true });
-      } catch (error) {
-        console.error('Full error details:', error);
-        alert(`Failed to create reservation: ${error.message || 'Unknown error'}`);
+      if (reservationType === 'hourly') {
+        // -------  HOURLY  (current behaviour)  -------
+        const startDate = new Date(newReservation.startTime);
+        const endDate = new Date(newReservation.endTime);
+        const now = new Date();
+
+        if (startDate < new Date(now.getTime() + 10 * 60000))
+          return alert('Start time must be at least 10 minutes from now.');
+        if (startDate >= endDate)
+          return alert('End time must be after start time.');
+
+        const durationHours = (endDate - startDate) / 36e5;
+        const totalPrice = (durationHours * 2.5).toFixed(2);
+
+        await ReservationService.createReservation({
+          lotId: newReservation.lotId,
+          spotId: newReservation.spotId,
+          building: newReservation.building,
+          startTime: startDate.toISOString(),
+          endTime: endDate.toISOString(),
+          totalPrice: parseFloat(totalPrice),
+          reservationType: 'hourly'
+        });
+
+      } else if (reservationType === 'daily') {
+        // -------  DAILY (send request → admin) -------
+        if (!dailyStartDate || !dailyEndDate)
+          return alert('Select a start and end date.');
+
+        const startD = new Date(dailyStartDate);
+        const endD = new Date(dailyEndDate);
+        const diff = (endD - startD) / 864e5;
+        if (diff < 0 || diff > 15)
+          return alert('Date range must be between 0-15 days.');
+
+        if (dailyStartTime >= dailyEndTime)
+          return alert('End time must be after start time.');
+
+        await ReservationService.createReservationRequest({
+          type: 'daily',
+          spotId: newReservation.spotId,
+          startDate: startD.toISOString(),
+          endDate: endD.toISOString(),
+          startTime: dailyStartTime,
+          endTime: dailyEndTime
+        });
+        alert('Request submitted! You’ll see it in “Pending” once approved.');
+
+      } else {
+        // -------  SEMESTER  (request → admin) -------
+        await ReservationService.createReservationRequest({
+          type: 'semester',
+          spotId: newReservation.spotId,
+          semester
+        });
+        alert('Semester request sent to admin for approval.');
       }
+
+      // Refresh UI & exit form
+      fetchReservations();
+      setShowReservationForm(false);
+      navigate('/reservations', { replace: true });
+
     } catch (err) {
-      console.error('Error creating reservation:', err);
-      alert(`Failed to create reservation: ${err.message || 'Unknown error'}`);
+      console.error(err);
+      if (err.conflicts && err.conflicts.length) {
+        const lines = err.conflicts
+          .map(c => `• ${new Date(c.startTime).toLocaleString()} → ${new Date(c.endTime).toLocaleString()}`)
+          .join('\n');
+        alert(`Sorry – that spot is already booked for:\n${lines}`);
+      } else {
+        alert(err.message || 'Could not submit request');
+      }
+
     }
   };
 
@@ -215,7 +244,7 @@ function ReservationsPage() {
     if (!window.confirm('Are you sure you want to cancel this reservation?')) {
       return;
     }
-    
+
     try {
       if (isEventReservation) {
         await EventReservationService.cancelEventReservation(id);
@@ -254,12 +283,12 @@ function ReservationsPage() {
       setLoadingMore(false);
     }, 500);
   };
-  
+
   // Format date for display
   const formatDateForDisplay = (dateString) => {
-    const options = { 
-      weekday: 'short', 
-      month: 'short', 
+    const options = {
+      weekday: 'short',
+      month: 'short',
       day: 'numeric',
       hour: 'numeric',
       minute: '2-digit'
@@ -267,13 +296,55 @@ function ReservationsPage() {
     return new Date(dateString).toLocaleDateString('en-US', options);
   };
 
+  const formatTimeOnly = ts => new Date(ts)
+    .toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+
+  const formatDateOnly = ts => new Date(ts)
+    .toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
+
+
+  /* ─── helper formatters ────────────────────────── */
+  function h12(t) {            // "2025-05-12T09:00:00Z" → "9 :00 AM"
+    return new Date(t).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+  }
+  function dateShort(d) {      // -> "May 12 2025"
+    return new Date(d).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+  function range(a, b) {       // -> "May 12 2025 → May 20 2025"
+    return `${dateShort(a)} → ${dateShort(b)}`;
+  }
+  /* ──────────────────────────────────────────────── */
+
+  function collapseByParent(resArray) {
+    const groups = {};
+    resArray.forEach(r => {
+      const key = r.parentRequest || r._id;
+      groups[key] = groups[key] || [];
+      groups[key].push(r);
+    });
+
+    return Object.values(groups).map(group => {
+      if (group.length === 1) return group[0];
+      const [first] = group;
+      const start = new Date(Math.min(...group.map(g => new Date(g.startTime))));
+      const end = new Date(Math.max(...group.map(g => new Date(g.endTime))));
+      const price = group.reduce((s, g) => s + g.totalPrice, 0);
+      return {
+        ...first,
+        startTime: start,
+        endTime: end,
+        totalPrice: price,
+        _collapsedChildren: group       // keep for drill-down if you like
+      };
+    });
+  }
 
   // Calculate reservation status
   const getReservationStatus = (reservation) => {
     const now = new Date();
     const startTime = new Date(reservation.startTime);
     const endTime = new Date(reservation.endTime);
-    
+
     if (reservation.status === 'cancelled') {
       return 'cancelled';
     } else if (reservation.status === 'rejected') {
@@ -283,15 +354,15 @@ function ReservationsPage() {
     } else if (reservation.status === 'pending' && startTime > now) {
       return 'pending';
     }
-    
+
     if (now < startTime) {
       return 'pending';
     }
-    
+
     if (now >= startTime && now <= endTime) {
       return 'active';
     }
-    
+
     return 'completed';
   };
 
@@ -302,38 +373,35 @@ function ReservationsPage() {
       ...res,
       isEventReservation: false
     }));
-    
+
     const processedEvent = eventReservations.map(res => ({
       ...res,
       isEventReservation: true,
-      spotDisplay: res.spots && res.spots.length > 0 ? 
-        `${res.spots.length} spots` : 
+      spotDisplay: res.spots && res.spots.length > 0 ?
+        `${res.spots.length} spots` :
         'Multiple spots'
     }));
-    
-    // Filter based on active tab
-    let filtered = [];
-    if (activeTab === 'all') {
-      filtered = [...processedRegular, ...processedEvent];
-    } else if (activeTab === 'regular') {
-      filtered = processedRegular;
-    } else if (activeTab === 'event') {
-      filtered = processedEvent;
-    }
-    
-    // Sort by creation date (newest first)
+
+    // 2. filter by tab
+    let filtered = activeTab === 'all' ? [...processedRegular, ...processedEvent]
+      : activeTab === 'regular' ? processedRegular
+        : processedEvent;
+
+    // 3. ***collapse daily/semester siblings***
+    filtered = collapseByParent(filtered);
+
+    // 4. sort newest first
     filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-    
+
     // Group reservations by status
     const active = filtered.filter(res => getReservationStatus(res) === 'active');
     const pending = filtered.filter(res => getReservationStatus(res) === 'pending');
     const approved = filtered.filter(res => getReservationStatus(res) === 'approved' && getReservationStatus(res) !== 'active');
     const completed = filtered.filter(res => getReservationStatus(res) === 'completed');
-    const cancelled = filtered.filter(res => 
-      getReservationStatus(res) === 'cancelled' ||
-      getReservationStatus(res) === 'rejected'
+    const cancelled = filtered.filter(res =>
+      ['cancelled', 'rejected'].includes(getReservationStatus(res))
     );
-    
+
     return {
       all: filtered,
       active,
@@ -446,14 +514,70 @@ function ReservationsPage() {
                   (typeof reservation.lot === 'string' ? 'Lot ' + reservation.lot.substring(0, 6) : 'N/A')}
               </span>
             </div>
-            <div className="reservation-detail">
-              <span className="reservation-detail-label">Start Time</span>
-              <span className="reservation-detail-value">{formatDateForDisplay(reservation.startTime)}</span>
-            </div>
-            <div className="reservation-detail">
-              <span className="reservation-detail-label">End Time</span>
-              <span className="reservation-detail-value">{formatDateForDisplay(reservation.endTime)}</span>
-            </div>
+            {['daily', 'semester'].includes(reservation.reservationType) ? (
+              <>
+                <div className="reservation-detail">
+                  <span className="reservation-detail-label">Time Window</span>
+                  <span className="reservation-detail-value">
+                    {h12(new Date(reservation.startTime))} → {h12(new Date(reservation.endTime))}
+                    {reservation.reservationType === 'daily' && ' every day'}
+                  </span>
+                </div>
+                <div className="reservation-detail">
+                  <span className="reservation-detail-label">Dates</span>
+                  <span className="reservation-detail-value">
+                    {range(reservation.startTime, reservation.endTime)}
+                  </span>
+                </div>
+              </>
+            ) : (
+              <>
+                {['pending', 'active'].includes(status) ? (
+                  <>
+                    <div className="reservation-detail">
+                      <span className="reservation-detail-label">Start Time</span>
+                      <span className="reservation-detail-value">
+                        {formatTimeOnly(reservation.startTime)}
+                      </span>
+                    </div>
+                    <div className="reservation-detail">
+                      <span className="reservation-detail-label">End Time</span>
+                      <span className="reservation-detail-value">
+                        {formatTimeOnly(reservation.endTime)}
+                      </span>
+                    </div>
+                    <div className="reservation-detail">
+                      <span className="reservation-detail-label">Start Date</span>
+                      <span className="reservation-detail-value">
+                        {formatDateOnly(reservation.startTime)}
+                      </span>
+                    </div>
+                    <div className="reservation-detail">
+                      <span className="reservation-detail-label">End Date</span>
+                      <span className="reservation-detail-value">
+                        {formatDateOnly(reservation.endTime)}
+                      </span>
+                    </div>
+                  </>
+                ) : (
+                  /* keep the original combined date-time for completed / cancelled */
+                  <>
+                    <div className="reservation-detail">
+                      <span className="reservation-detail-label">Start</span>
+                      <span className="reservation-detail-value">
+                        {formatDateForDisplay(reservation.startTime)}
+                      </span>
+                    </div>
+                    <div className="reservation-detail">
+                      <span className="reservation-detail-label">End</span>
+                      <span className="reservation-detail-value">
+                        {formatDateForDisplay(reservation.endTime)}
+                      </span>
+                    </div>
+                  </>
+                )}
+              </>
+            )}
             {isEvent && reservation.reason && (
               <div className="reservation-detail full-width">
                 <span className="reservation-detail-label">Event Reason</span>
@@ -468,84 +592,83 @@ function ReservationsPage() {
             )}
           </div>
           <div className="reservation-payment">
-              <div className="payment-status">
-                <span className="payment-label">Payment:</span>
-                {reservation.paymentStatus === 'paid' ? (
-                  <span className="paid-status">
-                    <svg 
-                      xmlns="http://www.w3.org/2000/svg" 
-                      width="24" 
-                      height="24" 
-                      viewBox="0 0 24 24" 
-                      fill="none" 
-                      stroke="currentColor" 
-                      strokeWidth="2" 
-                      strokeLinecap="round" 
-                      strokeLinejoin="round"
-                    >
-                      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                      <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                    </svg>
-                    Paid
-                  </span>
-                ) : (
-                  <span className="unpaid-status">
-                    <svg 
-                      xmlns="http://www.w3.org/2000/svg" 
-                      width="24" 
-                      height="24" 
-                      viewBox="0 0 24 24" 
-                      fill="none" 
-                      stroke="currentColor" 
-                      strokeWidth="2" 
-                      strokeLinecap="round" 
-                      strokeLinejoin="round"
-                    >
-                      <circle cx="12" cy="12" r="10"></circle>
-                      <line x1="12" y1="8" x2="12" y2="12"></line>
-                      <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                    </svg>
-                    Unpaid
-                  </span>
-                )}
-              </div>
-              
-              <span className="reservation-detail-value">${reservation.totalPrice.toFixed(2)}</span>
-              
-              {reservation.paymentStatus === 'unpaid' && (
-                <button
-                    className="pay-now-btn"
-                      onClick={async () => {
-                        try {
-                          const { url } = reservation.isEventReservation
-                           ? await ApiService.payment.createEventReservationCheckoutSession(
-                             reservation._id
-                             )
-                            : await ApiService.payment.createCheckoutSession(reservation._id);
-                          window.location.href = url;           // hand-off to Stripe Checkout
-                        } catch (err) {
-                          console.error(err);
-                          alert(err.message || 'Could not start checkout');
-                        }
-                      }}
-                    >
-                  <svg 
-                    xmlns="http://www.w3.org/2000/svg" 
-                    width="24" 
-                    height="24" 
-                    viewBox="0 0 24 24" 
-                    fill="none" 
-                    stroke="currentColor" 
-                    strokeWidth="2" 
-                    strokeLinecap="round" 
+            <div className="payment-status">
+              <span className="payment-label">Payment:</span>
+              {reservation.paymentStatus === 'paid' ? (
+                <span className="paid-status">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
                     strokeLinejoin="round"
                   >
-                    <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
-                    <line x1="1" y1="10" x2="23" y2="10"></line>
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
                   </svg>
-                  Pay Now
-                </button>
+                  Paid
+                </span>
+              ) : (
+                <span className="unpaid-status">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                  </svg>
+                  Unpaid
+                </span>
               )}
+            </div>
+
+            <span className="reservation-detail-value">${reservation.totalPrice.toFixed(2)}</span>
+
+            {reservation.paymentStatus === 'unpaid' && (
+              <button
+                className="pay-now-btn"
+                onClick={async () => {
+                  try {
+                    const targetId = reservation.parentRequest || reservation._id;
+                    const { url } = reservation.isEventReservation
+                      ? await ApiService.payment.createEventReservationCheckoutSession(targetId)
+                      : await ApiService.payment.createCheckoutSession(targetId);
+                    window.location.href = url;           // hand-off to Stripe Checkout
+                  } catch (err) {
+                    console.error(err);
+                    alert(err.message || 'Could not start checkout');
+                  }
+                }}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                  <line x1="1" y1="10" x2="23" y2="10"></line>
+                </svg>
+                Pay Now
+              </button>
+            )}
           </div>
         </div>
         <div className="reservation-actions">
@@ -622,7 +745,103 @@ function ReservationsPage() {
             </div>
             <div className="reservation-form-body">
               <form onSubmit={handleCreateReservation}>
-                <div className="reservation-form-group">
+                {/* === Reservation Type toggle === */}
+                <ReservationTypeToggle value={reservationType} onChange={setReservationType} />
+
+                {/* ---------- HOURLY (old behaviour) ---------- */}
+                {reservationType === 'hourly' && (
+                  <>
+                    <div className="reservation-form-group">
+                      <label className="reservation-form-label" htmlFor="startTime">Start Time:</label>
+                      <input
+                        className="reservation-form-input"
+                        type="datetime-local"
+                        id="startTime"
+                        value={newReservation.startTime}
+                        onChange={(e) =>
+                          setNewReservation({ ...newReservation, startTime: e.target.value })
+                        }
+                        min={formatLocalDateTimeInput(new Date())}
+                        required
+                      />
+                    </div>
+
+                    <div className="reservation-form-group">
+                      <label className="reservation-form-label" htmlFor="endTime">End Time:</label>
+                      <input
+                        className="reservation-form-input"
+                        type="datetime-local"
+                        id="endTime"
+                        value={newReservation.endTime}
+                        onChange={(e) =>
+                          setNewReservation({ ...newReservation, endTime: e.target.value })
+                        }
+                        min={newReservation.startTime}
+                        required
+                      />
+                    </div>
+                  </>
+                )}
+
+                {/* ---------- DAILY (admin-approval request) ---------- */}
+                {reservationType === 'daily' && (
+                  <>
+                    <div className="reservation-form-group">
+                      <label className="reservation-form-label">Daily **time window**:</label>
+                      <div style={{ display: 'flex', gap: 8 }}>
+                        <input
+                          type="time"
+                          value={dailyStartTime}
+                          onChange={(e) => setDailyStartTime(e.target.value)}
+                          required
+                        />
+                        <span style={{ alignSelf: 'center' }}>to</span>
+                        <input
+                          type="time"
+                          value={dailyEndTime}
+                          onChange={(e) => setDailyEndTime(e.target.value)}
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div className="reservation-form-group">
+                      <label className="reservation-form-label">Date range (≤ 15 days):</label>
+                      <div style={{ display: 'flex', gap: 8 }}>
+                        <input
+                          type="date"
+                          value={dailyStartDate}
+                          onChange={(e) => setDailyStartDate(e.target.value)}
+                          required
+                        />
+                        <span style={{ alignSelf: 'center' }}>→</span>
+                        <input
+                          type="date"
+                          value={dailyEndDate}
+                          onChange={(e) => setDailyEndDate(e.target.value)}
+                          required
+                        />
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                {/* ---------- SEMESTER (admin-approval request) ---------- */}
+                {reservationType === 'semester' && (
+                  <div className="reservation-form-group">
+                    <label className="reservation-form-label">Semester:</label>
+                    <select
+                      value={semester}
+                      onChange={(e) => setSemester(e.target.value)}
+                      required
+                    >
+                      <option value="spring">Spring (Jan 20 – May 15)</option>
+                      <option value="summer">Summer (May 20 – Aug 10)</option>
+                      <option value="fall">Fall (Aug 20 – Dec 20)</option>
+                    </select>
+                  </div>
+                )}
+                {/* <div className="reservation-form-group">
                   <label className="reservation-form-label" htmlFor="startTime">Start Time:</label>
                   <input
                     className="reservation-form-input"
@@ -645,7 +864,7 @@ function ReservationsPage() {
                     min={newReservation.startTime}
                     required
                   />
-                </div>
+                </div> */}
                 <div className="reservation-form-footer">
                   <div className="reservation-form-note">
                     <strong>Note:</strong> Price is calculated at $2.50 per hour based on your selected timeframe.

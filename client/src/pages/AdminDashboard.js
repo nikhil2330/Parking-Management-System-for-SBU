@@ -5,6 +5,7 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import AdminFeedbackPanel from '../components/AdminFeedbackPanel';
 import AdminEventApproval from '../components/AdminEventApproval';
+import AdminPendingList from '../components/AdminPendingList';
 import { FaCommentAlt } from 'react-icons/fa';
 import './admin-dashboard.css';
 
@@ -34,7 +35,7 @@ function AdminDashboard() {
   const analyticsRef = useRef(null);
 
   /* ----------------------------- state ---------------------------- */
-  const [activeTab, setActiveTab] = useState('users');   // 'users' | 'bookings' | 'analytics' | 'tickets' | 'events' | 'feedback'
+  const [activeTab, setActiveTab] = useState('users');   // 'users' | 'bookings' | 'pending' | 'analytics' | 'tickets' | 'events' | 'feedback'
   const [isLoading, setIsLoading] = useState(true);
 
   const [userRequests, setUserRequests] = useState([]);
@@ -93,78 +94,78 @@ function AdminDashboard() {
 
   /* ------------------------ initial fetch ------------------------- */
   // Updated initial fetch section in AdminDashboard.js
-/* ------------------------ initial fetch ------------------------- */
-useEffect(() => {
-  (async () => {
-    setIsLoading(true);
-    try {
-      // Fetch stats
-      const { data: statsData } = await api.get('/admin/stats');
-      if (statsData) setStats(statsData);
-
-      // Fetch pending users
-      const { data: pendingUsers } = await api.get('/admin/pending');
-      setUserRequests(pendingUsers.map(u => ({
-        id: u._id,
-        name: u.username,
-        email: u.email,
-        department: u.userType,
-        requestDate: u.createdAt,
-        status: 'pending'
-      })));
-
-      // Fetch all users for tickets dropdown
-      const { data: allUsers } = await api.get('/admin/users');
-      setUsers(allUsers);
-
-      // Fetch tickets for stats
+  /* ------------------------ initial fetch ------------------------- */
+  useEffect(() => {
+    (async () => {
+      setIsLoading(true);
       try {
-        const { data: ticketsData } = await api.get('/tickets/all');
-        // Update stats from ticket data
-        const pendingCount = ticketsData.filter(t => t.status === 'pending').length;
-        const paidCount = ticketsData.filter(t => t.status === 'paid').length;
-        const overdueCount = ticketsData.filter(t => t.status === 'overdue').length;
-        const totalRevenue = ticketsData.reduce((sum, ticket) => {
-          return sum + (ticket.status === 'paid' ? ticket.amount : 0);
-        }, 0);
-        
-        setStats(prev => ({
-          ...prev,
-          pendingTickets: pendingCount,
-          paidTickets: paidCount,
-          overdueTickets: overdueCount,
-          totalTicketRevenue: totalRevenue
-        }));
-      } catch (err) {
-        console.error('Error fetching ticket stats:', err);
-      }
+        // Fetch stats
+        const { data: statsData } = await api.get('/admin/stats');
+        if (statsData) setStats(statsData);
 
-      // Fetch feedback for stats
-      try {
-        const { data: feedbackData } = await api.get('/feedback/all');
-        const pendingFeedbackCount = feedbackData.filter(f => f.status === 'pending').length;
-        const reviewedFeedbackCount = feedbackData.filter(f => f.status === 'reviewed').length;
-        const resolvedFeedbackCount = feedbackData.filter(f => f.status === 'resolved').length;
-        
-        setStats(prev => ({
-          ...prev,
-          pendingFeedback: pendingFeedbackCount,
-          reviewedFeedback: reviewedFeedbackCount,
-          resolvedFeedback: resolvedFeedbackCount
-        }));
-      } catch (err) {
-        console.error('Error fetching feedback stats:', err);
-      }
+        // Fetch pending users
+        const { data: pendingUsers } = await api.get('/admin/pending');
+        setUserRequests(pendingUsers.map(u => ({
+          id: u._id,
+          name: u.username,
+          email: u.email,
+          department: u.userType,
+          requestDate: u.createdAt,
+          status: 'pending'
+        })));
 
-      // Placeholder for bookings
-      setBookingRequests([]);
-    } catch (error) {
-      console.error('Admin load error:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  })();
-}, []);
+        // Fetch all users for tickets dropdown
+        const { data: allUsers } = await api.get('/admin/users');
+        setUsers(allUsers);
+
+        // Fetch tickets for stats
+        try {
+          const { data: ticketsData } = await api.get('/tickets/all');
+          // Update stats from ticket data
+          const pendingCount = ticketsData.filter(t => t.status === 'pending').length;
+          const paidCount = ticketsData.filter(t => t.status === 'paid').length;
+          const overdueCount = ticketsData.filter(t => t.status === 'overdue').length;
+          const totalRevenue = ticketsData.reduce((sum, ticket) => {
+            return sum + (ticket.status === 'paid' ? ticket.amount : 0);
+          }, 0);
+
+          setStats(prev => ({
+            ...prev,
+            pendingTickets: pendingCount,
+            paidTickets: paidCount,
+            overdueTickets: overdueCount,
+            totalTicketRevenue: totalRevenue
+          }));
+        } catch (err) {
+          console.error('Error fetching ticket stats:', err);
+        }
+
+        // Fetch feedback for stats
+        try {
+          const { data: feedbackData } = await api.get('/feedback/all');
+          const pendingFeedbackCount = feedbackData.filter(f => f.status === 'pending').length;
+          const reviewedFeedbackCount = feedbackData.filter(f => f.status === 'reviewed').length;
+          const resolvedFeedbackCount = feedbackData.filter(f => f.status === 'resolved').length;
+
+          setStats(prev => ({
+            ...prev,
+            pendingFeedback: pendingFeedbackCount,
+            reviewedFeedback: reviewedFeedbackCount,
+            resolvedFeedback: resolvedFeedbackCount
+          }));
+        } catch (err) {
+          console.error('Error fetching feedback stats:', err);
+        }
+
+        // Placeholder for bookings
+        setBookingRequests([]);
+      } catch (error) {
+        console.error('Admin load error:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    })();
+  }, []);
 
   /* ---------- fetch analytics on first analytics tab load --------- */
   useEffect(() => {
@@ -186,7 +187,7 @@ useEffect(() => {
       try {
         const { data } = await api.get('/tickets/all');
         setTickets(data);
-        
+
         // Update stats from ticket data
         const pendingCount = data.filter(t => t.status === 'pending').length;
         const paidCount = data.filter(t => t.status === 'paid').length;
@@ -194,7 +195,7 @@ useEffect(() => {
         const totalRevenue = data.reduce((sum, ticket) => {
           return sum + (ticket.status === 'paid' ? ticket.amount : 0);
         }, 0);
-        
+
         setStats(prev => ({
           ...prev,
           pendingTickets: pendingCount,
@@ -215,7 +216,7 @@ useEffect(() => {
     year: 'numeric', month: 'short', day: 'numeric',
     hour: '2-digit', minute: '2-digit'
   });
-  
+
   const formatCurrency = amount => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -295,11 +296,11 @@ useEffect(() => {
   const handleCreateTicket = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+
     try {
       // Create the ticket using the email address
       const { data } = await api.post('/tickets/create', newTicket);
-      
+
       // Add the new ticket to the list with populated user info
       const ticketWithUser = {
         ...data.ticket,
@@ -309,15 +310,15 @@ useEffect(() => {
           email: newTicket.userEmail
         }
       };
-      
+
       setTickets(prev => [ticketWithUser, ...prev]);
-      
+
       // Update stats
       setStats(prev => ({
         ...prev,
         pendingTickets: prev.pendingTickets + 1
       }));
-      
+
       // Reset form
       setNewTicket({
         userEmail: '',
@@ -325,17 +326,17 @@ useEffect(() => {
         reason: '',
         dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
       });
-      
+
       // Show success notification
       setNotificationTitle('Ticket Created');
       setNotificationMessage('Parking ticket was successfully issued.');
       setShowNotification(true);
-      
+
       // Auto hide notification after 4 seconds
       setTimeout(() => {
         setShowNotification(false);
       }, 4000);
-      
+
     } catch (error) {
       console.error('Error creating ticket:', error);
       let errorMessage = 'Failed to create ticket. Please try again.';
@@ -351,22 +352,22 @@ useEffect(() => {
   const handleTicketStatusChange = async (ticketId, newStatus) => {
     try {
       const { data } = await api.patch(`/tickets/${ticketId}/status`, { status: newStatus });
-      
+
       // Update ticket in list
-      setTickets(prev => prev.map(t => 
+      setTickets(prev => prev.map(t =>
         t._id === ticketId ? { ...t, status: newStatus, paymentDate: newStatus === 'paid' ? new Date() : t.paymentDate } : t
       ));
-      
+
       // Update stats based on old and new status
       const ticket = tickets.find(t => t._id === ticketId);
       setStats(prev => {
         const newStats = { ...prev };
-        
+
         // Decrement old status count
         if (ticket.status === 'pending') newStats.pendingTickets--;
         else if (ticket.status === 'paid') newStats.paidTickets--;
         else if (ticket.status === 'overdue') newStats.overdueTickets--;
-        
+
         // Increment new status count
         if (newStatus === 'pending') newStats.pendingTickets++;
         else if (newStatus === 'paid') {
@@ -377,20 +378,20 @@ useEffect(() => {
           }
         }
         else if (newStatus === 'overdue') newStats.overdueTickets++;
-        
+
         return newStats;
       });
-      
+
       // Show success notification
       setNotificationTitle('Status Updated');
       setNotificationMessage(`Ticket status changed to ${newStatus.toUpperCase()}.`);
       setShowNotification(true);
-      
+
       // Auto hide notification after 4 seconds
       setTimeout(() => {
         setShowNotification(false);
       }, 4000);
-      
+
     } catch (error) {
       console.error('Error updating ticket status:', error);
       alert('Failed to update ticket status. Please try again.');
@@ -400,11 +401,11 @@ useEffect(() => {
   const handleDeleteTicket = async (ticketId) => {
     try {
       await api.delete(`/tickets/${ticketId}`);
-      
+
       // Remove from list
       const ticket = tickets.find(t => t._id === ticketId);
       setTickets(prev => prev.filter(t => t._id !== ticketId));
-      
+
       // Update stats
       setStats(prev => {
         const newStats = { ...prev };
@@ -416,17 +417,17 @@ useEffect(() => {
         else if (ticket.status === 'overdue') newStats.overdueTickets--;
         return newStats;
       });
-      
+
       // Show success notification
       setNotificationTitle('Ticket Deleted');
       setNotificationMessage('The ticket has been permanently removed.');
       setShowNotification(true);
-      
+
       // Auto hide notification after 4 seconds
       setTimeout(() => {
         setShowNotification(false);
       }, 4000);
-      
+
     } catch (error) {
       console.error('Error deleting ticket:', error);
       alert('Failed to delete ticket. Please try again.');
@@ -437,7 +438,7 @@ useEffect(() => {
   const paginate = n => setCurrentPage(n);
   const getCurrentItems = () => {
     let arr;
-    
+
     if (activeTab === 'users') {
       // Filter user requests based on selected filter
       if (userFilterStatus === 'all') {
@@ -453,20 +454,20 @@ useEffect(() => {
       else arr = tickets.filter(t => t.status === ticketFilter);
     }
     else arr = [];
-    
+
     const end = currentPage * itemsPerPage;
     return arr.slice(end - itemsPerPage, end);
   };
-  
+
   const totalPages = Math.max(
     1,
     Math.ceil(
-      (activeTab === 'users' ? 
-        (userFilterStatus === 'all' ? userRequests.length : 
-         userRequests.filter(u => u.status === userFilterStatus).length) : 
-       activeTab === 'bookings' ? bookingRequests.length :
-       activeTab === 'tickets' ? (ticketFilter === 'all' ? tickets.length : 
-                               tickets.filter(t => t.status === ticketFilter).length) : 0) /
+      (activeTab === 'users' ?
+        (userFilterStatus === 'all' ? userRequests.length :
+          userRequests.filter(u => u.status === userFilterStatus).length) :
+        activeTab === 'bookings' ? bookingRequests.length :
+          activeTab === 'tickets' ? (ticketFilter === 'all' ? tickets.length :
+            tickets.filter(t => t.status === ticketFilter).length) : 0) /
       itemsPerPage
     )
   );
@@ -478,7 +479,7 @@ useEffect(() => {
   // Prepare analytics data for export
   const prepareExportData = () => {
     if (!analytics) return null;
-    
+
     // Basic summary data
     const summaryData = {
       totalRevenue: analytics.totalRevenue,
@@ -486,21 +487,21 @@ useEffect(() => {
       averageDailyReservations: derivedAnalytics.avgDailyReservations,
       peakDay: `${derivedAnalytics.peakDay.date} (${derivedAnalytics.peakDay.count} reservations)`
     };
-    
+
     // Format parking lot data
     const parkingLotData = analytics.reservationsPerLot.map(lot => ({
       lotName: lot.officialLotName,
       reservations: lot.count,
       revenueShare: `$${derivedAnalytics.revenuePerLot.find(l => l.officialLotName === lot.officialLotName)?.revenue || '0'}`
     }));
-    
+
     // Format daily data
     const dailyData = analytics.reservationsByDate.map(day => ({
       date: day.date,
       reservations: day.count,
       estimatedRevenue: `$${((day.count / summaryData.totalReservations) * analytics.totalRevenue).toFixed(2)}`
     }));
-    
+
     return {
       summary: summaryData,
       parkingLots: parkingLotData,
@@ -509,7 +510,7 @@ useEffect(() => {
       exportDate: new Date().toISOString()
     };
   };
-  
+
   // Helper to convert object to CSV
   const convertToCSV = (objArray) => {
     const array = typeof objArray !== 'object' ? JSON.parse(objArray) : objArray;
@@ -556,11 +557,11 @@ useEffect(() => {
   const handleExportCSV = () => {
     const data = prepareExportData();
     if (!data) return;
-    
+
     // Create CSV files for each section
-    const summary = [{ 
-      Category: 'Total Revenue', 
-      Value: `$${data.summary.totalRevenue.toFixed(2)}` 
+    const summary = [{
+      Category: 'Total Revenue',
+      Value: `$${data.summary.totalRevenue.toFixed(2)}`
     }, {
       Category: 'Total Reservations',
       Value: data.summary.totalReservations
@@ -571,27 +572,27 @@ useEffect(() => {
       Category: 'Peak Day',
       Value: data.summary.peakDay
     }];
-    
+
     // Combine all data into a single CSV
     let csvContent = "Parking Analytics Summary\r\n\r\n";
-    
+
     // Add summary section
     csvContent += "Summary:\r\n";
     csvContent += convertToCSV(summary);
     csvContent += "\r\n";
-    
+
     // Add parking lots section
     csvContent += "Parking Lot Data:\r\n";
     csvContent += convertToCSV(data.parkingLots);
     csvContent += "\r\n";
-    
+
     // Add daily reservations section
     csvContent += "Daily Reservations:\r\n";
     csvContent += convertToCSV(data.dailyReservations);
-    
+
     // Generate filename with current date
     const filename = `parking_analytics_${new Date().toISOString().split('T')[0]}.csv`;
-    
+
     // Download the file
     downloadFile(csvContent, filename, 'text/csv;charset=utf-8;');
   };
@@ -600,7 +601,7 @@ useEffect(() => {
   const handleExportExcel = () => {
     const data = prepareExportData();
     if (!data) return;
-    
+
     // Create HTML table with Excel-friendly formatting
     const excelHtml = `
       <html xmlns:o="urn:schemas-microsoft-com:office:office" 
@@ -737,7 +738,7 @@ useEffect(() => {
       </body>
       </html>
     `;
-    
+
     // Convert HTML to blob with Excel MIME type
     const blob = new Blob([excelHtml], { type: 'application/vnd.ms-excel' });
     const url = URL.createObjectURL(blob);
@@ -756,17 +757,17 @@ useEffect(() => {
   const handleExportPDF = () => {
     // Since PDF generation typically requires a library (like jsPDF),
     // we'll implement a simple method using browser's print functionality
-    
+
     // Store original body overflow
     const originalOverflow = document.body.style.overflow;
-    
+
     // Create a printable version
     const printContent = document.createElement('div');
     printContent.className = 'pdf-export-container';
-    
+
     const data = prepareExportData();
     if (!data) return;
-    
+
     // Add styling to print content
     printContent.innerHTML = `
       <style>
@@ -856,12 +857,12 @@ useEffect(() => {
         <p>Report generated on ${new Date().toLocaleString()} • Period: ${analyticsPeriod}</p>
       </div>
     `;
-    
+
     // Create popup window for PDF
     const printWindow = window.open('', '_blank');
     printWindow.document.write(printContent.innerHTML);
     printWindow.document.close();
-    
+
     // Wait for content to load then print
     printWindow.onload = () => {
       printWindow.print();
@@ -874,11 +875,11 @@ useEffect(() => {
     // Create a printable version of the analytics section
     const analyticsContainer = analyticsRef.current;
     if (!analyticsContainer) return;
-    
+
     // Store original body content and styles
     const originalContent = document.body.innerHTML;
     const originalBodyStyle = document.body.style.cssText;
-    
+
     // Create a new printable page with only the analytics content
     const printContent = `
       <html>
@@ -907,10 +908,10 @@ useEffect(() => {
           
           <div class="print-content">
             ${(() => {
-              const data = prepareExportData();
-              if (!data) return '<p>No data available</p>';
-              
-              return `
+        const data = prepareExportData();
+        if (!data) return '<p>No data available</p>';
+
+        return `
                 <div class="print-section">
                   <h2>Summary</h2>
                   <div class="summary-grid">
@@ -982,17 +983,17 @@ useEffect(() => {
                   <button class="no-print" onclick="window.print()">Print This Page</button>
                 </div>
               `;
-            })()}
+      })()}
           </div>
         </body>
       </html>
     `;
-    
+
     // Open print window
     const printWindow = window.open('', '_blank');
     printWindow.document.write(printContent);
     printWindow.document.close();
-    
+
     // Wait for content to load then print
     printWindow.onload = () => {
       printWindow.focus(); // Focus on the new window
@@ -1021,25 +1022,25 @@ useEffect(() => {
   /* Calculate some additional metrics from actual data */
   const getAnalyticsDerivedData = () => {
     if (!analytics) return null;
-    
+
     // Calculate average daily reservations
     const avgDailyReservations = analytics.reservationsByDate.reduce(
-      (sum, day) => sum + day.count, 
+      (sum, day) => sum + day.count,
       0
     ) / analytics.reservationsByDate.length;
-    
+
     // Calculate peak day
     const peakDay = analytics.reservationsByDate.reduce(
-      (max, day) => day.count > max.count ? day : max, 
+      (max, day) => day.count > max.count ? day : max,
       { count: 0 }
     );
-    
+
     // Calculate revenue per lot
     const revenuePerLot = analytics.reservationsPerLot.map(lot => ({
       ...lot,
       revenue: (lot.count * (analytics.totalRevenue / analytics.reservationsPerLot.reduce((sum, l) => sum + l.count, 0))).toFixed(2)
     }));
-    
+
     return {
       avgDailyReservations,
       peakDay,
@@ -1070,10 +1071,10 @@ useEffect(() => {
             </div>
             <div className="welcome-date" role="note" aria-label="Current date">
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                <line x1="16" y1="2" x2="16" y2="6"/>
-                <line x1="8" y1="2" x2="8" y2="6"/>
-                <line x1="3" y1="10" x2="21" y2="10"/>
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                <line x1="16" y1="2" x2="16" y2="6" />
+                <line x1="8" y1="2" x2="8" y2="6" />
+                <line x1="3" y1="10" x2="21" y2="10" />
               </svg>
               <span>{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}</span>
             </div>
@@ -1086,9 +1087,9 @@ useEffect(() => {
               <div className="stat-card">
                 <div className="stat-icon" style={{ backgroundColor: 'var(--gold-50)', color: 'var(--warning-orange)' }}>
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="12" cy="12" r="10"/>
-                    <line x1="12" y1="6" x2="12" y2="12"/>
-                    <line x1="12" y1="16" x2="12.01" y2="16"/>
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="6" x2="12" y2="12" />
+                    <line x1="12" y1="16" x2="12.01" y2="16" />
                   </svg>
                 </div>
                 <div className="stat-content">
@@ -1102,8 +1103,8 @@ useEffect(() => {
               <div className="stat-card">
                 <div className="stat-icon" style={{ backgroundColor: '#e8f5e9', color: 'var(--success-green)' }}>
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                    <polyline points="22 4 12 14.01 9 11.01"/>
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                    <polyline points="22 4 12 14.01 9 11.01" />
                   </svg>
                 </div>
                 <div className="stat-content">
@@ -1114,29 +1115,29 @@ useEffect(() => {
               </div>
 
               {/* Resolved Items */}
-<div className="stat-card">
-  <div className="stat-icon" style={{ backgroundColor: 'var(--blue-50)', color: 'var(--info-blue)' }}>
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-      <polyline points="22 4 12 14.01 9 11.01"/>
-    </svg>
-  </div>
-  <div className="stat-content">
-    <h4>Resolved Items</h4>
-    <div className="stat-value">
-      {(stats.paidTickets || 0) + (stats.resolvedFeedback || 0)}
-    </div>
-    <div className="stat-trend trend-up">
-      <span className="trend-icon">🔄</span> Completed
-    </div>
-  </div>
-</div>
+              <div className="stat-card">
+                <div className="stat-icon" style={{ backgroundColor: 'var(--blue-50)', color: 'var(--info-blue)' }}>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                    <polyline points="22 4 12 14.01 9 11.01" />
+                  </svg>
+                </div>
+                <div className="stat-content">
+                  <h4>Resolved Items</h4>
+                  <div className="stat-value">
+                    {(stats.paidTickets || 0) + (stats.resolvedFeedback || 0)}
+                  </div>
+                  <div className="stat-trend trend-up">
+                    <span className="trend-icon">🔄</span> Completed
+                  </div>
+                </div>
+              </div>
 
               {/* Total Managed */}
               <div className="stat-card">
                 <div className="stat-icon" style={{ backgroundColor: 'var(--blue-50)', color: 'var(--info-blue)' }}>
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                   </svg>
                 </div>
                 <div className="stat-content">
@@ -1156,6 +1157,9 @@ useEffect(() => {
             <button className={`admin-tab ${activeTab === 'tickets' ? 'active' : ''}`} onClick={() => setActiveTab('tickets')}>
               Tickets {stats.pendingTickets > 0 && <span className="badge">{stats.pendingTickets}</span>}
             </button>
+            <button className={`admin-tab ${activeTab === 'pending' ? 'active' : ''}`} onClick={() => setActiveTab('pending')}>
+              Pending Reservations
+            </button>
             <button className={`admin-tab ${activeTab === 'events' ? 'active' : ''}`} onClick={() => setActiveTab('events')}>
               Event Reservations
             </button>
@@ -1169,37 +1173,40 @@ useEffect(() => {
 
           {/* ===== Content Area ===== */}
           <div className="admin-content-area">
+            {/* Pending Reservations */}
+            {activeTab === 'pending' && (<div className="admin-table-container">
+                <AdminPendingList /> </div> )}
             {activeTab === 'analytics' && analytics && (
               <div className="analytics-container" ref={analyticsRef}>
                 <h2 className="analytics-title">Analytics Dashboard</h2>
-                
+
                 <div className="analytics-period-selector">
-                  <button 
+                  <button
                     className={`period-btn ${analyticsPeriod === '7days' ? 'active' : ''}`}
                     onClick={() => setAnalyticsPeriod('7days')}
                   >
                     7 Days
                   </button>
-                  <button 
+                  <button
                     className={`period-btn ${analyticsPeriod === '30days' ? 'active' : ''}`}
                     onClick={() => setAnalyticsPeriod('30days')}
                   >
                     30 Days
                   </button>
-                  <button 
+                  <button
                     className={`period-btn ${analyticsPeriod === '90days' ? 'active' : ''}`}
                     onClick={() => setAnalyticsPeriod('90days')}
                   >
                     90 Days
                   </button>
-                  <button 
+                  <button
                     className={`period-btn ${analyticsPeriod === 'year' ? 'active' : ''}`}
                     onClick={() => setAnalyticsPeriod('year')}
                   >
                     Year
                   </button>
                 </div>
-                
+
                 {/* Analytics Summary Cards */}
                 <div className="analytics-summary-grid">
                   <div className="analytics-summary-card revenue-card">
@@ -1212,7 +1219,7 @@ useEffect(() => {
                     <h3>Total Revenue</h3>
                     <div className="card-value">${analytics.totalRevenue.toFixed(2)}</div>
                   </div>
-                  
+
                   <div className="analytics-summary-card reservations-card">
                     <div className="card-icon">
                       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -1227,7 +1234,7 @@ useEffect(() => {
                       {analytics.reservationsByDate.reduce((sum, day) => sum + day.count, 0)}
                     </div>
                   </div>
-                  
+
                   <div className="analytics-summary-card average-card">
                     <div className="card-icon">
                       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -1245,7 +1252,7 @@ useEffect(() => {
                       Reservations per day
                     </div>
                   </div>
-                  
+
                   <div className="analytics-summary-card peak-card">
                     <div className="card-icon">
                       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -1268,48 +1275,48 @@ useEffect(() => {
                   <div className="chart-container full-width">
                     <h3>Daily Reservations Trend</h3>
                     <ResponsiveContainer width="100%" height={300}>
-                      <AreaChart 
+                      <AreaChart
                         data={analytics.reservationsByDate}
                         margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
                       >
                         <defs>
                           <linearGradient id="colorCount" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="#4158D0" stopOpacity={0.8}/>
-                            <stop offset="95%" stopColor="#4158D0" stopOpacity={0.1}/>
+                            <stop offset="5%" stopColor="#4158D0" stopOpacity={0.8} />
+                            <stop offset="95%" stopColor="#4158D0" stopOpacity={0.1} />
                           </linearGradient>
                         </defs>
                         <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                         <XAxis dataKey="date" stroke="#888" />
                         <YAxis stroke="#888" />
-                        <Tooltip 
-                          contentStyle={{ 
-                            backgroundColor: '#fff', 
-                            border: 'none', 
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: '#fff',
+                            border: 'none',
                             borderRadius: '8px',
                             boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
                           }}
                         />
-                        <Area 
-                          type="monotone" 
-                          dataKey="count" 
-                          stroke="#4158D0" 
-                          fillOpacity={1} 
-                          fill="url(#colorCount)" 
+                        <Area
+                          type="monotone"
+                          dataKey="count"
+                          stroke="#4158D0"
+                          fillOpacity={1}
+                          fill="url(#colorCount)"
                           strokeWidth={2}
                           activeDot={{ r: 6, stroke: '#4158D0', strokeWidth: 2, fill: '#fff' }}
                         />
                       </AreaChart>
                     </ResponsiveContainer>
                   </div>
-                  
+
                   <div className="chart-container full-width">
                     <h3>Revenue by Lot</h3>
                     <ResponsiveContainer width="100%" height={300}>
-                      <RadialBarChart 
-                        innerRadius="20%" 
-                        outerRadius="80%" 
-                        data={derivedAnalytics.revenuePerLot.slice(0, 5)} 
-                        startAngle={180} 
+                      <RadialBarChart
+                        innerRadius="20%"
+                        outerRadius="80%"
+                        data={derivedAnalytics.revenuePerLot.slice(0, 5)}
+                        startAngle={180}
                         endAngle={0}
                         cx="50%"
                         cy="60%"
@@ -1320,25 +1327,25 @@ useEffect(() => {
                           dataKey="revenue"
                         >
                           {derivedAnalytics.revenuePerLot.slice(0, 5).map((entry, index) => (
-                            <Cell 
-                              key={`cell-${index}`} 
-                              fill={COLORS[index % COLORS.length]} 
+                            <Cell
+                              key={`cell-${index}`}
+                              fill={COLORS[index % COLORS.length]}
                             />
                           ))}
                         </RadialBar>
-                        <Tooltip 
+                        <Tooltip
                           formatter={(value) => [`$${value}`, 'Revenue']}
-                          contentStyle={{ 
-                            backgroundColor: '#fff', 
-                            border: 'none', 
+                          contentStyle={{
+                            backgroundColor: '#fff',
+                            border: 'none',
                             borderRadius: '8px',
                             boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
                           }}
                         />
-                        <Legend 
-                          iconSize={10} 
-                          layout="vertical" 
-                          verticalAlign="middle" 
+                        <Legend
+                          iconSize={10}
+                          layout="vertical"
+                          verticalAlign="middle"
                           align="right"
                           formatter={(value, entry) => {
                             const lot = entry.payload.officialLotName || '';
@@ -1348,29 +1355,29 @@ useEffect(() => {
                       </RadialBarChart>
                     </ResponsiveContainer>
                   </div>
-                  
+
                   <div className="chart-container">
                     <h3>Parking Lot Usage</h3>
                     <ResponsiveContainer width="100%" height={300}>
-                      <BarChart 
+                      <BarChart
                         data={analytics.reservationsPerLot.slice(0, 5)}
                         margin={{ top: 5, right: 30, left: 20, bottom: 60 }}
                       >
                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
-                        <XAxis 
-                          dataKey="officialLotName" 
-                          angle={-35} 
-                          textAnchor="end" 
-                          height={70} 
+                        <XAxis
+                          dataKey="officialLotName"
+                          angle={-35}
+                          textAnchor="end"
+                          height={70}
                           tick={{ fontSize: 12 }}
                           stroke="#888"
                         />
                         <YAxis stroke="#888" />
-                        <Tooltip 
+                        <Tooltip
                           cursor={{ fill: 'rgba(0,0,0,0.05)' }}
-                          contentStyle={{ 
-                            backgroundColor: '#fff', 
-                            border: 'none', 
+                          contentStyle={{
+                            backgroundColor: '#fff',
+                            border: 'none',
                             borderRadius: '8px',
                             boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
                           }}
@@ -1378,27 +1385,27 @@ useEffect(() => {
                         <defs>
                           {COLORS.map((color, index) => (
                             <linearGradient key={`colorBar${index}`} id={`colorBar${index}`} x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="0%" stopColor={color} stopOpacity={0.8}/>
-                              <stop offset="100%" stopColor={color} stopOpacity={0.3}/>
+                              <stop offset="0%" stopColor={color} stopOpacity={0.8} />
+                              <stop offset="100%" stopColor={color} stopOpacity={0.3} />
                             </linearGradient>
                           ))}
                         </defs>
-                        <Bar 
-                          dataKey="count" 
-                          name="Reservations" 
+                        <Bar
+                          dataKey="count"
+                          name="Reservations"
                           radius={[4, 4, 0, 0]}
                         >
                           {analytics.reservationsPerLot.slice(0, 5).map((entry, index) => (
-                            <Cell 
-                              key={`cell-${index}`} 
-                              fill={`url(#colorBar${index})`} 
+                            <Cell
+                              key={`cell-${index}`}
+                              fill={`url(#colorBar${index})`}
                             />
                           ))}
                         </Bar>
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
-                  
+
                   <div className="chart-container">
                     <h3>Top 5 Lots Share</h3>
                     <ResponsiveContainer width="100%" height={300}>
@@ -1416,19 +1423,19 @@ useEffect(() => {
                           labelLine={false}
                         >
                           {analytics.reservationsPerLot.slice(0, 5).map((entry, index) => (
-                            <Cell 
-                              key={`cell-${index}`} 
-                              fill={COLORS[index % COLORS.length]} 
+                            <Cell
+                              key={`cell-${index}`}
+                              fill={COLORS[index % COLORS.length]}
                               stroke="#fff"
                               strokeWidth={2}
                             />
                           ))}
                         </Pie>
-                        <Tooltip 
+                        <Tooltip
                           formatter={(value, name, props) => [`${value} reservations`, props.payload.officialLotName]}
-                          contentStyle={{ 
-                            backgroundColor: '#fff', 
-                            border: 'none', 
+                          contentStyle={{
+                            backgroundColor: '#fff',
+                            border: 'none',
                             borderRadius: '8px',
                             boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
                           }}
@@ -1437,40 +1444,40 @@ useEffect(() => {
                     </ResponsiveContainer>
                   </div>
                 </div>
-                
+
                 {/* Export Options */}
                 <div className="export-analytics">
                   <h3>Export Analytics Data</h3>
                   <div className="export-buttons">
                     <button className="export-btn csv" onClick={handleExportCSV}>
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                        <polyline points="7 10 12 15 17 10"/>
-                        <line x1="12" y1="15" x2="12" y2="3"/>
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                        <polyline points="7 10 12 15 17 10" />
+                        <line x1="12" y1="15" x2="12" y2="3" />
                       </svg>
                       CSV
                     </button>
                     <button className="export-btn excel" onClick={handleExportExcel}>
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                        <polyline points="7 10 12 15 17 10"/>
-                        <line x1="12" y1="15" x2="12" y2="3"/>
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                        <polyline points="7 10 12 15 17 10" />
+                        <line x1="12" y1="15" x2="12" y2="3" />
                       </svg>
                       Excel
                     </button>
                     <button className="export-btn pdf" onClick={handleExportPDF}>
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                        <polyline points="7 10 12 15 17 10"/>
-                        <line x1="12" y1="15" x2="12" y2="3"/>
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                        <polyline points="7 10 12 15 17 10" />
+                        <line x1="12" y1="15" x2="12" y2="3" />
                       </svg>
                       PDF
                     </button>
                     <button className="export-btn print" onClick={handlePrint}>
                       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <polyline points="6 9 6 2 18 2 18 9"/>
-                        <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
-                        <rect x="6" y="14" width="12" height="8"/>
+                        <polyline points="6 9 6 2 18 2 18 9" />
+                        <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+                        <rect x="6" y="14" width="12" height="8" />
                       </svg>
                       Print
                     </button>
@@ -1488,25 +1495,25 @@ useEffect(() => {
                     <div className="filter-group">
                       <label>Status:</label>
                       <div className="filter-options">
-                        <span 
+                        <span
                           className={`filter-option ${userFilterStatus === 'all' ? 'active' : ''}`}
                           onClick={() => setUserFilterStatus('all')}
                         >
                           All
                         </span>
-                        <span 
+                        <span
                           className={`filter-option ${userFilterStatus === 'pending' ? 'active' : ''}`}
                           onClick={() => setUserFilterStatus('pending')}
                         >
                           Pending
                         </span>
-                        <span 
+                        <span
                           className={`filter-option ${userFilterStatus === 'approved' ? 'active' : ''}`}
                           onClick={() => setUserFilterStatus('approved')}
                         >
                           Approved
                         </span>
-                        <span 
+                        <span
                           className={`filter-option ${userFilterStatus === 'rejected' ? 'active' : ''}`}
                           onClick={() => setUserFilterStatus('rejected')}
                         >
@@ -1663,7 +1670,7 @@ useEffect(() => {
                           </td>
                           <td>
                             <div className="lots-container">
-                              {booking.lots.map((lot,i) => <span key={i} className="lot-badge">{lot}</span>)}
+                              {booking.lots.map((lot, i) => <span key={i} className="lot-badge">{lot}</span>)}
                             </div>
                           </td>
                           <td>{booking.spots}</td>
@@ -1679,12 +1686,12 @@ useEffect(() => {
                           <td>
                             {booking.status === 'pending' ? (
                               <div className="action-buttons">
-                                <button className="approve-btn" onClick={() => handleBookingAction(booking.id,'approved')}>Approve</button>
-                                <button className="reject-btn" onClick={() => handleBookingAction(booking.id,'rejected')}>Reject</button>
+                                <button className="approve-btn" onClick={() => handleBookingAction(booking.id, 'approved')}>Approve</button>
+                                <button className="reject-btn" onClick={() => handleBookingAction(booking.id, 'rejected')}>Reject</button>
                               </div>
                             ) : (
                               <div className="action-completed">
-                                {booking.status==='approved'?'✅ Approved':'❌ Rejected'}
+                                {booking.status === 'approved' ? '✅ Approved' : '❌ Rejected'}
                               </div>
                             )}
                           </td>
@@ -1700,19 +1707,19 @@ useEffect(() => {
                   </tbody>
                 </table>
 
-                {totalPages>1 && (
+                {totalPages > 1 && (
                   <div className="pagination-controls">
-                    <button onClick={()=>paginate(1)} disabled={currentPage===1}>First</button>
-                    <button onClick={()=>paginate(currentPage-1)} disabled={currentPage===1}>Prev</button>
+                    <button onClick={() => paginate(1)} disabled={currentPage === 1}>First</button>
+                    <button onClick={() => paginate(currentPage - 1)} disabled={currentPage === 1}>Prev</button>
                     <span>Page {currentPage} of {totalPages}</span>
-                    <button onClick={()=>paginate(currentPage+1)} disabled={currentPage===totalPages}>Next</button>
-                    <button onClick={()=>paginate(totalPages)} disabled={currentPage===totalPages}>Last</button>
+                    <button onClick={() => paginate(currentPage + 1)} disabled={currentPage === totalPages}>Next</button>
+                    <button onClick={() => paginate(totalPages)} disabled={currentPage === totalPages}>Last</button>
                   </div>
                 )}
 
                 <div className="items-per-page-control">
                   <label>Show per page:</label>
-                  <select value={itemsPerPage} onChange={e=>{setItemsPerPage(Number(e.target.value)); setCurrentPage(1);}}>
+                  <select value={itemsPerPage} onChange={e => { setItemsPerPage(Number(e.target.value)); setCurrentPage(1); }}>
                     <option value="5">5</option>
                     <option value="10">10</option>
                     <option value="20">20</option>
@@ -1722,13 +1729,13 @@ useEffect(() => {
                 </div>
               </div>
             )}
-            
+
             {activeTab === 'tickets' && (
               <div className="admin-table-container">
                 <div className="admin-section-header">
                   <h2 className="admin-section-title">Parking Tickets Management</h2>
                   <p className="admin-section-desc">Issue and manage tickets for parking violations</p>
-                  
+
                   <form className="ticket-form" onSubmit={handleCreateTicket}>
                     <h3 className="form-title">Issue New Ticket</h3>
                     <div className="form-grid">
@@ -1747,7 +1754,7 @@ useEffect(() => {
                           placeholder="Enter user's email"
                         />
                       </div>
-                      
+
                       <div className="form-group">
                         <label htmlFor="amount">
                           <span className="label-icon">💰</span> Amount ($)
@@ -1768,7 +1775,7 @@ useEffect(() => {
                           />
                         </div>
                       </div>
-                      
+
                       <div className="form-group">
                         <label htmlFor="dueDate">
                           <span className="label-icon">📅</span> Due Date
@@ -1783,7 +1790,7 @@ useEffect(() => {
                           className="form-input"
                         />
                       </div>
-                      
+
                       <div className="form-group full-width">
                         <label htmlFor="reason">
                           <span className="label-icon">📝</span> Reason
@@ -1799,7 +1806,7 @@ useEffect(() => {
                           placeholder="Enter reason for ticket"
                         />
                       </div>
-                      
+
                       <div className="form-actions">
                         <button type="submit" className="form-submit-btn">
                           {isSubmitting ? (
@@ -1814,31 +1821,31 @@ useEffect(() => {
                       </div>
                     </div>
                   </form>
-                  
+
                   <div className="filter-group">
                     <label>Filter by Status:</label>
                     <div className="filter-options">
-                      <span 
+                      <span
                         className={`filter-option ${ticketFilter === 'all' ? 'active' : ''}`}
-                        onClick={() => {setTicketFilter('all'); setCurrentPage(1);}}
+                        onClick={() => { setTicketFilter('all'); setCurrentPage(1); }}
                       >
                         All
                       </span>
-                      <span 
+                      <span
                         className={`filter-option ${ticketFilter === 'pending' ? 'active' : ''}`}
-                        onClick={() => {setTicketFilter('pending'); setCurrentPage(1);}}
+                        onClick={() => { setTicketFilter('pending'); setCurrentPage(1); }}
                       >
                         Pending
                       </span>
-                      <span 
+                      <span
                         className={`filter-option ${ticketFilter === 'paid' ? 'active' : ''}`}
-                        onClick={() => {setTicketFilter('paid'); setCurrentPage(1);}}
+                        onClick={() => { setTicketFilter('paid'); setCurrentPage(1); }}
                       >
                         Paid
                       </span>
-                      <span 
+                      <span
                         className={`filter-option ${ticketFilter === 'overdue' ? 'active' : ''}`}
-                        onClick={() => {setTicketFilter('overdue'); setCurrentPage(1);}}
+                        onClick={() => { setTicketFilter('overdue'); setCurrentPage(1); }}
                       >
                         Overdue
                       </span>
@@ -1880,14 +1887,14 @@ useEffect(() => {
                             <div className="ticket-actions">
                               {ticket.status === 'pending' && (
                                 <>
-                                  <button 
+                                  <button
                                     className="ticket-btn paid-btn"
                                     onClick={() => handleTicketStatusChange(ticket._id, 'paid')}
                                     title="Mark as Paid"
                                   >
                                     <span aria-hidden="true">✓</span> Mark Paid
                                   </button>
-                                  <button 
+                                  <button
                                     className="ticket-btn overdue-btn"
                                     onClick={() => handleTicketStatusChange(ticket._id, 'overdue')}
                                     title="Mark as Overdue"
@@ -1897,7 +1904,7 @@ useEffect(() => {
                                 </>
                               )}
                               {ticket.status === 'overdue' && (
-                                <button 
+                                <button
                                   className="ticket-btn paid-btn"
                                   onClick={() => handleTicketStatusChange(ticket._id, 'paid')}
                                   title="Mark as Paid"
@@ -1905,7 +1912,7 @@ useEffect(() => {
                                   <span aria-hidden="true">✓</span> Mark Paid
                                 </button>
                               )}
-                              <button 
+                              <button
                                 className="ticket-btn delete-btn"
                                 onClick={() => setTicketToDelete(ticket._id)}
                                 title="Delete Ticket"
@@ -1989,8 +1996,8 @@ useEffect(() => {
                 <button className="confirmation-cancel" onClick={() => setTicketToDelete(null)}>
                   Cancel
                 </button>
-                <button 
-                  className="confirmation-confirm" 
+                <button
+                  className="confirmation-confirm"
                   onClick={() => {
                     handleDeleteTicket(ticketToDelete);
                     setTicketToDelete(null);
@@ -2012,8 +2019,8 @@ useEffect(() => {
             <h4 className="success-notification-title">{notificationTitle}</h4>
             <p className="success-notification-message">{notificationMessage}</p>
           </div>
-          <button 
-            className="success-notification-close" 
+          <button
+            className="success-notification-close"
             onClick={() => setShowNotification(false)}
             aria-label="Close notification"
           >
