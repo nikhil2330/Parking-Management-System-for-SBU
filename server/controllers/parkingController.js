@@ -4,6 +4,8 @@ const Building = require('../models/Building');
 const wayfindingService = require('../services/wayFindingService');
 const Reservation = require('../models/Reservation');
 const EventReservation = require('../models/EventReservation');
+const fs = require('fs');
+const path = require('path');
 
 const { getPopularTimes } = require('../services/forecastingService');
 
@@ -14,7 +16,15 @@ const { getPopularTimes } = require('../services/forecastingService');
 exports.getParkingOverlay = async (req, res) => {
   try {
     const lots = await ParkingLot.find({}, 'lotId groupId officialLotName campus boundingBox');
-    res.json(lots);
+    const lotsWithSvg = lots.map(lot => {
+      const svgPath = path.join(__dirname, '../../client/src/assets/svgs', `${lot.groupId}.svg`);
+      const svgExists = fs.existsSync(svgPath);
+      return {
+        ...lot.toObject(),
+        svgExists,
+      };
+    });
+    res.json(lotsWithSvg);
   } catch (error) {
     console.error("Error fetching parking overlays:", error);
     res.status(500).json({ error: "Internal server error" });
@@ -276,7 +286,13 @@ exports.getSpotDetails = async (req, res) => {
     if (!spot) {
       return res.status(404).json({ error: 'Spot not found' });
     }
-    
+    let svgExists = false;
+    let jsxPath = "";
+    if (spot.lot && spot.lot.groupId) {
+      jsxPath = path.join(__dirname, '../../client/src/assets/svgs', `${spot.lot.groupId}.jsx`);
+      svgExists = fs.existsSync(jsxPath);
+    }
+
     res.json({
       spotId: spot.spotId,
       status: spot.status,
@@ -293,7 +309,8 @@ exports.getSpotDetails = async (req, res) => {
         categories: spot.lot.categories,
         timings: spot.lot.timings,
         centroid: spot.lot.centroid,
-        closestBuilding: spot.lot.closestBuilding
+        closestBuilding: spot.lot.closestBuilding,
+        svgExists
 
       } : null
     });

@@ -12,6 +12,38 @@
     cursor: grab;
     position: relative;
   }
+
+  .no-svg-message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 180px;
+    font-size: 1.2rem;
+    color: #444;
+    background: #f8f8f8;
+    border-radius: 10px;
+    padding: 2rem 2.5rem;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+  }
+  
+  .lot-map-view .svg-loading,
+  .lot-map-view .no-svg-message {
+    width: 100%;
+    text-align: center;
+  }
+  
+  .lot-map-view .svg-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 180px;
+    font-size: 1.2rem;
+    color: #666;
+  }
+  
+
   
   .svg-container:active {
     cursor: grabbing;

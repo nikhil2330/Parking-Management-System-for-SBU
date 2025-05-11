@@ -2058,6 +2058,23 @@
   animation: fadeIn 0.3s ease-out forwards;
 }
 
+.category-type-select {
+  min-width: 140px;
+  font-weight: 600;
+  color: #4158d0;
+  background: #f8fafc;
+  border: 1.5px solid #c7d2fe;
+  border-radius: 7px;
+  padding: 7px 12px;
+  font-size: 15px;
+  transition: border-color 0.2s;
+}
+
+.category-type-select:focus {
+  border-color: #4158d0;
+  outline: none;
+}
+
 .category-item:hover {
   transform: translateY(-3px);
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);

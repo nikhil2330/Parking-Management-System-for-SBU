@@ -16,6 +16,7 @@ const DEFAULT_FILTERS = {
   covered: "",
   zone: "",
   categories: {
+    facultyStaff: false,
     commuterPremium: false,
     metered: false,
     commuter: false,
@@ -28,6 +29,20 @@ const DEFAULT_FILTERS = {
     evCharging: false,
   },
   spotsNeeded: 1,
+};
+
+const CATEGORY_LABELS = {
+  facultyStaff: "Faculty & Staff",
+  commuterPremium: "Commuter Premium",
+  metered: "Metered",
+  commuter: "Commuter",
+  resident: "Resident",
+  ada: "Accessible",
+  reservedMisc: "Reserved (Misc)",
+  stateVehiclesOnly: "State Vehicles Only",
+  specialServiceVehiclesOnly: "Special Service Vehicles Only",
+  stateAndSpecialServiceVehicles: "State & Special Service Vehicles",
+  evCharging: "Electric Vehicle",
 };
 
 function getNextWeekDate() {
@@ -191,7 +206,7 @@ function EventReservationPage() {
       .forEach(([cat]) => {
         badges.push(
           <span className="filter-tag" key={cat}>
-            {cat.replace(/([A-Z])/g, " $1").replace(/^./, (s) => s.toUpperCase())}
+            {CATEGORY_LABELS[cat] || cat.replace(/([A-Z])/g, " $1").replace(/^./, (s) => s.toUpperCase())}
             <button
               className="remove-tag-btn"
               type="button"
@@ -764,9 +779,7 @@ function EventReservationPage() {
                         }
                       />
                       <label htmlFor={cat}>
-                        {cat
-                          .replace(/([A-Z])/g, " $1")
-                          .replace(/^./, (s) => s.toUpperCase())}
+                      {CATEGORY_LABELS[cat] || cat}
                       </label>
                     </div>
                   ))}

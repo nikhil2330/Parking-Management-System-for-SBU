@@ -5,6 +5,7 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import AdminFeedbackPanel from '../components/AdminFeedbackPanel';
 import AdminEventApproval from '../components/AdminEventApproval';
+import adminService from '../services/AdminService';
 import { FaCommentAlt, FaParking, FaPlusCircle, FaTrashAlt, FaEdit, FaSave, FaTimes } from 'react-icons/fa';
 import './admin-dashboard.css';
 
@@ -44,6 +45,7 @@ function AdminDashboard() {
   const [tickets, setTickets] = useState([]);
   const [users, setUsers] = useState([]);
   const [parkingLots, setParkingLots] = useState([]);
+  const [originalBoundingBox, setOriginalBoundingBox] = useState("");
 
   const [newTicket, setNewTicket] = useState({
     userEmail: '',
@@ -56,11 +58,12 @@ function AdminDashboard() {
   const [newLot, setNewLot] = useState({
     officialName: '',
     lotId: '',
+    groupId: '',
+    campus: '',
     capacity: '',
-    boundingBox: {
-      topLeft: { lat: '', lng: '' },
-      bottomRight: { lat: '', lng: '' }
-    },
+    price: '',
+    closestBuilding: '',
+    boundingBox: '',
     categories: [],
     svgImage: null,
     geojsonCoordinates: ''
@@ -69,10 +72,22 @@ function AdminDashboard() {
   const [availableLotIds, setAvailableLotIds] = useState([
     'A1', 'A2', 'B1', 'B2', 'C1', 'C2', 'D1', 'D2'
   ]);
+  const CATEGORY_LABELS = {
+    facultyStaff: "Faculty and Staff",
+    commuterPremium: "Commuter Premium",
+    metered: "Metered",
+    commuter: "Commuter",
+    resident: "Resident",
+    ada: "Accessible",
+    reservedMisc: "Reserved (Misc)",
+    stateVehiclesOnly: "State Vehicles Only",
+    specialServiceVehiclesOnly: "Special Service Vehicles Only",
+    stateAndSpecialServiceVehicles: "State & Special Service Vehicles",
+    evCharging: "Electric Vehicle"
+  };
+  
+  const [availableCategories, setAvailableCategories] = useState(Object.keys(CATEGORY_LABELS));
 
-  const [availableCategories, setAvailableCategories] = useState([
-    'Standard', 'Compact', 'Accessible', 'Electric Vehicle', 'Reserved', 'VIP', 'Staff', 'Visitor'
-  ]);
 
   const [newCategory, setNewCategory] = useState({
     type: 'Standard',
@@ -193,7 +208,7 @@ useEffect(() => {
 
       // Fetch parking lots
       try {
-        const { data: parkingLotsData } = await api.get('/admin/parking-lots');
+        const { data: parkingLotsData } = await adminService.getParkingLots();
         setParkingLots(parkingLotsData);
         
         // Calculate parking lot stats
@@ -252,6 +267,23 @@ useEffect(() => {
     }
   })();
 }, []);
+
+  function spotNumbersToRanges(numbers) {
+    if (!numbers.length) return "";
+    numbers.sort((a, b) => a - b);
+    const ranges = [];
+    let start = numbers[0], end = numbers[0];
+    for (let i = 1; i <= numbers.length; i++) {
+      if (numbers[i] === end + 1) {
+        end = numbers[i];
+      } else {
+        ranges.push(start === end ? `${start}` : `${start}-${end}`);
+        start = numbers[i];
+        end = numbers[i];
+      }
+    }
+    return ranges.join(",");
+  }
 
   /* ---------- fetch analytics on first analytics tab load --------- */
   useEffect(() => {
@@ -601,12 +633,20 @@ useEffect(() => {
       if (newLot.categories.length === 0) {
         throw new Error('Please add at least one category.');
       }
+
+      const groupId = newLot.useLotIdAsGroupId !== false
+      ? newLot.lotId
+      : (newLot.groupId || newLot.lotId);
       
       // Create FormData for file upload
       const formData = new FormData();
       formData.append('officialName', newLot.officialName);
       formData.append('lotId', newLot.lotId);
+      formData.append('groupId', groupId);
+      formData.append('campus', newLot.campus);
       formData.append('capacity', newLot.capacity);
+      formData.append('price', newLot.price);
+      formData.append('closestBuilding', newLot.closestBuilding);
       formData.append('boundingBox', JSON.stringify(newLot.boundingBox));
       formData.append('categories', JSON.stringify(newLot.categories));
       
@@ -617,42 +657,25 @@ useEffect(() => {
       if (newLot.geojsonCoordinates) {
         formData.append('geojsonCoordinates', newLot.geojsonCoordinates);
       }
-
-      // Create parking lot
-      const { data } = await api.post('/admin/parking-lots', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      });
+      console.log('FormData:', formData);
+      await adminService.createParkingLot(formData);
+      await refreshLots();
       
-      // Add to list with ID from response
-      const newLotWithId = {
-        ...newLot,
-        id: data.id || Date.now().toString(),
-        svgImage: newLot.svgImage ? URL.createObjectURL(newLot.svgImage) : null
-      };
-      
-      setParkingLots(prev => [...prev, newLotWithId]);
-      
-      // Update stats
-      setStats(prev => ({
-        ...prev,
-        totalParkingLots: prev.totalParkingLots + 1,
-        totalParkingSpots: prev.totalParkingSpots + parseInt(newLot.capacity)
-      }));
       
       // Reset form
       setNewLot({
         officialName: '',
         lotId: '',
+        groupId: '',
+        campus: '',
         capacity: '',
-        boundingBox: {
-          topLeft: { lat: '', lng: '' },
-          bottomRight: { lat: '', lng: '' }
-        },
+        price: '',
+        closestBuilding: '',
+        boundingBox: '',
         categories: [],
         svgImage: null,
-        geojsonCoordinates: ''
+        geojsonCoordinates: '',
+        useLotIdAsGroupId: true
       });
       
       // Hide form
@@ -683,25 +706,10 @@ useEffect(() => {
   };
 
   const handleDeleteLot = async (lotId) => {
+    setIsSubmitting(true);
     try {
-      await api.delete(`/admin/parking-lots/${lotId}`);
-      
-      // Find lot before removing
-      const lot = parkingLots.find(l => l.id === lotId);
-      
-      // Remove from list
-      setParkingLots(prev => prev.filter(l => l.id !== lotId));
-      
-      // Update stats
-      if (lot) {
-        setStats(prev => ({
-          ...prev,
-          totalParkingLots: prev.totalParkingLots - 1,
-          totalParkingSpots: prev.totalParkingSpots - parseInt(lot.capacity)
-        }));
-      }
-      
-      // Show success notification
+      await adminService.deleteParkingLot(lotId);
+      await refreshLots();
       setNotificationTitle('Parking Lot Deleted');
       setNotificationMessage('The parking lot has been permanently removed.');
       setShowNotification(true);
@@ -720,20 +728,96 @@ useEffect(() => {
   };
 
   const handleEditLot = (lot) => {
-    setEditingLot(lot.id);
+    setEditingLot(lot._id);  
+    let categories = [];
+  
+    // Check if any spot is "standard"
+    const hasStandard = Array.isArray(lot.spots) && lot.spots.some(
+      spot => spot.type && spot.type.toLowerCase() === "standard"
+    );
+  
+    if (hasStandard && lot.categories && typeof lot.categories === "object") {
+      // Use counts from lot.categories (object format)
+      categories = Object.entries(lot.categories)
+        .filter(([type, count]) => count > 0)
+        .map(([type, count]) => ({
+          type,
+          spots: String(count)
+        }));
+    } else if (
+      Array.isArray(lot.spots) &&
+      lot.spots.length > 0 &&
+      lot.spots[0].spotId &&
+      lot.spots[0].type
+    ) {
+      // Use ranges based on spot types
+      const typeToSpots = {};
+      lot.spots.forEach(spot => {
+        const type = spot.type;
+        const match = spot.spotId.match(/-(\d+)$/);
+        const num = match ? parseInt(match[1], 10) : null;
+        if (num !== null) {
+          if (!typeToSpots[type]) typeToSpots[type] = [];
+          typeToSpots[type].push(num);
+        }
+      });
+      categories = Object.entries(typeToSpots).map(([type, nums]) => ({
+        type,
+        spots: spotNumbersToRanges(nums)
+      }));
+    } else if (Array.isArray(lot.categories)) {
+      categories = lot.categories.map(cat => {
+        if (cat.type && cat.spots !== undefined) return cat;
+        if (cat.type && cat.count !== undefined) return { type: cat.type, spots: String(cat.count) };
+        if (typeof cat === "string") return { type: cat, spots: "" };
+        return cat;
+      });
+    }
+
+    setOriginalBoundingBox(
+      lot.boundingBox
+        ? typeof lot.boundingBox === "string"
+          ? lot.boundingBox
+          : JSON.stringify(lot.boundingBox)
+        : ""
+    );
+
+    
     setNewLot({
-      officialName: lot.officialName,
-      lotId: lot.lotId,
-      capacity: lot.capacity,
-      boundingBox: lot.boundingBox || {
-        topLeft: { lat: '', lng: '' },
-        bottomRight: { lat: '', lng: '' }
-      },
-      categories: lot.categories || [],
+      officialName: lot.officialLotName,
+      lotId: lot.lotId || "",
+      groupId: lot.groupId || lot.lotId,
+      campus: lot.campus || "",
+      capacity: lot.capacity || "",
+      price: lot.price || "",
+      closestBuilding: lot.closestBuilding || "",
+      boundingBox: lot.boundingBox || "",
+      categories: categories,
       svgImage: null,
-      geojsonCoordinates: lot.geojsonCoordinates || ''
+      geojsonCoordinates: lot.geojsonCoordinates || "",
+      useLotIdAsGroupId: !lot.groupId || lot.groupId === lot.lotId
     });
     setShowLotForm(true);
+  };
+
+  const refreshLots = async () => {
+    try {
+      const { data: parkingLotsData } = await adminService.getParkingLots();
+      setParkingLots(parkingLotsData);
+      const totalLots = parkingLotsData.length;
+    const totalSpots = parkingLotsData.reduce(
+      (sum, lot) => sum + (lot.capacity || 0),
+      0
+    );
+    setStats(prev => ({
+      ...prev,
+      totalParkingLots: totalLots,
+      totalParkingSpots: totalSpots
+    }));
+
+    } catch (err) {
+      console.error('Error refreshing parking lots:', err);
+    }
   };
 
   const handleUpdateLot = async (e) => {
@@ -749,63 +833,52 @@ useEffect(() => {
       if (newLot.categories.length === 0) {
         throw new Error('Please add at least one category.');
       }
+      const groupId = newLot.useLotIdAsGroupId !== false
+      ? newLot.lotId
+      : (newLot.groupId || newLot.lotId);
       
       // Create FormData for file upload
       const formData = new FormData();
       formData.append('officialName', newLot.officialName);
-      formData.append('lotId', newLot.lotId);
-      formData.append('capacity', newLot.capacity);
-      formData.append('boundingBox', JSON.stringify(newLot.boundingBox));
-      formData.append('categories', JSON.stringify(newLot.categories));
-      
-      if (newLot.svgImage) {
-        formData.append('svgImage', newLot.svgImage);
-      }
-      
-      if (newLot.geojsonCoordinates) {
-        formData.append('geojsonCoordinates', newLot.geojsonCoordinates);
-      }
+    formData.append('lotId', newLot.lotId);
+    formData.append('groupId', groupId);
+    formData.append('campus', newLot.campus);
+    formData.append('capacity', newLot.capacity);
+    formData.append('price', newLot.price);
+    formData.append('closestBuilding', newLot.closestBuilding);
 
-      // Update parking lot
-      await api.put(`/admin/parking-lots/${editingLot}`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      });
-      
-      // Find the original lot to calculate capacity change
-      const originalLot = parkingLots.find(l => l.id === editingLot);
-      const capacityDifference = parseInt(newLot.capacity) - parseInt(originalLot.capacity);
-      
-      // Update in list
-      setParkingLots(prev => prev.map(l => 
-        l.id === editingLot ? {
-          ...l,
-          ...newLot,
-          svgImage: newLot.svgImage ? URL.createObjectURL(newLot.svgImage) : l.svgImage
-        } : l
-      ));
-      
-      // Update stats if capacity changed
-      if (capacityDifference !== 0) {
-        setStats(prev => ({
-          ...prev,
-          totalParkingSpots: prev.totalParkingSpots + capacityDifference
-        }));
-      }
+    const boundingBoxString = typeof newLot.boundingBox === "string"
+    ? newLot.boundingBox
+    : JSON.stringify(newLot.boundingBox);
+
+    if (
+      boundingBoxString &&
+      boundingBoxString.trim() !== "" &&
+      boundingBoxString !== originalBoundingBox
+    ) {
+      formData.append("boundingBox", boundingBoxString);
+    }
+    formData.append('categories', JSON.stringify(newLot.categories));
+    if (newLot.svgImage) formData.append('svgImage', newLot.svgImage);
+    if (newLot.geojsonCoordinates) formData.append('geojsonCoordinates', newLot.geojsonCoordinates);
+
+    await adminService.updateParkingLot(editingLot, formData);
+    await refreshLots();
       
       // Reset form and editing state
       setNewLot({
         officialName: '',
         lotId: '',
+        groupId: '',
+        campus: '',
         capacity: '',
-        boundingBox: {
-          topLeft: { lat: '', lng: '' },
-          bottomRight: { lat: '', lng: '' }
-        },
+        price: '',
+        closestBuilding: '',
+        boundingBox: '',
         categories: [],
         svgImage: null,
-        geojsonCoordinates: ''
+        geojsonCoordinates: '',
+        useLotIdAsGroupId: true
       });
       setEditingLot(null);
       setShowLotForm(false);
@@ -1485,7 +1558,6 @@ useEffect(() => {
 
       <div className="dashboard-content">
         <div className="dashboard-grid">
-
           {/* ===== Welcome ===== */}
           <section className="welcome-section">
             <div className="welcome-text">
@@ -1493,13 +1565,30 @@ useEffect(() => {
               <p>Manage user requests and parking lot bookings</p>
             </div>
             <div className="welcome-date" role="note" aria-label="Current date">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                <line x1="16" y1="2" x2="16" y2="6"/>
-                <line x1="8" y1="2" x2="8" y2="6"/>
-                <line x1="3" y1="10" x2="21" y2="10"/>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                <line x1="16" y1="2" x2="16" y2="6" />
+                <line x1="8" y1="2" x2="8" y2="6" />
+                <line x1="3" y1="10" x2="21" y2="10" />
               </svg>
-              <span>{new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })}</span>
+              <span>
+                {new Date().toLocaleDateString("en-US", {
+                  weekday: "long",
+                  month: "long",
+                  day: "numeric",
+                  year: "numeric",
+                })}
+              </span>
             </div>
           </section>
 
@@ -1508,65 +1597,144 @@ useEffect(() => {
             <div className="stats-grid">
               {/* Pending Requests */}
               <div className="stat-card">
-                <div className="stat-icon" style={{ backgroundColor: 'var(--gold-50)', color: 'var(--warning-orange)' }}>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="12" cy="12" r="10"/>
-                    <line x1="12" y1="6" x2="12" y2="12"/>
-                    <line x1="12" y1="16" x2="12.01" y2="16"/>
+                <div
+                  className="stat-icon"
+                  style={{
+                    backgroundColor: "var(--gold-50)",
+                    color: "var(--warning-orange)",
+                  }}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="6" x2="12" y2="12" />
+                    <line x1="12" y1="16" x2="12.01" y2="16" />
                   </svg>
                 </div>
                 <div className="stat-content">
                   <h4>Pending Requests</h4>
-                  <div className="stat-value">{stats.pendingUsers + stats.pendingBookings + stats.pendingFeedback}</div>
-                  <div className="stat-trend"><span className="trend-icon">⏱️</span> Awaiting action</div>
+                  <div className="stat-value">
+                    {stats.pendingUsers +
+                      stats.pendingBookings +
+                      stats.pendingFeedback}
+                  </div>
+                  <div className="stat-trend">
+                    <span className="trend-icon">⏱️</span> Awaiting action
+                  </div>
                 </div>
               </div>
 
               {/* Approved Requests */}
               <div className="stat-card">
-                <div className="stat-icon" style={{ backgroundColor: '#e8f5e9', color: 'var(--success-green)' }}>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                    <polyline points="22 4 12 14.01 9 11.01"/>
+                <div
+                  className="stat-icon"
+                  style={{
+                    backgroundColor: "#e8f5e9",
+                    color: "var(--success-green)",
+                  }}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                    <polyline points="22 4 12 14.01 9 11.01" />
                   </svg>
                 </div>
                 <div className="stat-content">
                   <h4>Approved Requests</h4>
-                  <div className="stat-value">{stats.approvedUsers + stats.approvedBookings + stats.reviewedFeedback}</div>
-                  <div className="stat-trend trend-up"><span className="trend-icon">✅</span> Successfully processed</div>
+                  <div className="stat-value">
+                    {stats.approvedUsers +
+                      stats.approvedBookings +
+                      stats.reviewedFeedback}
+                  </div>
+                  <div className="stat-trend trend-up">
+                    <span className="trend-icon">✅</span> Successfully
+                    processed
+                  </div>
                 </div>
               </div>
 
               {/* Resolved Items */}
-<div className="stat-card">
-  <div className="stat-icon" style={{ backgroundColor: 'var(--blue-50)', color: 'var(--info-blue)' }}>
-    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-      <polyline points="22 4 12 14.01 9 11.01"/>
-    </svg>
-  </div>
-  <div className="stat-content">
-    <h4>Resolved Items</h4>
-    <div className="stat-value">
-      {(stats.paidTickets || 0) + (stats.resolvedFeedback || 0)}
-    </div>
-    <div className="stat-trend trend-up">
-      <span className="trend-icon">🔄</span> Completed
-    </div>
-  </div>
-</div>
+              <div className="stat-card">
+                <div
+                  className="stat-icon"
+                  style={{
+                    backgroundColor: "var(--blue-50)",
+                    color: "var(--info-blue)",
+                  }}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+                    <polyline points="22 4 12 14.01 9 11.01" />
+                  </svg>
+                </div>
+                <div className="stat-content">
+                  <h4>Resolved Items</h4>
+                  <div className="stat-value">
+                    {(stats.paidTickets || 0) + (stats.resolvedFeedback || 0)}
+                  </div>
+                  <div className="stat-trend trend-up">
+                    <span className="trend-icon">🔄</span> Completed
+                  </div>
+                </div>
+              </div>
 
               {/* Total Managed */}
               <div className="stat-card">
-                <div className="stat-icon" style={{ backgroundColor: 'var(--blue-50)', color: 'var(--info-blue)' }}>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                <div
+                  className="stat-icon"
+                  style={{
+                    backgroundColor: "var(--blue-50)",
+                    color: "var(--info-blue)",
+                  }}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                   </svg>
                 </div>
                 <div className="stat-content">
                   <h4>Total Managed</h4>
                   <div className="stat-value">{stats.totalManaged}</div>
-                  <div className="stat-trend"><span className="trend-icon">📊</span> All-time activity</div>
+                  <div className="stat-trend">
+                    <span className="trend-icon">📊</span> All-time activity
+                  </div>
                 </div>
               </div>
             </div>
@@ -1574,76 +1742,137 @@ useEffect(() => {
 
           {/* ===== Tabs Navigation ===== */}
           {/* ===== Tabs Navigation ===== */}
-<div className="admin-tabs">
-  <button className={`admin-tab ${activeTab === 'users' ? 'active' : ''}`} onClick={() => setActiveTab('users')}>
-    User Requests {stats.pendingUsers > 0 && <span className="badge">{stats.pendingUsers}</span>}
-  </button>
-  <button className={`admin-tab ${activeTab === 'lots' ? 'active' : ''}`} onClick={() => setActiveTab('lots')}>
-    Parking Lots
-  </button>
-  <button className={`admin-tab ${activeTab === 'events' ? 'active' : ''}`} onClick={() => setActiveTab('events')}>
-    Event Reservations
-  </button>
-  <button className={`admin-tab ${activeTab === 'tickets' ? 'active' : ''}`} onClick={() => setActiveTab('tickets')}>
-    Tickets {stats.pendingTickets > 0 && <span className="badge">{stats.pendingTickets}</span>}
-  </button>
-  <button className={`admin-tab ${activeTab === 'feedback' ? 'active' : ''}`} onClick={() => setActiveTab('feedback')}>
-    Feedback {stats.pendingFeedback > 0 && <span className="badge">{stats.pendingFeedback}</span>}
-  </button>
-  <button className={`admin-tab ${activeTab === 'analytics' ? 'active' : ''}`} onClick={() => setActiveTab('analytics')}>
-    Analytics
-  </button>
-</div>
+          <div className="admin-tabs">
+            <button
+              className={`admin-tab ${activeTab === "users" ? "active" : ""}`}
+              onClick={() => setActiveTab("users")}
+            >
+              User Requests{" "}
+              {stats.pendingUsers > 0 && (
+                <span className="badge">{stats.pendingUsers}</span>
+              )}
+            </button>
+            <button
+              className={`admin-tab ${activeTab === "lots" ? "active" : ""}`}
+              onClick={() => setActiveTab("lots")}
+            >
+              Parking Lots
+            </button>
+            <button
+              className={`admin-tab ${activeTab === "events" ? "active" : ""}`}
+              onClick={() => setActiveTab("events")}
+            >
+              Event Reservations
+            </button>
+            <button
+              className={`admin-tab ${activeTab === "tickets" ? "active" : ""}`}
+              onClick={() => setActiveTab("tickets")}
+            >
+              Tickets{" "}
+              {stats.pendingTickets > 0 && (
+                <span className="badge">{stats.pendingTickets}</span>
+              )}
+            </button>
+            <button
+              className={`admin-tab ${
+                activeTab === "feedback" ? "active" : ""
+              }`}
+              onClick={() => setActiveTab("feedback")}
+            >
+              Feedback{" "}
+              {stats.pendingFeedback > 0 && (
+                <span className="badge">{stats.pendingFeedback}</span>
+              )}
+            </button>
+            <button
+              className={`admin-tab ${
+                activeTab === "analytics" ? "active" : ""
+              }`}
+              onClick={() => setActiveTab("analytics")}
+            >
+              Analytics
+            </button>
+          </div>
 
           {/* ===== Content Area ===== */}
           <div className="admin-content-area">
-            {activeTab === 'analytics' && analytics && (
+            {activeTab === "analytics" && analytics && (
               <div className="analytics-container" ref={analyticsRef}>
                 <h2 className="analytics-title">Analytics Dashboard</h2>
-                
+
                 <div className="analytics-period-selector">
-                  <button 
-                    className={`period-btn ${analyticsPeriod === '7days' ? 'active' : ''}`}
-                    onClick={() => setAnalyticsPeriod('7days')}
+                  <button
+                    className={`period-btn ${
+                      analyticsPeriod === "7days" ? "active" : ""
+                    }`}
+                    onClick={() => setAnalyticsPeriod("7days")}
                   >
                     7 Days
                   </button>
-                  <button 
-                    className={`period-btn ${analyticsPeriod === '30days' ? 'active' : ''}`}
-                    onClick={() => setAnalyticsPeriod('30days')}
+                  <button
+                    className={`period-btn ${
+                      analyticsPeriod === "30days" ? "active" : ""
+                    }`}
+                    onClick={() => setAnalyticsPeriod("30days")}
                   >
                     30 Days
                   </button>
-                  <button 
-                    className={`period-btn ${analyticsPeriod === '90days' ? 'active' : ''}`}
-                    onClick={() => setAnalyticsPeriod('90days')}
+                  <button
+                    className={`period-btn ${
+                      analyticsPeriod === "90days" ? "active" : ""
+                    }`}
+                    onClick={() => setAnalyticsPeriod("90days")}
                   >
                     90 Days
                   </button>
-                  <button 
-                    className={`period-btn ${analyticsPeriod === 'year' ? 'active' : ''}`}
-                    onClick={() => setAnalyticsPeriod('year')}
+                  <button
+                    className={`period-btn ${
+                      analyticsPeriod === "year" ? "active" : ""
+                    }`}
+                    onClick={() => setAnalyticsPeriod("year")}
                   >
                     Year
                   </button>
                 </div>
-                
+
                 {/* Analytics Summary Cards */}
                 <div className="analytics-summary-grid">
                   <div className="analytics-summary-card revenue-card">
                     <div className="card-icon">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
                         <line x1="12" y1="1" x2="12" y2="23"></line>
                         <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
                       </svg>
                     </div>
                     <h3>Total Revenue</h3>
-                    <div className="card-value">${analytics.totalRevenue.toFixed(2)}</div>
+                    <div className="card-value">
+                      ${analytics.totalRevenue.toFixed(2)}
+                    </div>
                   </div>
-                  
+
                   <div className="analytics-summary-card reservations-card">
                     <div className="card-icon">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
                         <rect x="1" y="3" width="15" height="13"></rect>
                         <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
                         <circle cx="5.5" cy="18.5" r="2.5"></circle>
@@ -1652,14 +1881,34 @@ useEffect(() => {
                     </div>
                     <h3>Total Reservations</h3>
                     <div className="card-value">
-                      {analytics.reservationsByDate.reduce((sum, day) => sum + day.count, 0)}
+                      {analytics.reservationsByDate.reduce(
+                        (sum, day) => sum + day.count,
+                        0
+                      )}
                     </div>
                   </div>
-                  
+
                   <div className="analytics-summary-card average-card">
                     <div className="card-icon">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <rect
+                          x="3"
+                          y="4"
+                          width="18"
+                          height="18"
+                          rx="2"
+                          ry="2"
+                        ></rect>
                         <line x1="16" y1="2" x2="16" y2="6"></line>
                         <line x1="8" y1="2" x2="8" y2="6"></line>
                         <line x1="3" y1="10" x2="21" y2="10"></line>
@@ -1669,14 +1918,22 @@ useEffect(() => {
                     <div className="card-value">
                       {derivedAnalytics.avgDailyReservations.toFixed(1)}
                     </div>
-                    <div className="card-info">
-                      Reservations per day
-                    </div>
+                    <div className="card-info">Reservations per day</div>
                   </div>
-                  
+
                   <div className="analytics-summary-card peak-card">
                     <div className="card-icon">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
                         <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
                         <polyline points="17 6 23 6 23 12"></polyline>
                       </svg>
@@ -1696,137 +1953,183 @@ useEffect(() => {
                   <div className="chart-container full-width">
                     <h3>Daily Reservations Trend</h3>
                     <ResponsiveContainer width="100%" height={300}>
-                      <AreaChart 
+                      <AreaChart
                         data={analytics.reservationsByDate}
                         margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
                       >
                         <defs>
-                          <linearGradient id="colorCount" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="#4158D0" stopOpacity={0.8}/>
-                            <stop offset="95%" stopColor="#4158D0" stopOpacity={0.1}/>
+                          <linearGradient
+                            id="colorCount"
+                            x1="0"
+                            y1="0"
+                            x2="0"
+                            y2="1"
+                          >
+                            <stop
+                              offset="5%"
+                              stopColor="#4158D0"
+                              stopOpacity={0.8}
+                            />
+                            <stop
+                              offset="95%"
+                              stopColor="#4158D0"
+                              stopOpacity={0.1}
+                            />
                           </linearGradient>
                         </defs>
                         <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                         <XAxis dataKey="date" stroke="#888" />
                         <YAxis stroke="#888" />
-                        <Tooltip 
-                          contentStyle={{ 
-                            backgroundColor: '#fff', 
-                            border: 'none', 
-                            borderRadius: '8px',
-                            boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: "#fff",
+                            border: "none",
+                            borderRadius: "8px",
+                            boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
                           }}
                         />
-                        <Area 
-                          type="monotone" 
-                          dataKey="count" 
-                          stroke="#4158D0" 
-                          fillOpacity={1} 
-                          fill="url(#colorCount)" 
+                        <Area
+                          type="monotone"
+                          dataKey="count"
+                          stroke="#4158D0"
+                          fillOpacity={1}
+                          fill="url(#colorCount)"
                           strokeWidth={2}
-                          activeDot={{ r: 6, stroke: '#4158D0', strokeWidth: 2, fill: '#fff' }}
+                          activeDot={{
+                            r: 6,
+                            stroke: "#4158D0",
+                            strokeWidth: 2,
+                            fill: "#fff",
+                          }}
                         />
                       </AreaChart>
                     </ResponsiveContainer>
                   </div>
-                  
+
                   <div className="chart-container full-width">
                     <h3>Revenue by Lot</h3>
                     <ResponsiveContainer width="100%" height={300}>
-                      <RadialBarChart 
-                        innerRadius="20%" 
-                        outerRadius="80%" 
-                        data={derivedAnalytics.revenuePerLot.slice(0, 5)} 
-                        startAngle={180} 
+                      <RadialBarChart
+                        innerRadius="20%"
+                        outerRadius="80%"
+                        data={derivedAnalytics.revenuePerLot.slice(0, 5)}
+                        startAngle={180}
                         endAngle={0}
                         cx="50%"
                         cy="60%"
                       >
                         <RadialBar
-                          label={{ position: 'insideStart', fill: '#666', fontSize: 12 }}
-                          background={{ fill: '#f8f9fa' }}
+                          label={{
+                            position: "insideStart",
+                            fill: "#666",
+                            fontSize: 12,
+                          }}
+                          background={{ fill: "#f8f9fa" }}
                           dataKey="revenue"
                         >
-                          {derivedAnalytics.revenuePerLot.slice(0, 5).map((entry, index) => (
-                            <Cell 
-                              key={`cell-${index}`} 
-                              fill={COLORS[index % COLORS.length]} 
-                            />
-                          ))}
+                          {derivedAnalytics.revenuePerLot
+                            .slice(0, 5)
+                            .map((entry, index) => (
+                              <Cell
+                                key={`cell-${index}`}
+                                fill={COLORS[index % COLORS.length]}
+                              />
+                            ))}
                         </RadialBar>
-                        <Tooltip 
-                          formatter={(value) => [`$${value}`, 'Revenue']}
-                          contentStyle={{ 
-                            backgroundColor: '#fff', 
-                            border: 'none', 
-                            borderRadius: '8px',
-                            boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
+                        <Tooltip
+                          formatter={(value) => [`$${value}`, "Revenue"]}
+                          contentStyle={{
+                            backgroundColor: "#fff",
+                            border: "none",
+                            borderRadius: "8px",
+                            boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
                           }}
                         />
-                        <Legend 
-                          iconSize={10} 
-                          layout="vertical" 
-                          verticalAlign="middle" 
+                        <Legend
+                          iconSize={10}
+                          layout="vertical"
+                          verticalAlign="middle"
                           align="right"
                           formatter={(value, entry) => {
-                            const lot = entry.payload.officialLotName || '';
-                            return lot.split(' ').slice(0, 2).join(' ');
+                            const lot = entry.payload.officialLotName || "";
+                            return lot.split(" ").slice(0, 2).join(" ");
                           }}
                         />
                       </RadialBarChart>
                     </ResponsiveContainer>
                   </div>
-                  
+
                   <div className="chart-container">
                     <h3>Parking Lot Usage</h3>
                     <ResponsiveContainer width="100%" height={300}>
-                      <BarChart 
+                      <BarChart
                         data={analytics.reservationsPerLot.slice(0, 5)}
                         margin={{ top: 5, right: 30, left: 20, bottom: 60 }}
                       >
-                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
-                        <XAxis 
-                          dataKey="officialLotName" 
-                          angle={-35} 
-                          textAnchor="end" 
-                          height={70} 
+                        <CartesianGrid
+                          strokeDasharray="3 3"
+                          vertical={false}
+                          stroke="#f0f0f0"
+                        />
+                        <XAxis
+                          dataKey="officialLotName"
+                          angle={-35}
+                          textAnchor="end"
+                          height={70}
                           tick={{ fontSize: 12 }}
                           stroke="#888"
                         />
                         <YAxis stroke="#888" />
-                        <Tooltip 
-                          cursor={{ fill: 'rgba(0,0,0,0.05)' }}
-                          contentStyle={{ 
-                            backgroundColor: '#fff', 
-                            border: 'none', 
-                            borderRadius: '8px',
-                            boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
+                        <Tooltip
+                          cursor={{ fill: "rgba(0,0,0,0.05)" }}
+                          contentStyle={{
+                            backgroundColor: "#fff",
+                            border: "none",
+                            borderRadius: "8px",
+                            boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
                           }}
                         />
                         <defs>
                           {COLORS.map((color, index) => (
-                            <linearGradient key={`colorBar${index}`} id={`colorBar${index}`} x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="0%" stopColor={color} stopOpacity={0.8}/>
-                              <stop offset="100%" stopColor={color} stopOpacity={0.3}/>
+                            <linearGradient
+                              key={`colorBar${index}`}
+                              id={`colorBar${index}`}
+                              x1="0"
+                              y1="0"
+                              x2="0"
+                              y2="1"
+                            >
+                              <stop
+                                offset="0%"
+                                stopColor={color}
+                                stopOpacity={0.8}
+                              />
+                              <stop
+                                offset="100%"
+                                stopColor={color}
+                                stopOpacity={0.3}
+                              />
                             </linearGradient>
                           ))}
                         </defs>
-                        <Bar 
-                          dataKey="count" 
-                          name="Reservations" 
+                        <Bar
+                          dataKey="count"
+                          name="Reservations"
                           radius={[4, 4, 0, 0]}
                         >
-                          {analytics.reservationsPerLot.slice(0, 5).map((entry, index) => (
-                            <Cell 
-                              key={`cell-${index}`} 
-                              fill={`url(#colorBar${index})`} 
-                            />
-                          ))}
+                          {analytics.reservationsPerLot
+                            .slice(0, 5)
+                            .map((entry, index) => (
+                              <Cell
+                                key={`cell-${index}`}
+                                fill={`url(#colorBar${index})`}
+                              />
+                            ))}
                         </Bar>
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
-                  
+
                   <div className="chart-container">
                     <h3>Top 5 Lots Share</h3>
                     <ResponsiveContainer width="100%" height={300}>
@@ -1840,65 +2143,119 @@ useEffect(() => {
                           innerRadius={60}
                           outerRadius={100}
                           paddingAngle={3}
-                          label={(entry) => entry.officialLotName.split(' ')[0]}
+                          label={(entry) => entry.officialLotName.split(" ")[0]}
                           labelLine={false}
                         >
-                          {analytics.reservationsPerLot.slice(0, 5).map((entry, index) => (
-                            <Cell 
-                              key={`cell-${index}`} 
-                              fill={COLORS[index % COLORS.length]} 
-                              stroke="#fff"
-                              strokeWidth={2}
-                            />
-                          ))}
+                          {analytics.reservationsPerLot
+                            .slice(0, 5)
+                            .map((entry, index) => (
+                              <Cell
+                                key={`cell-${index}`}
+                                fill={COLORS[index % COLORS.length]}
+                                stroke="#fff"
+                                strokeWidth={2}
+                              />
+                            ))}
                         </Pie>
-                        <Tooltip 
-                          formatter={(value, name, props) => [`${value} reservations`, props.payload.officialLotName]}
-                          contentStyle={{ 
-                            backgroundColor: '#fff', 
-                            border: 'none', 
-                            borderRadius: '8px',
-                            boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
+                        <Tooltip
+                          formatter={(value, name, props) => [
+                            `${value} reservations`,
+                            props.payload.officialLotName,
+                          ]}
+                          contentStyle={{
+                            backgroundColor: "#fff",
+                            border: "none",
+                            borderRadius: "8px",
+                            boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
                           }}
                         />
                       </PieChart>
                     </ResponsiveContainer>
                   </div>
                 </div>
-                
+
                 {/* Export Options */}
                 <div className="export-analytics">
                   <h3>Export Analytics Data</h3>
                   <div className="export-buttons">
-                    <button className="export-btn csv" onClick={handleExportCSV}>
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                        <polyline points="7 10 12 15 17 10"/>
-                        <line x1="12" y1="15" x2="12" y2="3"/>
+                    <button
+                      className="export-btn csv"
+                      onClick={handleExportCSV}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                        <polyline points="7 10 12 15 17 10" />
+                        <line x1="12" y1="15" x2="12" y2="3" />
                       </svg>
                       CSV
                     </button>
-                    <button className="export-btn excel" onClick={handleExportExcel}>
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                        <polyline points="7 10 12 15 17 10"/>
-                        <line x1="12" y1="15" x2="12" y2="3"/>
+                    <button
+                      className="export-btn excel"
+                      onClick={handleExportExcel}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                        <polyline points="7 10 12 15 17 10" />
+                        <line x1="12" y1="15" x2="12" y2="3" />
                       </svg>
                       Excel
                     </button>
-                    <button className="export-btn pdf" onClick={handleExportPDF}>
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                        <polyline points="7 10 12 15 17 10"/>
-                        <line x1="12" y1="15" x2="12" y2="3"/>
+                    <button
+                      className="export-btn pdf"
+                      onClick={handleExportPDF}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                        <polyline points="7 10 12 15 17 10" />
+                        <line x1="12" y1="15" x2="12" y2="3" />
                       </svg>
                       PDF
                     </button>
                     <button className="export-btn print" onClick={handlePrint}>
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <polyline points="6 9 6 2 18 2 18 9"/>
-                        <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
-                        <rect x="6" y="14" width="12" height="8"/>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <polyline points="6 9 6 2 18 2 18 9" />
+                        <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
+                        <rect x="6" y="14" width="12" height="8" />
                       </svg>
                       Print
                     </button>
@@ -1907,36 +2264,46 @@ useEffect(() => {
               </div>
             )}
 
-            {activeTab === 'users' && (
+            {activeTab === "users" && (
               <div className="admin-table-container">
                 <div className="admin-section-header">
                   <h2 className="admin-section-title">User Account Requests</h2>
-                  <p className="admin-section-desc">Approve or reject user account creation requests</p>
+                  <p className="admin-section-desc">
+                    Approve or reject user account creation requests
+                  </p>
                   <div className="admin-actions-row">
                     <div className="filter-group">
                       <label>Status:</label>
                       <div className="filter-options">
-                        <span 
-                          className={`filter-option ${userFilterStatus === 'all' ? 'active' : ''}`}
-                          onClick={() => setUserFilterStatus('all')}
+                        <span
+                          className={`filter-option ${
+                            userFilterStatus === "all" ? "active" : ""
+                          }`}
+                          onClick={() => setUserFilterStatus("all")}
                         >
                           All
                         </span>
-                        <span 
-                          className={`filter-option ${userFilterStatus === 'pending' ? 'active' : ''}`}
-                          onClick={() => setUserFilterStatus('pending')}
+                        <span
+                          className={`filter-option ${
+                            userFilterStatus === "pending" ? "active" : ""
+                          }`}
+                          onClick={() => setUserFilterStatus("pending")}
                         >
                           Pending
                         </span>
-                        <span 
-                          className={`filter-option ${userFilterStatus === 'approved' ? 'active' : ''}`}
-                          onClick={() => setUserFilterStatus('approved')}
+                        <span
+                          className={`filter-option ${
+                            userFilterStatus === "approved" ? "active" : ""
+                          }`}
+                          onClick={() => setUserFilterStatus("approved")}
                         >
                           Approved
                         </span>
-                        <span 
-                          className={`filter-option ${userFilterStatus === 'rejected' ? 'active' : ''}`}
-                          onClick={() => setUserFilterStatus('rejected')}
+                        <span
+                          className={`filter-option ${
+                            userFilterStatus === "rejected" ? "active" : ""
+                          }`}
+                          onClick={() => setUserFilterStatus("rejected")}
                         >
                           Rejected
                         </span>
@@ -1945,15 +2312,19 @@ useEffect(() => {
                     <div className="bulk-actions">
                       <button
                         className="bulk-action-btn approve-all"
-                        onClick={() => handleBulkUserAction('approved')}
-                        disabled={!getCurrentItems().some(u => u.status === 'pending')}
+                        onClick={() => handleBulkUserAction("approved")}
+                        disabled={
+                          !getCurrentItems().some((u) => u.status === "pending")
+                        }
                       >
                         Approve All
                       </button>
                       <button
                         className="bulk-action-btn reject-all"
-                        onClick={() => handleBulkUserAction('rejected')}
-                        disabled={!getCurrentItems().some(u => u.status === 'pending')}
+                        onClick={() => handleBulkUserAction("rejected")}
+                        disabled={
+                          !getCurrentItems().some((u) => u.status === "pending")
+                        }
                       >
                         Reject All
                       </button>
@@ -1974,25 +2345,53 @@ useEffect(() => {
                   </thead>
                   <tbody>
                     {getCurrentItems().length > 0 ? (
-                      getCurrentItems().map(user => (
+                      getCurrentItems().map((user) => (
                         <tr
                           key={user.id}
-                          className={`${user.status !== 'pending' ? `status-${user.status}` : ''} ${animatingItems[user.id] ? `animate-${animatingItems[user.id]}` : ''}`}
+                          className={`${
+                            user.status !== "pending"
+                              ? `status-${user.status}`
+                              : ""
+                          } ${
+                            animatingItems[user.id]
+                              ? `animate-${animatingItems[user.id]}`
+                              : ""
+                          }`}
                         >
                           <td>{user.name}</td>
                           <td>{user.email}</td>
                           <td>{user.department}</td>
                           <td>{formatDate(user.requestDate)}</td>
-                          <td><span className={`status-badge ${user.status}`}>{user.status}</span></td>
                           <td>
-                            {user.status === 'pending' ? (
+                            <span className={`status-badge ${user.status}`}>
+                              {user.status}
+                            </span>
+                          </td>
+                          <td>
+                            {user.status === "pending" ? (
                               <div className="action-buttons">
-                                <button className="approve-btn" onClick={() => handleUserAction(user.id, 'approved')}>Approve</button>
-                                <button className="reject-btn" onClick={() => handleUserAction(user.id, 'rejected')}>Reject</button>
+                                <button
+                                  className="approve-btn"
+                                  onClick={() =>
+                                    handleUserAction(user.id, "approved")
+                                  }
+                                >
+                                  Approve
+                                </button>
+                                <button
+                                  className="reject-btn"
+                                  onClick={() =>
+                                    handleUserAction(user.id, "rejected")
+                                  }
+                                >
+                                  Reject
+                                </button>
                               </div>
                             ) : (
                               <div className="action-completed">
-                                {user.status === 'approved' ? '✅ Approved' : '❌ Rejected'}
+                                {user.status === "approved"
+                                  ? "✅ Approved"
+                                  : "❌ Rejected"}
                               </div>
                             )}
                           </td>
@@ -2000,24 +2399,47 @@ useEffect(() => {
                       ))
                     ) : (
                       <tr>
-  <td colSpan="6" className="empty-state-message">
-    <div className="no-data-message">
-      <span className="message-text">No user requests found</span>
-    </div>
-  </td>
-</tr>
-
+                        <td colSpan="6" className="empty-state-message">
+                          <div className="no-data-message">
+                            <span className="message-text">
+                              No user requests found
+                            </span>
+                          </div>
+                        </td>
+                      </tr>
                     )}
                   </tbody>
                 </table>
 
                 {totalPages > 1 && (
                   <div className="pagination-controls">
-                    <button onClick={() => paginate(1)} disabled={currentPage === 1}>First</button>
-                    <button onClick={() => paginate(currentPage - 1)} disabled={currentPage === 1}>Prev</button>
-                    <span>Page {currentPage} of {totalPages}</span>
-                    <button onClick={() => paginate(currentPage + 1)} disabled={currentPage === totalPages}>Next</button>
-                    <button onClick={() => paginate(totalPages)} disabled={currentPage === totalPages}>Last</button>
+                    <button
+                      onClick={() => paginate(1)}
+                      disabled={currentPage === 1}
+                    >
+                      First
+                    </button>
+                    <button
+                      onClick={() => paginate(currentPage - 1)}
+                      disabled={currentPage === 1}
+                    >
+                      Prev
+                    </button>
+                    <span>
+                      Page {currentPage} of {totalPages}
+                    </span>
+                    <button
+                      onClick={() => paginate(currentPage + 1)}
+                      disabled={currentPage === totalPages}
+                    >
+                      Next
+                    </button>
+                    <button
+                      onClick={() => paginate(totalPages)}
+                      disabled={currentPage === totalPages}
+                    >
+                      Last
+                    </button>
                   </div>
                 )}
 
@@ -2025,7 +2447,7 @@ useEffect(() => {
                   <label>Show per page:</label>
                   <select
                     value={itemsPerPage}
-                    onChange={e => {
+                    onChange={(e) => {
                       setItemsPerPage(Number(e.target.value));
                       setCurrentPage(1);
                     }}
@@ -2040,11 +2462,15 @@ useEffect(() => {
               </div>
             )}
 
-            {activeTab === 'bookings' && (
+            {activeTab === "bookings" && (
               <div className="admin-table-container">
                 <div className="admin-section-header">
-                  <h2 className="admin-section-title">Multiple Parking Lot Booking Requests</h2>
-                  <p className="admin-section-desc">Manage requests for multiple parking spots or lots</p>
+                  <h2 className="admin-section-title">
+                    Multiple Parking Lot Booking Requests
+                  </h2>
+                  <p className="admin-section-desc">
+                    Manage requests for multiple parking spots or lots
+                  </p>
                   <div className="admin-actions-row">
                     <div className="filter-group">
                       <label>Status:</label>
@@ -2058,14 +2484,26 @@ useEffect(() => {
                     <div className="bulk-actions">
                       <button
                         className="bulk-action-btn approve-all"
-                        onClick={() => handleBookingAction(null, 'approved')}
-                        disabled={!getCurrentItems().some(b => b?.status === 'pending')}
-                      >Approve All</button>
+                        onClick={() => handleBookingAction(null, "approved")}
+                        disabled={
+                          !getCurrentItems().some(
+                            (b) => b?.status === "pending"
+                          )
+                        }
+                      >
+                        Approve All
+                      </button>
                       <button
                         className="bulk-action-btn reject-all"
-                        onClick={() => handleBookingAction(null, 'rejected')}
-                        disabled={!getCurrentItems().some(b => b?.status === 'pending')}
-                      >Reject All</button>
+                        onClick={() => handleBookingAction(null, "rejected")}
+                        disabled={
+                          !getCurrentItems().some(
+                            (b) => b?.status === "pending"
+                          )
+                        }
+                      >
+                        Reject All
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -2084,17 +2522,29 @@ useEffect(() => {
                   </thead>
                   <tbody>
                     {getCurrentItems().length > 0 ? (
-                      getCurrentItems().map(booking => (
+                      getCurrentItems().map((booking) => (
                         <tr
                           key={booking.id}
-                          className={`${booking.status !== 'pending' ? `status-${booking.status}` : ''} ${animatingItems[booking.id] ? `animate-${animatingItems[booking.id]}` : ''}`}
+                          className={`${
+                            booking.status !== "pending"
+                              ? `status-${booking.status}`
+                              : ""
+                          } ${
+                            animatingItems[booking.id]
+                              ? `animate-${animatingItems[booking.id]}`
+                              : ""
+                          }`}
                         >
                           <td>
                             <div>{booking.requester}</div>
                           </td>
                           <td>
                             <div className="lots-container">
-                              {booking.lots.map((lot,i) => <span key={i} className="lot-badge">{lot}</span>)}
+                              {booking.lots.map((lot, i) => (
+                                <span key={i} className="lot-badge">
+                                  {lot}
+                                </span>
+                              ))}
                             </div>
                           </td>
                           <td>{booking.spots}</td>
@@ -2106,16 +2556,36 @@ useEffect(() => {
                             </div>
                           </td>
                           <td>{booking.reason}</td>
-                          <td><span className={`status-badge ${booking.status}`}>{booking.status}</span></td>
                           <td>
-                            {booking.status === 'pending' ? (
+                            <span className={`status-badge ${booking.status}`}>
+                              {booking.status}
+                            </span>
+                          </td>
+                          <td>
+                            {booking.status === "pending" ? (
                               <div className="action-buttons">
-                                <button className="approve-btn" onClick={() => handleBookingAction(booking.id,'approved')}>Approve</button>
-                                <button className="reject-btn" onClick={() => handleBookingAction(booking.id,'rejected')}>Reject</button>
+                                <button
+                                  className="approve-btn"
+                                  onClick={() =>
+                                    handleBookingAction(booking.id, "approved")
+                                  }
+                                >
+                                  Approve
+                                </button>
+                                <button
+                                  className="reject-btn"
+                                  onClick={() =>
+                                    handleBookingAction(booking.id, "rejected")
+                                  }
+                                >
+                                  Reject
+                                </button>
                               </div>
                             ) : (
                               <div className="action-completed">
-                                {booking.status==='approved'?'✅ Approved':'❌ Rejected'}
+                                {booking.status === "approved"
+                                  ? "✅ Approved"
+                                  : "❌ Rejected"}
                               </div>
                             )}
                           </td>
@@ -2123,29 +2593,59 @@ useEffect(() => {
                       ))
                     ) : (
                       <tr>
-  <td colSpan="7" className="empty-state-message">
-    <div className="no-data-message">
-      <span className="message-text">No booking requests found</span>
-    </div>
-  </td>
-</tr>
+                        <td colSpan="7" className="empty-state-message">
+                          <div className="no-data-message">
+                            <span className="message-text">
+                              No booking requests found
+                            </span>
+                          </div>
+                        </td>
+                      </tr>
                     )}
                   </tbody>
                 </table>
 
-                {totalPages>1 && (
+                {totalPages > 1 && (
                   <div className="pagination-controls">
-                    <button onClick={()=>paginate(1)} disabled={currentPage===1}>First</button>
-                    <button onClick={()=>paginate(currentPage-1)} disabled={currentPage===1}>Prev</button>
-                    <span>Page {currentPage} of {totalPages}</span>
-                    <button onClick={()=>paginate(currentPage+1)} disabled={currentPage===totalPages}>Next</button>
-                    <button onClick={()=>paginate(totalPages)} disabled={currentPage===totalPages}>Last</button>
+                    <button
+                      onClick={() => paginate(1)}
+                      disabled={currentPage === 1}
+                    >
+                      First
+                    </button>
+                    <button
+                      onClick={() => paginate(currentPage - 1)}
+                      disabled={currentPage === 1}
+                    >
+                      Prev
+                    </button>
+                    <span>
+                      Page {currentPage} of {totalPages}
+                    </span>
+                    <button
+                      onClick={() => paginate(currentPage + 1)}
+                      disabled={currentPage === totalPages}
+                    >
+                      Next
+                    </button>
+                    <button
+                      onClick={() => paginate(totalPages)}
+                      disabled={currentPage === totalPages}
+                    >
+                      Last
+                    </button>
                   </div>
                 )}
 
                 <div className="items-per-page-control">
                   <label>Show per page:</label>
-                  <select value={itemsPerPage} onChange={e=>{setItemsPerPage(Number(e.target.value)); setCurrentPage(1);}}>
+                  <select
+                    value={itemsPerPage}
+                    onChange={(e) => {
+                      setItemsPerPage(Number(e.target.value));
+                      setCurrentPage(1);
+                    }}
+                  >
                     <option value="5">5</option>
                     <option value="10">10</option>
                     <option value="20">20</option>
@@ -2155,13 +2655,17 @@ useEffect(() => {
                 </div>
               </div>
             )}
-            
-            {activeTab === 'tickets' && (
+
+            {activeTab === "tickets" && (
               <div className="admin-table-container">
                 <div className="admin-section-header">
-                  <h2 className="admin-section-title">Parking Tickets Management</h2>
-                  <p className="admin-section-desc">Issue and manage tickets for parking violations</p>
-                  
+                  <h2 className="admin-section-title">
+                    Parking Tickets Management
+                  </h2>
+                  <p className="admin-section-desc">
+                    Issue and manage tickets for parking violations
+                  </p>
+
                   <form className="ticket-form" onSubmit={handleCreateTicket}>
                     <h3 className="form-title">Issue New Ticket</h3>
                     <div className="form-grid">
@@ -2180,7 +2684,7 @@ useEffect(() => {
                           placeholder="Enter user's email"
                         />
                       </div>
-                      
+
                       <div className="form-group">
                         <label htmlFor="amount">
                           <span className="label-icon">💰</span> Amount ($)
@@ -2201,7 +2705,7 @@ useEffect(() => {
                           />
                         </div>
                       </div>
-                      
+
                       <div className="form-group">
                         <label htmlFor="dueDate">
                           <span className="label-icon">📅</span> Due Date
@@ -2216,7 +2720,7 @@ useEffect(() => {
                           className="form-input"
                         />
                       </div>
-                      
+
                       <div className="form-group full-width">
                         <label htmlFor="reason">
                           <span className="label-icon">📝</span> Reason
@@ -2232,12 +2736,15 @@ useEffect(() => {
                           placeholder="Enter reason for ticket"
                         />
                       </div>
-                      
+
                       <div className="form-actions">
                         <button type="submit" className="form-submit-btn">
                           {isSubmitting ? (
                             <>
-                              <span className="processing-spinner-small" aria-hidden="true"></span>
+                              <span
+                                className="processing-spinner-small"
+                                aria-hidden="true"
+                              ></span>
                               Issuing Ticket...
                             </>
                           ) : (
@@ -2247,31 +2754,51 @@ useEffect(() => {
                       </div>
                     </div>
                   </form>
-                  
+
                   <div className="filter-group">
                     <label>Filter by Status:</label>
                     <div className="filter-options">
-                      <span 
-                        className={`filter-option ${ticketFilter === 'all' ? 'active' : ''}`}
-                        onClick={() => {setTicketFilter('all'); setCurrentPage(1);}}
+                      <span
+                        className={`filter-option ${
+                          ticketFilter === "all" ? "active" : ""
+                        }`}
+                        onClick={() => {
+                          setTicketFilter("all");
+                          setCurrentPage(1);
+                        }}
                       >
                         All
                       </span>
-                      <span 
-                        className={`filter-option ${ticketFilter === 'pending' ? 'active' : ''}`}
-                        onClick={() => {setTicketFilter('pending'); setCurrentPage(1);}}
+                      <span
+                        className={`filter-option ${
+                          ticketFilter === "pending" ? "active" : ""
+                        }`}
+                        onClick={() => {
+                          setTicketFilter("pending");
+                          setCurrentPage(1);
+                        }}
                       >
                         Pending
                       </span>
-                      <span 
-                        className={`filter-option ${ticketFilter === 'paid' ? 'active' : ''}`}
-                        onClick={() => {setTicketFilter('paid'); setCurrentPage(1);}}
+                      <span
+                        className={`filter-option ${
+                          ticketFilter === "paid" ? "active" : ""
+                        }`}
+                        onClick={() => {
+                          setTicketFilter("paid");
+                          setCurrentPage(1);
+                        }}
                       >
                         Paid
                       </span>
-                      <span 
-                        className={`filter-option ${ticketFilter === 'overdue' ? 'active' : ''}`}
-                        onClick={() => {setTicketFilter('overdue'); setCurrentPage(1);}}
+                      <span
+                        className={`filter-option ${
+                          ticketFilter === "overdue" ? "active" : ""
+                        }`}
+                        onClick={() => {
+                          setTicketFilter("overdue");
+                          setCurrentPage(1);
+                        }}
                       >
                         Overdue
                       </span>
@@ -2293,52 +2820,75 @@ useEffect(() => {
                   </thead>
                   <tbody>
                     {getCurrentItems().length > 0 ? (
-                      getCurrentItems().map(ticket => (
+                      getCurrentItems().map((ticket) => (
                         <tr
                           key={ticket._id}
                           className={`status-${ticket.status}`}
                         >
                           <td>
                             <div className="user-info">
-                              <div className="user-name">{ticket.user?.username || 'Unknown User'}</div>
-                              <div className="user-email">{ticket.user?.email || 'No email'}</div>
+                              <div className="user-name">
+                                {ticket.user?.username || "Unknown User"}
+                              </div>
+                              <div className="user-email">
+                                {ticket.user?.email || "No email"}
+                              </div>
                             </div>
                           </td>
-                          <td className="amount-cell">{formatCurrency(ticket.amount)}</td>
+                          <td className="amount-cell">
+                            {formatCurrency(ticket.amount)}
+                          </td>
                           <td>{ticket.reason}</td>
                           <td>{formatDate(ticket.issueDate)}</td>
                           <td>{formatDate(ticket.dueDate)}</td>
-                          <td><span className={`status-badge ${ticket.status}`}>{ticket.status}</span></td>
+                          <td>
+                            <span className={`status-badge ${ticket.status}`}>
+                              {ticket.status}
+                            </span>
+                          </td>
                           <td>
                             <div className="ticket-actions">
-                              {ticket.status === 'pending' && (
+                              {ticket.status === "pending" && (
                                 <>
-                                  <button 
+                                  <button
                                     className="ticket-btn paid-btn"
-                                    onClick={() => handleTicketStatusChange(ticket._id, 'paid')}
+                                    onClick={() =>
+                                      handleTicketStatusChange(
+                                        ticket._id,
+                                        "paid"
+                                      )
+                                    }
                                     title="Mark as Paid"
                                   >
                                     <span aria-hidden="true">✓</span> Mark Paid
                                   </button>
-                                  <button 
+                                  <button
                                     className="ticket-btn overdue-btn"
-                                    onClick={() => handleTicketStatusChange(ticket._id, 'overdue')}
+                                    onClick={() =>
+                                      handleTicketStatusChange(
+                                        ticket._id,
+                                        "overdue"
+                                      )
+                                    }
                                     title="Mark as Overdue"
                                   >
-                                    <span aria-hidden="true">⚠️</span> Mark Overdue
+                                    <span aria-hidden="true">⚠️</span> Mark
+                                    Overdue
                                   </button>
                                 </>
                               )}
-                              {ticket.status === 'overdue' && (
-                                <button 
+                              {ticket.status === "overdue" && (
+                                <button
                                   className="ticket-btn paid-btn"
-                                  onClick={() => handleTicketStatusChange(ticket._id, 'paid')}
+                                  onClick={() =>
+                                    handleTicketStatusChange(ticket._id, "paid")
+                                  }
                                   title="Mark as Paid"
                                 >
                                   <span aria-hidden="true">✓</span> Mark Paid
                                 </button>
                               )}
-                              <button 
+                              <button
                                 className="ticket-btn delete-btn"
                                 onClick={() => setTicketToDelete(ticket._id)}
                                 title="Delete Ticket"
@@ -2351,23 +2901,47 @@ useEffect(() => {
                       ))
                     ) : (
                       <tr>
-  <td colSpan="7" className="empty-state-message">
-    <div className="no-data-message">
-      <span className="message-text">No tickets found</span>
-    </div>
-  </td>
-</tr>
+                        <td colSpan="7" className="empty-state-message">
+                          <div className="no-data-message">
+                            <span className="message-text">
+                              No tickets found
+                            </span>
+                          </div>
+                        </td>
+                      </tr>
                     )}
                   </tbody>
                 </table>
 
                 {totalPages > 1 && (
                   <div className="pagination-controls">
-                    <button onClick={() => paginate(1)} disabled={currentPage === 1}>First</button>
-                    <button onClick={() => paginate(currentPage - 1)} disabled={currentPage === 1}>Prev</button>
-                    <span>Page {currentPage} of {totalPages}</span>
-                    <button onClick={() => paginate(currentPage + 1)} disabled={currentPage === totalPages}>Next</button>
-                    <button onClick={() => paginate(totalPages)} disabled={currentPage === totalPages}>Last</button>
+                    <button
+                      onClick={() => paginate(1)}
+                      disabled={currentPage === 1}
+                    >
+                      First
+                    </button>
+                    <button
+                      onClick={() => paginate(currentPage - 1)}
+                      disabled={currentPage === 1}
+                    >
+                      Prev
+                    </button>
+                    <span>
+                      Page {currentPage} of {totalPages}
+                    </span>
+                    <button
+                      onClick={() => paginate(currentPage + 1)}
+                      disabled={currentPage === totalPages}
+                    >
+                      Next
+                    </button>
+                    <button
+                      onClick={() => paginate(totalPages)}
+                      disabled={currentPage === totalPages}
+                    >
+                      Last
+                    </button>
                   </div>
                 )}
 
@@ -2375,7 +2949,7 @@ useEffect(() => {
                   <label>Show per page:</label>
                   <select
                     value={itemsPerPage}
-                    onChange={e => {
+                    onChange={(e) => {
                       setItemsPerPage(Number(e.target.value));
                       setCurrentPage(1);
                     }}
@@ -2391,12 +2965,16 @@ useEffect(() => {
             )}
 
             {/* Parking Lots Management Tab */}
-            {activeTab === 'lots' && (
+            {activeTab === "lots" && (
               <div className="admin-table-container">
                 <div className="admin-section-header">
-                  <h2 className="admin-section-title">Parking Lots Management</h2>
-                  <p className="admin-section-desc">Add, edit, and manage parking lots and their configurations</p>
-                  
+                  <h2 className="admin-section-title">
+                    Parking Lots Management
+                  </h2>
+                  <p className="admin-section-desc">
+                    Add, edit, and manage parking lots and their configurations
+                  </p>
+
                   <div className="stats-mini-grid">
                     <div className="stat-mini-card">
                       <div className="stat-mini-icon">
@@ -2404,27 +2982,57 @@ useEffect(() => {
                       </div>
                       <div className="stat-mini-content">
                         <div className="stat-mini-label">Total Lots</div>
-                        <div className="stat-mini-value">{stats.totalParkingLots || 0}</div>
+                        <div className="stat-mini-value">
+                          {stats.totalParkingLots || 0}
+                        </div>
                       </div>
                     </div>
                     <div className="stat-mini-card">
                       <div className="stat-mini-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
-                          <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="20"
+                          height="20"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        >
+                          <rect
+                            x="2"
+                            y="2"
+                            width="20"
+                            height="8"
+                            rx="2"
+                            ry="2"
+                          ></rect>
+                          <rect
+                            x="2"
+                            y="14"
+                            width="20"
+                            height="8"
+                            rx="2"
+                            ry="2"
+                          ></rect>
                           <line x1="6" y1="6" x2="6.01" y2="6"></line>
                           <line x1="6" y1="18" x2="6.01" y2="18"></line>
                         </svg>
                       </div>
                       <div className="stat-mini-content">
-                        <div className="stat-mini-label">Total Parking Spots</div>
-                        <div className="stat-mini-value">{stats.totalParkingSpots || 0}</div>
+                        <div className="stat-mini-label">
+                          Total Parking Spots
+                        </div>
+                        <div className="stat-mini-value">
+                          {stats.totalParkingSpots || 0}
+                        </div>
                       </div>
                     </div>
                   </div>
-                  
+
                   {!showLotForm ? (
-                    <button 
+                    <button
                       className="add-lot-btn"
                       onClick={() => setShowLotForm(true)}
                     >
@@ -2432,12 +3040,22 @@ useEffect(() => {
                     </button>
                   ) : (
                     <div className="lot-form-container">
-                      <h3 className="form-title">{editingLot ? 'Edit Parking Lot' : 'Add New Parking Lot'}</h3>
-                      <form className="lot-form" onSubmit={editingLot ? handleUpdateLot : handleCreateLot}>
+                      <h3 className="form-title">
+                        {editingLot
+                          ? "Edit Parking Lot"
+                          : "Add New Parking Lot"}
+                      </h3>
+                      <form
+                        className="lot-form"
+                        onSubmit={
+                          editingLot ? handleUpdateLot : handleCreateLot
+                        }
+                      >
                         <div className="form-grid">
                           <div className="form-group">
                             <label htmlFor="officialName">
-                              <span className="label-icon">🏢</span> Official Lot Name*
+                              <span className="label-icon">🏢</span> Official
+                              Lot Name*
                             </label>
                             <input
                               type="text"
@@ -2450,26 +3068,73 @@ useEffect(() => {
                               placeholder="e.g. North Campus Main Lot"
                             />
                           </div>
-                          
+
                           <div className="form-group">
                             <label htmlFor="lotId">
                               <span className="label-icon">🔢</span> Lot ID*
                             </label>
-                            <select
+                            <input
+                              type="text"
                               id="lotId"
                               name="lotId"
                               value={newLot.lotId}
                               onChange={handleLotFormChange}
                               required
                               className="form-input"
-                            >
-                              <option value="">Select a Lot ID</option>
-                              {availableLotIds.map(id => (
-                                <option key={id} value={id}>{id}</option>
-                              ))}
-                            </select>
+                              placeholder="Enter Lot ID (e.g. A1, 17B, etc.)"
+                            />
                           </div>
-                          
+
+                          <div className="form-group">
+                            <label htmlFor="groupId">
+                              <span className="label-icon">🆔</span> Group ID
+                            </label>
+                            <input
+                              type="text"
+                              id="groupId"
+                              name="groupId"
+                              value={newLot.groupId || newLot.lotId}
+                              onChange={handleLotFormChange}
+                              disabled={newLot.useLotIdAsGroupId !== false}
+                              className="form-input"
+                              placeholder="Group ID"
+                              style={{ flex: 1 }}
+                            />
+                            <div style={{ marginTop: 6 }}>
+                              <label
+                                style={{
+                                  fontSize: 14,
+                                  display: "flex",
+                                  alignItems: "center",
+                                  gap: 0,
+                                }}
+                              >
+                                <input
+                                  type="checkbox"
+                                  checked={newLot.useLotIdAsGroupId !== false}
+                                  onChange={(e) => {
+                                    const checked = e.target.checked;
+                                    setNewLot((prev) => ({
+                                      ...prev,
+                                      useLotIdAsGroupId: checked,
+                                      groupId: checked
+                                        ? prev.lotId
+                                        : prev.groupId || prev.lotId,
+                                    }));
+                                  }}
+                                  style={{
+                                    marginRight: 4,
+                                    width: 14,
+                                    height: 14,
+                                    minWidth: 14,
+                                    maxWidth: 14,
+                                  }}
+                                />
+                                Use Lot ID as Group ID
+                              </label>
+                            </div>
+                          </div>
+
                           <div className="form-group">
                             <label htmlFor="capacity">
                               <span className="label-icon">🚗</span> Capacity*
@@ -2486,87 +3151,116 @@ useEffect(() => {
                               placeholder="Total number of parking spots"
                             />
                           </div>
-                          
-                          <div className="form-group form-group-half">
-                            <label htmlFor="boundingBox.topLeft.lat">
-                              <span className="label-icon">📍</span> Top-Left Latitude*
+
+                          <div className="form-group full-width">
+                            <label htmlFor="boundingBox">
+                              <span className="label-icon">📍</span> Bounding
+                              Box
                             </label>
                             <input
                               type="text"
-                              id="boundingBox.topLeft.lat"
-                              name="boundingBox.topLeft.lat"
-                              value={newLot.boundingBox.topLeft.lat}
+                              id="boundingBox"
+                              name="boundingBox"
+                              value={
+                                typeof newLot.boundingBox === "string"
+                                  ? newLot.boundingBox
+                                  : JSON.stringify(newLot.boundingBox)
+                              }
                               onChange={handleLotFormChange}
-                              required
                               className="form-input"
-                              placeholder="e.g. 37.7749"
+                              placeholder="Paste bounding box JSON or coordinates"
                             />
+                            <div className="category-hint">
+                              Example:{" "}
+                              <code>[[40.91, -73.12], [40.92, -73.13]]</code> or{" "}
+                              <code>
+                                [[[40.91, -73.12], [40.92, -73.13]], [[40.93,
+                                -73.14], [40.94, -73.15]]]
+                              </code>
+                            </div>
                           </div>
-                          
-                          <div className="form-group form-group-half">
-                            <label htmlFor="boundingBox.topLeft.lng">
-                              <span className="label-icon">📍</span> Top-Left Longitude*
-                            </label>
+                          <div className="form-group">
+                            <label>Campus*</label>
                             <input
                               type="text"
-                              id="boundingBox.topLeft.lng"
-                              name="boundingBox.topLeft.lng"
-                              value={newLot.boundingBox.topLeft.lng}
+                              name="campus"
+                              value={newLot.campus}
                               onChange={handleLotFormChange}
                               required
-                              className="form-input"
-                              placeholder="e.g. -122.4194"
                             />
                           </div>
-                          
-                          <div className="form-group form-group-half">
-                            <label htmlFor="boundingBox.bottomRight.lat">
-                              <span className="label-icon">📍</span> Bottom-Right Latitude*
-                            </label>
+                          <div className="form-group">
+                            <label>Price per Hour ($)*</label>
+                            <input
+                              type="number"
+                              name="price"
+                              value={newLot.price}
+                              onChange={handleLotFormChange}
+                              required
+                              min="0"
+                              step="0.01"
+                            />
+                          </div>
+                          <div className="form-group">
+                            <label>Closest Building</label>
                             <input
                               type="text"
-                              id="boundingBox.bottomRight.lat"
-                              name="boundingBox.bottomRight.lat"
-                              value={newLot.boundingBox.bottomRight.lat}
+                              name="closestBuilding"
+                              value={newLot.closestBuilding}
                               onChange={handleLotFormChange}
-                              required
-                              className="form-input"
-                              placeholder="e.g. 37.7647"
                             />
                           </div>
-                          
-                          <div className="form-group form-group-half">
-                            <label htmlFor="boundingBox.bottomRight.lng">
-                              <span className="label-icon">📍</span> Bottom-Right Longitude*
-                            </label>
-                            <input
-                              type="text"
-                              id="boundingBox.bottomRight.lng"
-                              name="boundingBox.bottomRight.lng"
-                              value={newLot.boundingBox.bottomRight.lng}
-                              onChange={handleLotFormChange}
-                              required
-                              className="form-input"
-                              placeholder="e.g. -122.4094"
-                            />
-                          </div>
-                          
+
                           <div className="form-group full-width">
                             <label className="categories-label">
                               <span className="label-icon">🏷️</span> Categories*
-                              <span className="required-note">(at least one category required)</span>
+                              <span className="required-note">
+                                (at least one category required)
+                              </span>
                             </label>
-                            
+
                             {newLot.categories.length > 0 && (
                               <div className="categories-list">
                                 {newLot.categories.map((category, index) => (
                                   <div key={index} className="category-item">
-                                    <div className="category-type">{category.type}</div>
-                                    <div className="category-spots">Spots: {category.spots}</div>
-                                    <button 
+                                    <select
+                                      value={category.type}
+                                      onChange={(e) => {
+                                        const updated = [...newLot.categories];
+                                        updated[index].type = e.target.value;
+                                        setNewLot((prev) => ({
+                                          ...prev,
+                                          categories: updated,
+                                        }));
+                                      }}
+                                      className="category-type-select"
+                                    >
+                                      {availableCategories.map((cat) => (
+                                        <option key={cat} value={cat}>
+                                          {CATEGORY_LABELS[cat]}
+                                        </option>
+                                      ))}
+                                    </select>
+                                    <input
+                                      type="text"
+                                      value={category.spots}
+                                      onChange={(e) => {
+                                        const updated = [...newLot.categories];
+                                        updated[index].spots = e.target.value;
+                                        setNewLot((prev) => ({
+                                          ...prev,
+                                          categories: updated,
+                                        }));
+                                      }}
+                                      className="category-spots-input"
+                                      placeholder="e.g. 1-50 or 200"
+                                    />
+                                    <button
                                       type="button"
                                       className="remove-category-btn"
-                                      onClick={() => handleRemoveCategory(index)}
+                                      onClick={() =>
+                                        handleRemoveCategory(index)
+                                      }
                                     >
                                       <FaTrashAlt />
                                     </button>
@@ -2574,7 +3268,7 @@ useEffect(() => {
                                 ))}
                               </div>
                             )}
-                            
+
                             <div className="add-category-container">
                               <select
                                 name="type"
@@ -2582,11 +3276,13 @@ useEffect(() => {
                                 onChange={handleCategoryChange}
                                 className="category-select"
                               >
-                                {availableCategories.map(cat => (
-                                  <option key={cat} value={cat}>{cat}</option>
+                                {availableCategories.map((cat) => (
+                                  <option key={cat} value={cat}>
+                                    {CATEGORY_LABELS[cat]}
+                                  </option>
                                 ))}
                               </select>
-                              
+
                               <input
                                 type="text"
                                 name="range"
@@ -2595,8 +3291,8 @@ useEffect(() => {
                                 className="category-range-input"
                                 placeholder="e.g. 1-50 or 200"
                               />
-                              
-                              <button 
+
+                              <button
                                 type="button"
                                 className="add-category-btn"
                                 onClick={handleAddCategory}
@@ -2605,24 +3301,31 @@ useEffect(() => {
                               </button>
                             </div>
                             <div className="category-hint">
-                              You can specify spot numbers as a single value (e.g. "200") or a range (e.g. "150-167")
+                              You can specify spot numbers as a single value
+                              (e.g. "200") or a range (e.g. "150-167")
                             </div>
                           </div>
-                          
+
                           <div className="form-group full-width">
-                            <label htmlFor="svgImage" className="file-input-label">
-                              <span className="label-icon">🖼️</span> SVG Image of Parking Lot (Optional)
+                            <label
+                              htmlFor="svgImage"
+                              className="file-input-label"
+                            >
+                              <span className="label-icon">🖼️</span> SVG Image
+                              of Parking Lot (Optional)
                             </label>
                             <div className="file-input-container">
-                              <button 
-                                type="button" 
+                              <button
+                                type="button"
                                 className="file-select-btn"
                                 onClick={triggerFileInput}
                               >
                                 Select File
                               </button>
                               <span className="file-name">
-                                {newLot.svgImage ? newLot.svgImage.name : 'No file selected'}
+                                {newLot.svgImage
+                                  ? newLot.svgImage.name
+                                  : "No file selected"}
                               </span>
                               <input
                                 type="file"
@@ -2631,14 +3334,15 @@ useEffect(() => {
                                 accept=".svg"
                                 onChange={handleFileChange}
                                 ref={fileInputRef}
-                                style={{ display: 'none' }}
+                                style={{ display: "none" }}
                               />
                             </div>
                           </div>
-                          
+
                           <div className="form-group full-width">
                             <label htmlFor="geojsonCoordinates">
-                              <span className="label-icon">📍</span> GeoJSON Coordinates (Optional)
+                              <span className="label-icon">📍</span> GeoJSON
+                              Coordinates (Optional)
                             </label>
                             <textarea
                               id="geojsonCoordinates"
@@ -2650,29 +3354,32 @@ useEffect(() => {
                               rows={5}
                             />
                           </div>
-                          
+
                           <div className="form-actions">
-                            <button 
+                            <button
                               type="button"
                               className="form-cancel-btn"
                               onClick={handleCancel}
                             >
                               <FaTimes /> Cancel
                             </button>
-                            <button 
+                            <button
                               type="submit"
                               className="form-submit-btn"
                               disabled={isSubmitting}
                             >
                               {isSubmitting ? (
                                 <>
-                                  <span className="processing-spinner-small" aria-hidden="true"></span>
-                                  {editingLot ? 'Updating...' : 'Creating...'}
+                                  <span
+                                    className="processing-spinner-small"
+                                    aria-hidden="true"
+                                  ></span>
+                                  {editingLot ? "Updating..." : "Creating..."}
                                 </>
                               ) : (
                                 <>
                                   <FaSave />
-                                  {editingLot ? 'Update Lot' : 'Create Lot'}
+                                  {editingLot ? "Update Lot" : "Create Lot"}
                                 </>
                               )}
                             </button>
@@ -2688,52 +3395,116 @@ useEffect(() => {
                     <tr>
                       <th>Lot Name</th>
                       <th>Lot ID</th>
+                      <th>Campus</th>
                       <th>Capacity</th>
+                      <th>Price/hr</th>
+                      <th>Closest Building</th>
                       <th>Categories</th>
                       <th>SVG Map</th>
+                      <th>Bounding Box</th>
                       <th>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {getCurrentItems().length > 0 ? (
-                      getCurrentItems().map(lot => (
-                        <tr key={lot.id}>
-                          <td>{lot.officialName}</td>
+                      getCurrentItems().map((lot) => (
+                        <tr key={lot._id}>
+                          <td>{lot.officialLotName}</td>
                           <td>
                             <span className="lot-id-badge">{lot.lotId}</span>
                           </td>
+                          <td>{lot.campus}</td>
                           <td>{lot.capacity}</td>
+                          <td>{lot.price ? `$${lot.price}` : "-"}</td>
+                          <td>
+                            {lot.closestBuilding || "Student Activities Center"}
+                          </td>
                           <td>
                             <div className="categories-display">
-                              {lot.categories.map((category, index) => (
-                                <div key={index} className="category-chip">
-                                  <span className="category-type">{category.type}</span>
-                                  <span className="category-count">({category.spots})</span>
-                                </div>
-                              ))}
+                              {lot.categories &&
+                              Object.entries(lot.categories).filter(
+                                ([type, count]) => count > 0
+                              ).length > 0 ? (
+                                Object.entries(lot.categories)
+                                  .filter(([type, count]) => count > 0)
+                                  .map(([type, count], i) => (
+                                    <div key={i} className="category-chip">
+                                      <span className="category-type">
+                                        {CATEGORY_LABELS[type] || type}
+                                      </span>
+                                      <span className="category-count">
+                                        ({count})
+                                      </span>
+                                    </div>
+                                  ))
+                              ) : (
+                                <span style={{ color: "#aaa" }}>None</span>
+                              )}
                             </div>
                           </td>
                           <td>
-                            {lot.svgImage ? (
-                              <div className="svg-thumbnail">
-                                <img src={lot.svgImage} alt={`${lot.officialName} layout`} width="60" />
-                              </div>
+                            {lot.svgExists ? (
+                              <span style={{ color: "green", fontWeight: 600 }}>
+                                Exists
+                              </span>
                             ) : (
-                              <span className="no-svg">No SVG</span>
+                              <span
+                                style={{
+                                  color: "#b0b0b0",
+                                  fontStyle: "italic",
+                                }}
+                              >
+                                Missing
+                              </span>
                             )}
                           </td>
                           <td>
+                            {(() => {
+                              // Accepts both array and stringified array
+                              let exists = false;
+                              if (
+                                Array.isArray(lot.boundingBox) &&
+                                lot.boundingBox.length > 0
+                              ) {
+                                exists = true;
+                              } else if (typeof lot.boundingBox === "string") {
+                                try {
+                                  const arr = JSON.parse(lot.boundingBox);
+                                  exists = Array.isArray(arr) && arr.length > 0;
+                                } catch {
+                                  exists = false;
+                                }
+                              }
+                              return exists ? (
+                                <span
+                                  style={{ color: "green", fontWeight: 600 }}
+                                >
+                                  Exists
+                                </span>
+                              ) : (
+                                <span
+                                  style={{
+                                    color: "#b0b0b0",
+                                    fontStyle: "italic",
+                                  }}
+                                >
+                                  Missing
+                                </span>
+                              );
+                            })()}
+                          </td>
+                          <td>
                             <div className="lot-actions">
-                              <button 
+                              <button
                                 className="lot-btn edit-btn"
                                 onClick={() => handleEditLot(lot)}
                                 title="Edit Lot"
                               >
                                 <FaEdit /> Edit
                               </button>
-                              <button 
+                              <button
                                 className="lot-btn delete-btn"
-                                onClick={() => setLotToDelete(lot.id)}
+                                onClick={() => setLotToDelete(lot._id)}
                                 title="Delete Lot"
                               >
                                 <FaTrashAlt /> Delete
@@ -2744,23 +3515,47 @@ useEffect(() => {
                       ))
                     ) : (
                       <tr>
-  <td colSpan="6" className="empty-state-message">
-    <div className="no-data-message">
-      <span className="message-text">No parking lots found</span>
-    </div>
-  </td>
-</tr>
+                        <td colSpan="6" className="empty-state-message">
+                          <div className="no-data-message">
+                            <span className="message-text">
+                              No parking lots found
+                            </span>
+                          </div>
+                        </td>
+                      </tr>
                     )}
                   </tbody>
                 </table>
 
                 {totalPages > 1 && (
                   <div className="pagination-controls">
-                    <button onClick={() => paginate(1)} disabled={currentPage === 1}>First</button>
-                    <button onClick={() => paginate(currentPage - 1)} disabled={currentPage === 1}>Prev</button>
-                    <span>Page {currentPage} of {totalPages}</span>
-                    <button onClick={() => paginate(currentPage + 1)} disabled={currentPage === totalPages}>Next</button>
-                    <button onClick={() => paginate(totalPages)} disabled={currentPage === totalPages}>Last</button>
+                    <button
+                      onClick={() => paginate(1)}
+                      disabled={currentPage === 1}
+                    >
+                      First
+                    </button>
+                    <button
+                      onClick={() => paginate(currentPage - 1)}
+                      disabled={currentPage === 1}
+                    >
+                      Prev
+                    </button>
+                    <span>
+                      Page {currentPage} of {totalPages}
+                    </span>
+                    <button
+                      onClick={() => paginate(currentPage + 1)}
+                      disabled={currentPage === totalPages}
+                    >
+                      Next
+                    </button>
+                    <button
+                      onClick={() => paginate(totalPages)}
+                      disabled={currentPage === totalPages}
+                    >
+                      Last
+                    </button>
                   </div>
                 )}
 
@@ -2768,7 +3563,7 @@ useEffect(() => {
                   <label>Show per page:</label>
                   <select
                     value={itemsPerPage}
-                    onChange={e => {
+                    onChange={(e) => {
                       setItemsPerPage(Number(e.target.value));
                       setCurrentPage(1);
                     }}
@@ -2784,14 +3579,14 @@ useEffect(() => {
             )}
 
             {/* Event Reservations Tab Content */}
-            {activeTab === 'events' && (
+            {activeTab === "events" && (
               <div className="admin-table-container">
                 <AdminEventApproval />
               </div>
             )}
 
             {/* Feedback Tab Content */}
-            {activeTab === 'feedback' && (
+            {activeTab === "feedback" && (
               <div className="admin-table-container">
                 <AdminFeedbackPanel />
               </div>
@@ -2803,22 +3598,31 @@ useEffect(() => {
       {/* Delete Confirmation Dialog */}
       {ticketToDelete && (
         <div className="confirmation-dialog-overlay">
-          <div className="confirmation-dialog" role="dialog" aria-labelledby="delete-dialog-title">
+          <div
+            className="confirmation-dialog"
+            role="dialog"
+            aria-labelledby="delete-dialog-title"
+          >
             <div className="confirmation-header">
-              <div className="confirmation-header-icon warning">!
-              </div>
-              <h3 id="delete-dialog-title" className="confirmation-title">Confirm Deletion</h3>
+              <div className="confirmation-header-icon warning">!</div>
+              <h3 id="delete-dialog-title" className="confirmation-title">
+                Confirm Deletion
+              </h3>
             </div>
             <div className="confirmation-content">
               <p className="confirmation-message">
-                Are you sure you want to delete this ticket? This action cannot be undone.
+                Are you sure you want to delete this ticket? This action cannot
+                be undone.
               </p>
               <div className="confirmation-actions">
-                <button className="confirmation-cancel" onClick={() => setTicketToDelete(null)}>
+                <button
+                  className="confirmation-cancel"
+                  onClick={() => setTicketToDelete(null)}
+                >
                   Cancel
                 </button>
-                <button 
-                  className="confirmation-confirm" 
+                <button
+                  className="confirmation-confirm"
                   onClick={() => {
                     handleDeleteTicket(ticketToDelete);
                     setTicketToDelete(null);
@@ -2835,22 +3639,32 @@ useEffect(() => {
       {/* Delete Lot Confirmation Dialog */}
       {lotToDelete && (
         <div className="confirmation-dialog-overlay">
-          <div className="confirmation-dialog" role="dialog" aria-labelledby="delete-lot-dialog-title">
+          <div
+            className="confirmation-dialog"
+            role="dialog"
+            aria-labelledby="delete-lot-dialog-title"
+          >
             <div className="confirmation-header">
-              <div className="confirmation-header-icon warning">!
-              </div>
-              <h3 id="delete-lot-dialog-title" className="confirmation-title">Confirm Parking Lot Deletion</h3>
+              <div className="confirmation-header-icon warning">!</div>
+              <h3 id="delete-lot-dialog-title" className="confirmation-title">
+                Confirm Parking Lot Deletion
+              </h3>
             </div>
             <div className="confirmation-content">
               <p className="confirmation-message">
-                Are you sure you want to delete this parking lot? All associated data will be permanently removed and this action cannot be undone.
+                Are you sure you want to delete this parking lot? All associated
+                data will be permanently removed and this action cannot be
+                undone.
               </p>
               <div className="confirmation-actions">
-                <button className="confirmation-cancel" onClick={() => setLotToDelete(null)}>
+                <button
+                  className="confirmation-cancel"
+                  onClick={() => setLotToDelete(null)}
+                >
                   Cancel
                 </button>
-                <button 
-                  className="confirmation-confirm" 
+                <button
+                  className="confirmation-confirm"
                   onClick={() => {
                     handleDeleteLot(lotToDelete);
                   }}
@@ -2869,10 +3683,12 @@ useEffect(() => {
           <div className="success-notification-icon">✓</div>
           <div className="success-notification-content">
             <h4 className="success-notification-title">{notificationTitle}</h4>
-            <p className="success-notification-message">{notificationMessage}</p>
+            <p className="success-notification-message">
+              {notificationMessage}
+            </p>
           </div>
-          <button 
-            className="success-notification-close" 
+          <button
+            className="success-notification-close"
             onClick={() => setShowNotification(false)}
             aria-label="Close notification"
           >
