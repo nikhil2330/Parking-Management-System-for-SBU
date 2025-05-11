@@ -19,7 +19,8 @@ const app = express();
 
 // Only allow frontend running on localhost:3000
 app.use(cors({
-  origin: 'http://localhost:3000',
+  // origin: 'http://localhost:3000',
+  origin: 'https://cse416-client.onrender.com',
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
