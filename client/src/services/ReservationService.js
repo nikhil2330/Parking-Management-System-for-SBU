@@ -1,13 +1,18 @@
 // client/src/services/ReservationService.js
 import axios from 'axios';
 
-const API = axios.create({
-  baseURL: 'https://p4sbu.onrender.com' 
-});
+// const API = axios.create({
+//   baseURL: 'https://p4sbu.onrender.com' 
+// });
 // Create axios instance with auth header
 // const API = axios.create({
 //   baseURL: 'http://localhost:8000/api' 
 // });
+
+const API = axios.create({
+  baseURL: process.env.REACT_APP_API_URL,
+  headers: { 'Content-Type': 'application/json' }
+});
 
 // Add request interceptor to automatically include token
 API.interceptors.request.use((config) => {
