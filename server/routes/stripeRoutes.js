@@ -176,8 +176,8 @@ router.post(
       const session = await stripeSvc.createTicketCheckoutSession({
         ticket,
         user: req.user,
-        successUrl: 'http://localhost:3000/tickets?session_id={CHECKOUT_SESSION_ID}',
-        cancelUrl: 'http://localhost:3000/tickets?checkout=cancel'
+        successUrl: 'https://cse416-client.onrender.com/tickets?session_id={CHECKOUT_SESSION_ID}',
+        cancelUrl: 'https://cse416-client.onrender.com/tickets?checkout=cancel'
       });
 
       ticket.stripeSessionId = session.id;

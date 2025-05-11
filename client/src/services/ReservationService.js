@@ -2,11 +2,16 @@
 import axios from 'axios';
 
 // const API = axios.create({
-//   baseURL: 'https://p4sbu.onrender.com/api' 
+//   baseURL: 'https://p4sbu.onrender.com' 
 // });
 // Create axios instance with auth header
+// const API = axios.create({
+//   baseURL: 'http://localhost:8000/api' 
+// });
+
 const API = axios.create({
-  baseURL: 'http://localhost:8000/api'
+  baseURL: process.env.REACT_APP_API_URL,
+  headers: { 'Content-Type': 'application/json' }
 });
 
 // Add request interceptor to automatically include token

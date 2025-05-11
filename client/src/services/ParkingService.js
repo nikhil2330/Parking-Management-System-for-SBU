@@ -1,12 +1,17 @@
 // client/src/services/ParkingService.js
 import axios from 'axios';
-// axios.defaults.baseURL = 'https://p4sbu.onrender.com';
-axios.defaults.baseURL = 'http://localhost:8000';
+// API.defaults.baseURL = 'https://p4sbu.onrender.com';
+// API.defaults.baseURL = 'http://localhost:8000';
+
+const API = axios.create({
+  baseURL: process.env.REACT_APP_API_URL,
+  headers: { 'Content-Type': 'application/json' }
+});
 
 const fetchClosestSpots = async (buildingId, filters, startTime, endTime, { limit, signal } = {}) => {
   try {
     const data = { buildingId, filters, startTime, endTime, ...(limit ? { limit } : {}) };
-    const response = await axios.post('/api/parking/closest-spots', data, { signal });
+    const response = await API.post('/parking/closest-spots', data, { signal });
     return response.data;
   } catch (error) {
     const errMsg = error.response?.data?.error || error.message;
@@ -15,7 +20,7 @@ const fetchClosestSpots = async (buildingId, filters, startTime, endTime, { limi
 };
 
 const fetchLotAvailability = async (lotId, start, end) => {
-  const res = await axios.get(`/api/parking/lot/${lotId}/availability`, {
+  const res = await API.get(`/parking/lot/${lotId}/availability`, {
     params: { startTime: start, endTime: end }
   });
   return res.data;
@@ -23,7 +28,7 @@ const fetchLotAvailability = async (lotId, start, end) => {
 
 const fetchSpotDetails = async (spotId) => {
   try {
-    const response = await axios.get(`/api/parking/spot/${spotId}/details`);
+    const response = await API.get(`/parking/spot/${spotId}/details`);
     return response.data;
   } catch (error) {
     const errMsg = error.response?.data?.error || error.message;
@@ -33,7 +38,7 @@ const fetchSpotDetails = async (spotId) => {
 
 const fetchParkingLotDetails = async (lotId) => {
   try {
-    const response = await axios.get(`/api/parking/lot/${lotId}/details`);
+    const response = await API.get(`/parking/lot/${lotId}/details`);
     return response.data;
   } catch (error) {
     const errMsg = error.response?.data?.error || error.message;
@@ -43,7 +48,7 @@ const fetchParkingLotDetails = async (lotId) => {
 
 const fetchParkingOverlay = async () => {
   try {
-    const response = await axios.get('/api/parking/overlay');
+    const response = await API.get('/parking/overlay');
     return response.data;
   } catch (error) {
     const errMsg = error.response?.data?.error || error.message;
@@ -53,7 +58,7 @@ const fetchParkingOverlay = async () => {
 
 const searchBuildings = async (query) => {
   try {
-    const response = await axios.get('/api/parking/search/buildings', {
+    const response = await API.get('/parking/search/buildings', {
       params: { query }
     });
     return response.data;
@@ -64,20 +69,18 @@ const searchBuildings = async (query) => {
 };
 
 const fetchPopularTimes = async (lotId) => {
-  console.log('[fetchPopularTimes] Fetching for lotId:', lotId); // Debug log
-  const response = await fetch(`/api/parking/popularTimes/${lotId}`);
-  if (!response.ok) {
-    const text = await response.text();
-    console.error('[fetchPopularTimes] Error response:', text); // Debug log
-    throw new Error('Failed to fetch popular times');
+  try {
+    const response = await API.get(`/parking/popularTimes/${lotId}`);
+    return response.data;
+  } catch (error) {
+    const errMsg = error.response?.data?.error || error.message;
+    throw new Error(errMsg);
   }
-  //console.log(response)
-  return response.json();
-}
+};
 
 
 const fetchSpotReservations = async (spotId, start, end) => {
-  const res = await axios.get(`/api/parking/spot/${spotId}/reservations`, {
+  const res = await API.get(`/parking/spot/${spotId}/reservations`, {
     params: { startTime: start, endTime: end }
   });
   return res.data.reservations;
@@ -86,7 +89,7 @@ const fetchSpotReservations = async (spotId, start, end) => {
 const fetchClosestLots = async (buildingId, filters, startTime, endTime, { signal } = {}) => {
   try {
     const data = { buildingId, filters, startTime, endTime };
-    const response = await axios.post('/api/parking/closest-lots', data, { signal });
+    const response = await API.post('/parking/closest-lots', data, { signal });
     return response.data;
   } catch (error) {
     const errMsg = error.response?.data?.error || error.message;

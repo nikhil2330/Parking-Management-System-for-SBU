@@ -1,9 +1,14 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { FaGithub, FaLinkedin, FaTwitter } from 'react-icons/fa';
 import './Footer.css';
 
 function Footer() {
   const currentYear = new Date().getFullYear();
+  
+  const handleContactEmail = () => {
+    window.location.href = 'mailto:parking4sbu@gmail.com?subject=P4SBU Inquiry';
+  };
   
   return (
     <>
@@ -25,30 +30,26 @@ function Footer() {
               <div className="footer-column">
                 <h4>Company</h4>
                 <ul>
-                  <li><a href="/about">About Us</a></li>
-                  <li><a href="/team">Our Team</a></li>
-                  <li><a href="/careers">Careers</a></li>
-                  <li><a href="/contact">Contact</a></li>
+                  <li><Link to="/about">About Us</Link></li>
+                  <li><Link to="/team">Our Team</Link></li>
+                  <li><Link to="/careers">Careers</Link></li>
+                  <li><a href="#" onClick={handleContactEmail}>Contact</a></li>
                 </ul>
               </div>
               
               <div className="footer-column">
                 <h4>Resources</h4>
                 <ul>
-                  <li><a href="/faq">FAQ</a></li>
-                  <li><a href="/help">Help Center</a></li>
-                  <li><a href="/campus-map">Campus Map</a></li>
-                  <li><a href="/accessibility">Accessibility</a></li>
+                  <li><Link to="/help">FAQ</Link></li>
                 </ul>
               </div>
               
               <div className="footer-column">
                 <h4>Legal</h4>
                 <ul>
-                  <li><a href="/terms">Terms of Service</a></li>
-                  <li><a href="/privacy">Privacy Policy</a></li>
-                  <li><a href="/cookies">Cookie Policy</a></li>
-                  <li><a href="/security">Security</a></li>
+                  <li><Link to="/privacy">Privacy Policy</Link></li>
+                  <li><Link to="/cookies">Cookie Policy</Link></li>
+                  <li><Link to="/security">Security</Link></li>
                 </ul>
               </div>
             </div>
@@ -56,13 +57,13 @@ function Footer() {
           
           <div className="footer-bottom">
             <div className="footer-social">
-              <a href="https://github.com" aria-label="GitHub" className="social-icon">
+              <a href="https://github.com" aria-label="GitHub" className="social-icon" target="_blank" rel="noopener noreferrer">
                 <FaGithub />
               </a>
-              <a href="https://linkedin.com" aria-label="LinkedIn" className="social-icon">
+              <a href="https://linkedin.com" aria-label="LinkedIn" className="social-icon" target="_blank" rel="noopener noreferrer">
                 <FaLinkedin />
               </a>
-              <a href="https://twitter.com" aria-label="Twitter" className="social-icon">
+              <a href="https://twitter.com" aria-label="Twitter" className="social-icon" target="_blank" rel="noopener noreferrer">
                 <FaTwitter />
               </a>
             </div>

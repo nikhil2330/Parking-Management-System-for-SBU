@@ -15,6 +15,7 @@ const DEFAULT_FILTERS = {
   covered: "",
   zone: "",
   categories: {
+    facultyStaff: false,
     commuterPremium: false,
     metered: false,
     commuter: false,
@@ -26,6 +27,19 @@ const DEFAULT_FILTERS = {
     stateAndSpecialServiceVehicles: false,
     evCharging: false,
   },
+};
+const CATEGORY_LABELS = {
+  facultyStaff: "Faculty & Staff",
+  commuterPremium: "Commuter Premium",
+  metered: "Metered",
+  commuter: "Commuter",
+  resident: "Resident",
+  ada: "Accessible",
+  reservedMisc: "Reserved (Misc)",
+  stateVehiclesOnly: "State Vehicles Only",
+  specialServiceVehiclesOnly: "Special Service Vehicles Only",
+  stateAndSpecialServiceVehicles: "State & Special Service Vehicles",
+  evCharging: "Electric Vehicle",
 };
 
 function SearchParkingPage() {
@@ -124,7 +138,7 @@ function SearchParkingPage() {
     Object.entries(activeFilters.categories)
       .filter(([_, checked]) => checked)
       .forEach(([cat]) => {
-        labels.push(cat.replace(/([A-Z])/g, " $1").replace(/^./, (s) => s.toUpperCase()));
+        labels.push(CATEGORY_LABELS[cat] || cat.replace(/([A-Z])/g, " $1").replace(/^./, (s) => s.toUpperCase()));
       });
     return labels;
   };
@@ -790,9 +804,8 @@ function SearchParkingPage() {
                         }
                       />
                       <label htmlFor={cat}>
-                        {cat
-                          .replace(/([A-Z])/g, " $1")
-                          .replace(/^./, (s) => s.toUpperCase())}
+                      {CATEGORY_LABELS[cat] || cat}
+
                       </label>
                     </div>
                   ))}
@@ -949,6 +962,8 @@ function SearchParkingPage() {
                         const [lotIdFromSpot, spotNumber] =
                           spot.spotId.split("-");
                         const details = spotDetailsMap[spot.spotId];
+                        const svgExists = details?.lot?.svgExists === true;
+
                         // Use official lot name from fetched spot details; fallback to lotIdFromSpot if not available.
                         const officialLotName =
                           details && details.lot
@@ -987,9 +1002,11 @@ function SearchParkingPage() {
                                     alt="Recenter"
                                   />
                                 </button>
+                                
                                 <button
                                   className="spot-card-show-spot-btn"
                                   onClick={() => {
+                                    if (svgExists === false) return;
                                     navigate(
                                       getSearchParkingUrl({
                                         buildingId:
@@ -1000,11 +1017,21 @@ function SearchParkingPage() {
                                     );
                                     handleViewSpot(spot.spotId);
                                   }}
-                                  title="Show Spot"
+                                  title={svgExists ? "Show Spot" : "No SVG yet"}
+                                  disabled={!svgExists}
+                                  style={{
+                                    opacity: svgExists ? 1 : 0.5,
+                                    pointerEvents: svgExists ? "auto" : "none",
+                                    cursor: svgExists
+                                      ? "pointer"
+                                      : "not-allowed",
+                                  }}
                                 >
                                   <img
                                     src={require("../assets/focus.png")}
                                     alt="Show Spot"
+                                    style={{ filter: svgExists ? "none" : "grayscale(100%)" }}
+
                                   />
                                 </button>
                               </div>

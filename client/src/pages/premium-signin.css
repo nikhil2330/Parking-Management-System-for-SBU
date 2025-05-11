@@ -742,3 +742,44 @@
       height: 45px;
     }
   }
+
+  /* Add these styles to your premium-signin.css file */
+
+/* Password input container for proper positioning */
+.password-input-container {
+  position: relative;
+  width: 100%;
+}
+
+/* Password toggle button styling */
+.password-toggle-btn {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--gray-600);
+  cursor: pointer;
+  padding: 8px;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  transition: color 0.2s ease;
+}
+
+.password-toggle-btn:hover {
+  color: var(--primary-dark);
+}
+
+.password-toggle-btn:focus {
+  outline: none;
+}
+
+/* Make sure the input field works correctly with the button */
+.password-input-container .input-field {
+  width: 100%;
+  padding-right: 45px; /* Make space for the button */
+}

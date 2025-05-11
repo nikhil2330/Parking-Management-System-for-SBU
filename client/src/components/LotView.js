@@ -33,10 +33,16 @@ const LotMapView = ({ lotId, onBack, highlightedSpot, dateTimeRange }) => {
   }, [lotId, dateTimeRange]);
 
 
+  const [svgLoadError, setSvgLoadError] = useState(false);
+
   useEffect(() => {
+    setSvgLoadError(false); // reset on lotId change
     import(`../assets/svgs/${lotId}.jsx`)
       .then((module) => setSvgComponent(() => module.default))
-      .catch((err) => console.error("Error loading SVG for lot", lotId, err));
+      .catch((err) => {
+        console.error("Error loading SVG for lot", lotId, err);
+        setSvgLoadError(true);
+      });
   }, [lotId]);
 
   useEffect(() => {
@@ -266,10 +272,29 @@ const LotMapView = ({ lotId, onBack, highlightedSpot, dateTimeRange }) => {
       });
     }
   }, [SvgComponent, lotDetails, lotId, highlightedSpot, lotAvailability]);
-
-  if (!SvgComponent) {
-    return <div>Loading SVG...</div>;
+  if (svgLoadError) {
+    return (
+      <div className="lot-map-view">
+        <button className="back-button" onClick={onBack}>
+          Back
+        </button>
+        <div className="no-svg-message">
+          <h3>No SVG yet</h3>
+          <p>This lot does not have a map SVG uploaded yet.</p>
+        </div>
+      </div>
+    );
   }
+
+if (!SvgComponent) {
+  return (
+    <div className="lot-map-view">
+      <div className="svg-loading">
+        <p>Loading SVG...</p>
+      </div>
+    </div>
+  );
+}
 
   return (
     <div className="lot-map-view">

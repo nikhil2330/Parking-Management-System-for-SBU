@@ -60,8 +60,6 @@ async function updateSpotAndLotStatus(spotId, lotId) {
  * Create a new reservation with enhanced error handling.
  */
 exports.createReservation = async (req, res) => {
-  console.log('Reservation request received:', req.body);
-  console.log('User from JWT:', req.user);
 
   const { lotId, spotId, building, startTime, endTime, totalPrice } = req.body;
   const userId = req.user?.id;
@@ -99,12 +97,10 @@ exports.createReservation = async (req, res) => {
     const spot = await ParkingSpot.findOne({ spotId });
     if (spot) {
       spotObjectId = spot._id;
-      console.log('Found spot by spotId:', spotObjectId);
     } else {
       // If spot not found by spotId, try using the ID directly if it's a valid ObjectId
       if (mongoose.Types.ObjectId.isValid(spotId)) {
         spotObjectId = new mongoose.Types.ObjectId(spotId);
-        console.log('Using spotId as ObjectId:', spotObjectId);
       } else {
         console.log('Invalid spotId format:', spotId);
         return res.status(400).json({ error: 'Invalid spot ID format' });
@@ -115,10 +111,8 @@ exports.createReservation = async (req, res) => {
     const lot = await ParkingLot.findOne({ lotId });
     if (lot) {
       lotObjectId = lot._id;
-      console.log('Found lot by lotId:', lotObjectId);
     } else if (mongoose.Types.ObjectId.isValid(lotId)) {
       lotObjectId = new mongoose.Types.ObjectId(lotId);
-      console.log('Using lotId as ObjectId:', lotObjectId);
     } else {
       console.log('Invalid lotId format:', lotId);
       return res.status(400).json({ error: 'Invalid lot ID format' });
@@ -176,11 +170,19 @@ exports.createReservation = async (req, res) => {
     await session.commitTransaction();
     return res.status(201).json(newRes);
   } catch (err) {
-    if (session.inTransaction()) {
-      await session.abortTransaction();
+    try {
+      if (session.inTransaction()) {
+        await session.abortTransaction();
+      }
+    } catch (abortErr) {
     }
     console.error('Error creating reservation:', err);
-
+    if (err.code === 11000) {
+      return res.status(409).json({ error: 'Spot already reserved for this time window.' });
+    }
+    if (err.code === 112) { // WriteConflict
+      return res.status(409).json({ error: 'Spot already reserved for this time window.' });
+    }
     // Enhanced error response
     if (err.name === 'ValidationError') {
       const validationErrors = {};

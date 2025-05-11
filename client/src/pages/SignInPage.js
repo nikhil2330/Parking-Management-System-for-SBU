@@ -81,7 +81,10 @@ function SignInPage() {
     }
   };
 
-  const togglePasswordVisibility = () => setShowPassword(!showPassword);
+  // Fixed toggle function
+  const togglePasswordVisibility = () => {
+    setShowPassword(prevState => !prevState);
+  };
 
   /* ---------------- render ---------------- */
   return (
@@ -107,7 +110,7 @@ function SignInPage() {
         <div className="campus-content" style={{ opacity: 0 }}>
           <div className="campus-badge">
             <span className="badge-icon">🏛️</span>
-            <span className="badge-text">STONY BROOK UNIVERSITY</span>
+            <span className="badge-text">STONY BROOK UNIVERSITY</span>
           </div>
           <h1 className="campus-headline">
             Smarter Parking<br />for Campus Life
@@ -154,7 +157,7 @@ function SignInPage() {
         </div>
 
         <div className="form-content">
-          <h1 className="welcomeline">Welcome Back!</h1>
+          <h1 className="welcomeline">Welcome Back!</h1>
           <p className="signin-subheading">
             Sign in to manage your parking reservations
           </p>
@@ -183,17 +186,25 @@ function SignInPage() {
 
               <div className="input-group">
                 <label htmlFor="password" className="input-label">Password</label>
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  id="password"
-                  className="input-field"
-                  placeholder="Enter your password"
-                  value={password}
-                  onChange={e => setPassword(e.target.value)}
-                  autoComplete="current-password"
-                />
-                <div className="input-icon" onClick={togglePasswordVisibility}>
-                  {showPassword ? '👁️' : '👁️‍🗨️'}
+                <div className="password-input-container">
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    id="password"
+                    className="input-field"
+                    placeholder="Enter your password"
+                    value={password}
+                    onChange={e => setPassword(e.target.value)}
+                    autoComplete="current-password"
+                  />
+                  <button 
+                    type="button"
+                    className="password-toggle-btn"
+                    onClick={togglePasswordVisibility}
+                    tabIndex="-1"
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showPassword ? '👁️' : '👁️‍🗨️'}
+                  </button>
                 </div>
               </div>
 
@@ -210,9 +221,6 @@ function SignInPage() {
                     Remember me
                   </label>
                 </div>
-                <a href="#forgot-password" className="forgot-link">
-                  Forgot password?
-                </a>
               </div>
 
               <button type="submit" className="signin-btn">Sign In</button>

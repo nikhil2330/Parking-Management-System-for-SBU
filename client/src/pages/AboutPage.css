@@ -1,0 +1,377 @@
+/* About page styling that matches the premium aesthetic */
+.about-page {
+    min-height: 100vh;
+    background: linear-gradient(135deg, var(--gray-50) 0%, var(--gray-100) 100%);
+    font-family: 'Inter', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    color: var(--gray-800);
+    position: relative;
+    overflow-x: hidden;
+  }
+  
+  /* Animated background decoration */
+  .bg-shape {
+    position: absolute;
+    z-index: 1;
+    opacity: 0.4;
+    pointer-events: none;
+  }
+  
+  .about-shape-1 {
+    top: 10%;
+    right: 5%;
+    width: 300px;
+    height: 300px;
+    background-color: var(--primary-red);
+    border-radius: 72% 28% 70% 30% / 42% 67% 33% 58%;
+    filter: blur(60px);
+    animation: float 15s ease-in-out infinite;
+  }
+  
+  .about-shape-2 {
+    bottom: 30%;
+    left: 5%;
+    width: 250px;
+    height: 250px;
+    background-color: var(--primary-dark);
+    border-radius: 24% 76% 35% 65% / 58% 17% 83% 42%;
+    filter: blur(60px);
+    animation: float 18s ease-in-out infinite reverse;
+    animation-delay: 2s;
+  }
+  
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
+  
+  /* Hero section */
+  .about-hero-section {
+    background: linear-gradient(135deg, var(--primary-dark) 0%, #152a4d 100%);
+    padding: 4rem 0;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    color: var(--white);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    margin-bottom: 3rem;
+  }
+  
+  .about-hero-section::before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    background-image: url("data:image/svg+xml,%3Csvg width='100' height='20' viewBox='0 0 100 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M21.184 20c.357-.13.72-.264.888-.14 1.005.626 1.87 1.05 2.693 1.08.896.033 1.342-.19 1.604-.612.263-.423.396-1.012.396-1.777 0-.726-.123-1.306-.356-1.767-.226-.454-.74-.98-1.238-1.29-.41-.248-.874-.43-1.416-.43-.463 0-.86.127-1.306.127-.857 0-1.574-.484-2.097-.997a4.559 4.559 0 00-.335-.39c-.77-.755-1.493-1.428-2.354-1.126-.648.227-1.13.89-1.275 1.865-.145.977-.035 2.13.557 2.93.39.52.887.807 1.525.863.464.04.934-.142 1.412-.433.318-.193.658-.446.976-.763.156-.158.316-.326.48-.504.164-.178.334-.35.5-.514l-.86.063c.286-.223.55-.47.785-.76.265-.355.506-.753.707-1.19.293-.585.522-1.304.717-2.133.147-.636.26-1.31.322-2.02.053-.653.07-1.326.07-1.993 0-.647-.366-1.223-.913-1.516a1.468 1.468 0 00-.756-.212c-.12 0-.213.047-.28.133-.63.076-.14.195-.14.357 0 .237.053.418.15.54.11.142.146.3.146.477 0 .347-.174.67-.37.877-.19.204-.39.315-.548.315-.336 0-.59-.14-.84-.414-.18-.21-.28-.657-.28-1.343 0-.677.058-1.286.196-1.837.14-.548.345-1.026.626-1.434.285-.408.615-.76 1.006-1.06.39-.3.837-.553 1.337-.743.267-.1.52-.187.803-.256.284-.07.662-.134.963-.134.872 0 1.597.194 2.133.583.573.392.914.992.914 1.742 0 .82-.045 1.643-.127 2.468-.08.823-.2 1.646-.346 2.47-.16.86-.392 1.62-.702 2.238h.005zM12.84 20.112c.1-.277.205-.552.32-.83.962-2.33 2.147-4.42 3.555-6.314.42-.572.83-1.126 1.23-1.663.395-.537.724-1.05.996-1.532.27-.486.466-.96.594-1.417.13-.457.194-.895.194-1.315 0-.374-.052-.732-.18-1.072-.115-.34-.302-.63-.533-.905-.232-.27-.52-.483-.854-.625-.32-.143-.65-.267-1.027-.267-.414 0-.788.12-1.148.326a3.57 3.57 0 00-.949.845 4.685 4.685 0 00-.68 1.186 5.12 5.12 0 00-.394 1.355c-.04.265-.076.527-.076.787 0 .437.09.83.283 1.17.18.34.473.605.88.78.156.068.33.113.52.113.245 0 .498-.06.752-.18.254-.12.515-.296.714-.515l.375-.375c.13-.132.273-.227.435-.25.166-.025.31.02.43.13.119.11.188.26.214.462.025.173-.018.39-.147.63-.13.248-.345.484-.676.702-.332.22-.773.32-1.174.32-.7 0-1.292-.192-1.76-.564-.482-.376-.83-.912-1.087-1.596-.262-.697-.382-1.494-.382-2.395 0-.873.095-1.642.295-2.324.195-.683.474-1.255.83-1.726.375-.47.795-.838 1.29-1.102.494-.265 1.004-.396 1.544-.396.435 0 .85.064 1.25.195.406.13.77.32 1.094.562.328.244.594.553.804.93.204.375.314.819.314 1.333 0 .592-.11 1.172-.318 1.742a7.53 7.53 0 01-.886 1.726 16.04 16.04 0 01-1.28 1.726 44.667 44.667 0 01-1.514 1.742 66.54 66.54 0 01-1.593 1.726c-.553.577-1.1 1.16-1.647 1.744-.412.437-.83.872-1.237 1.297-.338.353-.673.712-.9 1.06a2.348 2.348 0 00-.21.322c-.42.83-.084.166-.084.166.062-.01.118-.037.18-.037.257 0 .514.07.743.219.212.137.494.283.751.49.313.254.66.437.77.758.1.326.364.7.446 1.1.088.404.343.757.594 1.06 1.12 1.338 2.855 1.867 4.483 2.198.16.033.32.064.48.094' fill='%23ffffff' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
+    z-index: -1;
+  }
+  
+  .about-hero-content {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 2rem;
+  }
+  
+  .about-hero-content h1 {
+    font-size: 3.5rem;
+    font-weight: 800;
+    margin-bottom: 1rem;
+    color: var(--white);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+  
+  .about-hero-content p {
+    font-size: 1.4rem;
+    margin-bottom: 1.5rem;
+    color: rgba(255, 255, 255, 0.9);
+  }
+  
+  /* Main content container */
+  .about-content-container {
+    width: 92%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding-bottom: 4rem;
+    position: relative;
+    z-index: 2;
+  }
+  
+  /* Section headers */
+  .section-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    position: relative;
+  }
+  
+  .section-header h2 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--primary-dark);
+    margin-bottom: 1rem;
+  }
+  
+  .section-divider {
+    width: 80px;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-red), var(--primary-dark));
+    margin: 0 auto;
+    border-radius: 2px;
+  }
+  
+  /* Mentor section */
+  .about-mentor-section {
+    margin-bottom: 5rem;
+    background: var(--white);
+    border-radius: 16px;
+    padding: 3rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  }
+  
+  .mentor-profile {
+    display: flex;
+    align-items: flex-start;
+    gap: 3rem;
+  }
+  
+  .mentor-image-container {
+    flex-shrink: 0;
+    width: 250px;
+    height: 250px;
+    border-radius: 50%;
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    border: 5px solid var(--white);
+  }
+  
+  .mentor-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .mentor-info {
+    flex-grow: 1;
+  }
+  
+  .mentor-info h3 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary-dark);
+    margin-bottom: 0.5rem;
+  }
+  
+  .mentor-info h4 {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: var(--primary-red);
+    margin-bottom: 1rem;
+  }
+  
+  .mentor-info p {
+    font-size: 1.1rem;
+    color: var(--gray-700);
+    line-height: 1.6;
+    margin-bottom: 1rem;
+  }
+  
+  .mentor-contact {
+    margin: 1.5rem 0;
+    padding: 1rem;
+    background-color: var(--gray-50);
+    border-radius: 8px;
+    border-left: 4px solid var(--primary-red);
+  }
+  
+  .mentor-bio {
+    font-size: 1.1rem;
+    line-height: 1.8;
+  }
+  
+  /* Team section */
+  .about-team-section {
+    margin-bottom: 5rem;
+    background: var(--white);
+    border-radius: 16px;
+    padding: 3rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  }
+  
+  .team-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 3rem;
+  }
+  
+  .team-member {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 2rem;
+    background-color: var(--gray-50);
+    border-radius: 16px;
+    transition: all 0.3s ease;
+    border: 1px solid var(--gray-100);
+  }
+  
+  .team-member:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    border-color: var(--gray-200);
+  }
+  
+  .team-member-image-container {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    border: 4px solid var(--white);
+  }
+  
+  .team-member-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .team-member h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary-dark);
+    margin-bottom: 0.5rem;
+  }
+  
+  .team-member h4 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--primary-red);
+    margin-bottom: 0.5rem;
+  }
+  
+  .team-member p {
+    font-size: 1rem;
+    color: var(--gray-600);
+    margin-bottom: 1.5rem;
+  }
+  
+  .team-member-bio {
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: var(--gray-700);
+  }
+  
+  /* Mission section */
+  .about-mission-section {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 3rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  }
+  
+  .mission-content {
+    max-width: 900px;
+    margin: 0 auto;
+    text-align: center;
+  }
+  
+  .mission-content p {
+    font-size: 1.2rem;
+    line-height: 1.8;
+    color: var(--gray-700);
+    margin-bottom: 1.5rem;
+  }
+  
+  .mission-content p:last-child {
+    margin-bottom: 0;
+  }
+  
+  /* Responsive styles */
+  @media screen and (max-width: 1100px) {
+    .team-grid {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+  }
+  
+  @media screen and (max-width: 900px) {
+    .mentor-profile {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 2rem;
+    }
+    
+    .mentor-contact {
+      text-align: left;
+    }
+    
+    .about-hero-content h1 {
+      font-size: 2.5rem;
+    }
+    
+    .about-mentor-section,
+    .about-team-section,
+    .about-mission-section {
+      padding: 2rem;
+    }
+  }
+  
+  @media screen and (max-width: 600px) {
+    .about-hero-content h1 {
+      font-size: 2rem;
+    }
+    
+    .about-hero-content p {
+      font-size: 1.1rem;
+    }
+    
+    .section-header h2 {
+      font-size: 1.8rem;
+    }
+    
+    .mentor-image-container {
+      width: 200px;
+      height: 200px;
+    }
+    
+    .mentor-info h3 {
+      font-size: 1.6rem;
+    }
+    
+    .mentor-info h4 {
+      font-size: 1.2rem;
+    }
+    
+    .team-member {
+      padding: 1.5rem;
+    }
+    
+    .team-member-image-container {
+      width: 150px;
+      height: 150px;
+    }
+    
+    .mission-content p {
+      font-size: 1rem;
+    }
+  }
+
+  .team-member-image-container {
+    width: 180px;
+    height: auto;
+    max-height: 220px;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    border: 4px solid var(--white);
+  }
+  
+  .team-member-image {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
