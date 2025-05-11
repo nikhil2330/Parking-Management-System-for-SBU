@@ -110,8 +110,7 @@ function AboutPage() {
                 <p>
                   Shiv is a junior at Stony Brook University majoring in Computer Science. Outside of his academic
                   commitments, Shiv spends his time working out, playing soccer, and reading about current events
-                  around the world. His analytical mind and problem-solving skills have been key assets to the development
-                  of P4SBU.
+                  around the world.
                 </p>
               </div>
             </div>
@@ -128,8 +127,7 @@ function AboutPage() {
                 <p>
                   Nikhil is a senior at Stony Brook University majoring in Computer Science. Beyond his technical 
                   contributions to P4SBU, Nikhil is a professional basketball player. He also enjoys working out 
-                  and playing the piano in his spare time. His diverse talents and creative approach have helped 
-                  shape the user experience of the platform.
+                  and playing the piano in his spare time.
                 </p>
               </div>
             </div>

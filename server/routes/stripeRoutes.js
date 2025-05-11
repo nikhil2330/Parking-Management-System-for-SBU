@@ -30,8 +30,8 @@ router.post(
       const session = await stripeSvc.createCheckoutSession({
         reservation,
         user: req.user,
-        successUrl: 'http://localhost:3000/reservations?session_id={CHECKOUT_SESSION_ID}',
-        cancelUrl: 'http://localhost:3000/reservations?checkout=cancel',
+        successUrl: 'https://cse416-client.onrender.com/reservations?session_id={CHECKOUT_SESSION_ID}',
+        cancelUrl: 'https://cse416-client.onrender.com?checkout=cancel',
       });
 
       reservation.stripeSessionId = session.id;
@@ -132,8 +132,8 @@ router.post(
       const session = await stripeSvc.createTicketCheckoutSession({
         ticket,
         user: req.user,
-        successUrl: 'http://localhost:3000/tickets?session_id={CHECKOUT_SESSION_ID}',
-        cancelUrl: 'http://localhost:3000/tickets?checkout=cancel'
+        successUrl: 'https://cse416-client.onrender.com/tickets?session_id={CHECKOUT_SESSION_ID}',
+        cancelUrl: 'https://cse416-client.onrender.com/tickets?checkout=cancel'
       });
 
       ticket.stripeSessionId = session.id;
@@ -184,8 +184,8 @@ router.post(
       const session = await stripeSvc.createEventReservationCheckoutSession({
         eventReservation: evRes,
         user: req.user,
-        successUrl: 'http://localhost:3000/event-reservations?session_id={CHECKOUT_SESSION_ID}',
-        cancelUrl: 'http://localhost:3000/event-reservations?checkout=cancel'
+        successUrl: 'https://cse416-client.onrender.com/event-reservations?session_id={CHECKOUT_SESSION_ID}',
+        cancelUrl: 'https://cse416-client.onrender.com/event-reservations?checkout=cancel'
       });
 
       evRes.stripeSessionId = session.id;
