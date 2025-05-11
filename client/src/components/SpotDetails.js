@@ -105,6 +105,20 @@ const PopularTimesChart = ({ popularTimes, capacity, onBack }) => {
   );
 }
 
+const CATEGORY_LABELS = {
+  facultyStaff: "Faculty & Staff",
+  commuterPremium: "Commuter Premium",
+  metered: "Metered",
+  commuter: "Commuter",
+  resident: "Resident",
+  ada: "Accessible",
+  reservedMisc: "Reserved (Misc)",
+  stateVehiclesOnly: "State Vehicles Only",
+  specialServiceVehiclesOnly: "Special Service Vehicles Only",
+  stateAndSpecialServiceVehicles: "State & Special Service Vehicles",
+  evCharging: "Electric Vehicle",
+};
+
 const SpotDetails = ({ spotId, onClose, onReserve, onGetDirections, minWalkTime, maxWalkTime, dateTimeRange }) => {
   const [spotData, setSpotData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -391,8 +405,7 @@ const SpotDetails = ({ spotId, onClose, onReserve, onGetDirections, minWalkTime,
               <div className="categories-inline">
                 {activeCategories.map((item) => (
                   <span key={item.key} className="category-badge">
-                    {item.key}: {item.value}
-                  </span>
+                  {CATEGORY_LABELS[item.key] || item.key}: {item.value}                  </span>
                 ))}
               </div>
             </div>

@@ -4,6 +4,8 @@ const mongoose = require('mongoose');
 const ParkingLot = require('../models/ParkingLot');
 const ParkingSpot = require('../models/ParkingSpot');
 const User = require('../models/User');
+const Reservation = require('../models/Reservation');
+
 
 require('dotenv').config({ path: '../config/.env' });
 
@@ -48,6 +50,8 @@ describe('Concurrency: Reservation Double-Booking Prevention', () => {
   });
 
   afterAll(async () => {
+    await Reservation.deleteMany({});
+
     await mongoose.disconnect();
   });
 
@@ -58,7 +62,7 @@ describe('Concurrency: Reservation Double-Booking Prevention', () => {
 
     // Simulate 10 concurrent requests
     const promises = [];
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 100; i++) {
       promises.push(
         request(app)
           .post('/api/reservation')
@@ -78,6 +82,6 @@ describe('Concurrency: Reservation Double-Booking Prevention', () => {
     const success = results.filter(r => r.statusCode === 201);
     const failures = results.filter(r => [400, 409].includes(r.statusCode));
     expect(success.length).toBe(1);
-    expect(failures.length).toBe(9);
-  });
+    expect(failures.length).toBe(99);
+  }, 60000);
 });
