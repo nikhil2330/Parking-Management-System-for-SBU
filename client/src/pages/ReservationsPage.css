@@ -75,6 +75,26 @@
   z-index: 10;
 }
 
+.reservation-datetime-row {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  width: 100%;
+  margin-bottom: 0.1rem;
+}
+
+.reservation-datetime-label.inline {
+  font-size: 0.98rem;
+  font-weight: 600;
+  color: var(--primary-red);
+  min-width: 56px;   /* Make sure both labels have the same width */
+  width: 56px;
+  margin-bottom: 0;
+  margin-right: 0.4rem;
+  text-align: left;
+  display: inline-block;
+}
+
 /* Main content layout */
 .reservations-container {
   max-width: 1200px;

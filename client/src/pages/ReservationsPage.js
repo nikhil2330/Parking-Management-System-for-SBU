@@ -7,6 +7,7 @@ import ApiService from '../services/api';
 import GoogleMapService from '../services/GoogleMapService';
 import EventReservationService from '../services/EventReservationService';
 import './ReservationsPage.css';
+import dayjs from 'dayjs';
 import ReservationTypeToggle from '../components/ReservationTypeToggle';
 
 function ReservationsPage() {
@@ -198,14 +199,15 @@ function ReservationsPage() {
         if (!dailyStartDate || !dailyEndDate)
           return alert('Select a start and end date.');
 
-        const startD = new Date(dailyStartDate);
-        const endD = new Date(dailyEndDate);
-        const diff = (endD - startD) / 864e5;
-        if (diff < 0 || diff > 15)
-          return alert('Date range must be between 0-15 days.');
+      const startD = dayjs(`${dailyStartDate}T${dailyStartTime}`);
+      const endD = dayjs(`${dailyEndDate}T${dailyEndTime}`);
 
-        if (dailyStartTime >= dailyEndTime)
-          return alert('End time must be after start time.');
+      const diff = endD.diff(startD, 'day');
+      if (diff < 0 || diff > 15)
+        return alert('Date range must be between 0-15 days.');
+
+      if (dailyStartTime >= dailyEndTime)
+        return alert('End time must be after start time.');
 
         await ReservationService.createReservationRequest({
           type: 'daily',

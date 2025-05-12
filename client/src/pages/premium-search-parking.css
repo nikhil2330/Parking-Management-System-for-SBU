@@ -829,46 +829,7 @@
   background-color: var(--gray-50);
 } */
 
-  .reservation-type-toggle {
-    display: flex;
-    gap: 0.25rem;
-    margin-bottom: 0.5rem;
-    justify-content: flex-start;
-    background: var(--gray-50);
-    border-radius: 999px;
-    padding: 0.25rem;
-    width: fit-content;
-    margin-left: auto;
-    margin-right: auto;
-  }
-  
-  .reservation-type-toggle-btn {
-    padding: 0.3rem 1rem;
-    border: none;
-    border-radius: 999px;
-    background: transparent;
-    color: var(--primary-red);
-    font-weight: 600;
-    font-size: 0.98rem;
-    cursor: pointer;
-    transition: background 0.15s, color 0.15s;
-    outline: none;
-    min-width: 80px;
-    box-shadow: none;
-  }
-  
-  .reservation-type-toggle-btn.active,
-  .reservation-type-toggle-btn:focus {
-    background: var(--primary-red);
-    color: #fff;
-    box-shadow: 0 2px 8px rgba(153,0,0,0.08);
-  }
-  
-  .reservation-type-toggle-btn:not(.active):hover {
-    background: #ffe5e5;
-    color: var(--primary-red);
-  }
-  
+
 .lot-svg {
   width: 100%;
   height: 100%;
@@ -1335,61 +1296,54 @@
 }
 
 .reservation-datetime-bar.vertical {
-  background: var(--white);
-  border-radius: 14px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-  padding: 0.7rem 1rem 0.7rem 1rem;
-  gap: 0.6rem;
-  margin-bottom: 1rem;
   width: 100%;
-  min-width: 0;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
   align-items: stretch;
+  background: var(--white);
+  border-radius: 14px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  padding: 0.7rem 1rem 0.7rem 1rem; /* less vertical padding */
+  gap: 0.6rem; /* less gap between rows */
+  font-size: 1rem;
+  min-width: 0;
+  margin-bottom: 1rem; /* gap below container */
 }
-  .reservation-datetime-label.inline {
-    color: var(--primary-red);
-    font-weight: 700;
-    font-size: 1rem;
-    min-width: 44px;
-    margin-bottom: 0;
-    margin-right: 0.4rem;
-    text-align: left;
-  }
-  
-  /* Compact row for start/end */
-  .reservation-datetime-row {
-    display: flex;
-    align-items: center;
-    gap: 0.7rem;
-    margin-bottom: 0.2rem;
-    width: 100%;
-  }
-  
 
-  .reservation-datetime-input {
-    border: 1.5px solid var(--gray-200);
-    border-radius: 8px;
-    padding: 0.25rem 0.1rem;
-    font-size: 0.98rem;
-    background: var(--white);
-    color: var(--primary-dark);
-    outline: none;
-    transition: border 0.2s;
-    width: 220px; /* increased width for full date/time visibility */
-    height: 32px;
-  }
+.reservation-datetime-row {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  width: 100%;
+  margin-bottom: 0.1rem;
+}
 
+.reservation-datetime-label.inline {
+  font-size: 0.98rem;
+  font-weight: 600;
+  color: var(--primary-red);
+  min-width: 44px;
+  margin-bottom: 0;
+  margin-right: 0.4rem;
+  text-align: left;
+}
 
-  
-.reservation-datetime-input:focus {
+.reservation-datetime-input.wide {
+  border: 1.5px solid var(--gray-200);
+  border-radius: 8px;
+  padding: 0.25rem 0.7rem;
+  font-size: 0.98rem;
+  background: var(--white);
+  color: var(--primary-dark);
+  outline: none;
+  transition: border 0.2s;
+  width: 220px; /* increased width for full date/time visibility */
+  height: 32px;
+}
+
+.reservation-datetime-input.wide:focus {
   border-color: var(--primary-red);
-}
-
-/* Semester select */
-.reservation-datetime-input.semester {
-  width: 180px;
-  font-weight: 400;
 }
 
 

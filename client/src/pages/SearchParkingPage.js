@@ -65,57 +65,53 @@ function SearchParkingPage() {
   const [isCollapsed, setIsCollapsed] = useState(true);
   const [mapCenter, setMapCenter] = useState(undefined);
   const [autoCenter, setAutoCenter] = useState(true);
-  const [reservationType, setReservationType] = useState("hourly");
-
-// Hourly
-function getNextHourDate() {
-  const now = new Date();
-  now.setMinutes(0, 0, 0);
-  now.setHours(now.getHours() + 1);
-  return now;
-}
-function formatDateForInput(date) {
-  const pad = (n) => n.toString().padStart(2, "0");
-  return (
-    date.getFullYear() +
-    "-" +
-    pad(date.getMonth() + 1) +
-    "-" +
-    pad(date.getDate()) +
-    "T" +
-    pad(date.getHours()) +
-    ":" +
-    pad(date.getMinutes())
-  );
-}
-const defaultStart = getNextHourDate();
-const defaultEnd = new Date(defaultStart);
-defaultEnd.setHours(defaultEnd.getHours() + 1);
-const [dateTimeRange, setDateTimeRange] = useState({
-  start: formatDateForInput(defaultStart),
-  end: formatDateForInput(defaultEnd),
-});
-
-// Daily
-const [dailyStartTime, setDailyStartTime] = useState(dayjs().hour(8).minute(0).format("HH:mm"));
-const [dailyEndTime, setDailyEndTime] = useState(dayjs().hour(12).minute(0).format("HH:mm"));
-const [dailyDateRange, setDailyDateRange] = useState({
-  start: dayjs().add(1, "day").format("YYYY-MM-DD"),
-  end: dayjs().add(1, "day").format("YYYY-MM-DD"),
-});
-
-// Semester
-const [semester, setSemester] = useState("summer");
-const SEMESTER_BOUNDS = {
-  summer: { start: "2025-05-20T00:00", end: "2025-08-10T23:59" },
-  fall: { start: "2025-08-20T00:00", end: "2025-12-20T23:59" },
-  winter: { start: "2026-01-01T00:00", end: "2025-01-28T23:59" },
-};
+  const reservationType = "hourly";
+  const [dailyStartTime, setDailyStartTime] = useState("09:00");
+  const [dailyEndTime, setDailyEndTime] = useState("14:00");
+  const [dailyDateRange, setDailyDateRange] = useState({
+    start: dayjs().format("YYYY-MM-DD"),
+    end: dayjs().add(1, "day").format("YYYY-MM-DD"),
+  });
+  const [semester, setSemester] = useState("spring"); // spring|summer|fall
+  const SEMESTER_BOUNDS = {
+    spring: { start: "2025-01-20T00:00", end: "2025-05-15T23:59" },
+    summer: { start: "2025-05-20T00:00", end: "2025-08-10T23:59" },
+    fall: { start: "2025-08-20T00:00", end: "2025-12-20T23:59" },
+  };
   const [spotWalkTimes, setSpotWalkTimes] = useState({});
   const [draftFilters, setDraftFilters] = useState(DEFAULT_FILTERS);
   // "Active" filters are only set when you click Apply Filters
   const [activeFilters, setActiveFilters] = useState(DEFAULT_FILTERS);
 
+
+  function getNextHourDate() {
+    const now = new Date();
+    now.setMinutes(0, 0, 0);
+    now.setHours(now.getHours() + 1);
+    return now;
+  }
+  function formatDateForInput(date) {
+    const pad = (n) => n.toString().padStart(2, "0");
+    return (
+      date.getFullYear() +
+      "-" +
+      pad(date.getMonth() + 1) +
+      "-" +
+      pad(date.getDate()) +
+      "T" +
+      pad(date.getHours()) +
+      ":" +
+      pad(date.getMinutes())
+    );
+  }
+  const defaultStart = getNextHourDate();
+  const defaultEnd = new Date(defaultStart);
+  defaultEnd.setHours(defaultEnd.getHours() + 1);
+
+  const [dateTimeRange, setDateTimeRange] = useState({
+    start: formatDateForInput(defaultStart),
+    end: formatDateForInput(defaultEnd),
+  });
   const [appliedDateTimeRange, setAppliedDateTimeRange] = useState({
     start: formatDateForInput(defaultStart),
     end: formatDateForInput(defaultEnd),
@@ -340,11 +336,9 @@ const SEMESTER_BOUNDS = {
         })
       );
       /* work out the start / end pair based on reservationType */
-      let searchStart, searchEnd;
-      if (reservationType === "hourly") {
-        searchStart = dateTimeRange.start;
-        searchEnd = dateTimeRange.end;
-      } else if (reservationType === "daily") {
+      let searchStart = appliedDateTimeRange.start;
+      let searchEnd = appliedDateTimeRange.end;
+      if (reservationType === "daily") {
         searchStart = `${dailyDateRange.start}T${dailyStartTime}`;
         searchEnd = `${dailyDateRange.end}T${dailyEndTime}`;
       } else if (reservationType === "semester") {
@@ -625,142 +619,102 @@ const SEMESTER_BOUNDS = {
       <div className="search-container">
         {/* Filters Panel */}
         <div className="filters-sidebar">
-          {/* Reservation Type Toggle */}
-          <div className="reservation-type-toggle">
-            <button
-              type="button"
-              className={`reservation-type-toggle-btn${
-                reservationType === "hourly" ? " active" : ""
-              }`}
-              onClick={() => setReservationType("hourly")}
-              aria-pressed={reservationType === "hourly"}
-            >
-              Hourly
-            </button>
-            <button
-              type="button"
-              className={`reservation-type-toggle-btn${
-                reservationType === "daily" ? " active" : ""
-              }`}
-              onClick={() => setReservationType("daily")}
-              aria-pressed={reservationType === "daily"}
-            >
-              Daily
-            </button>
-            <button
-              type="button"
-              className={`reservation-type-toggle-btn${
-                reservationType === "semester" ? " active" : ""
-              }`}
-              onClick={() => setReservationType("semester")}
-              aria-pressed={reservationType === "semester"}
-            >
-              Semester
-            </button>
-          </div>
-
-          {/* Hourly */}
+          {/* ---------- Hourly-mode pickers ---------- */}
           {reservationType === "hourly" && (
-  <div className="reservation-datetime-bar vertical">
-    <div className="reservation-datetime-row">
-      <label className="reservation-datetime-label inline" htmlFor="searchStartTime">
-        Start
-      </label>
-      <input
-        className="reservation-datetime-input"
-        type="datetime-local"
-        id="searchStartTime"
-        value={dateTimeRange.start}
-        onChange={(e) =>
-          setDateTimeRange((prev) => ({
-            ...prev,
-            start: e.target.value,
-          }))
-        }
-        max={dateTimeRange.end}
-      />
-    </div>
-    <div className="reservation-datetime-row">
-      <label className="reservation-datetime-label inline" htmlFor="searchEndTime">
-        End
-      </label>
-      <input
-        className="reservation-datetime-input"
-        type="datetime-local"
-        id="searchEndTime"
-        value={dateTimeRange.end}
-        onChange={(e) =>
-          setDateTimeRange((prev) => ({
-            ...prev,
-            end: e.target.value,
-          }))
-        }
-        min={dateTimeRange.start}
-      />
-    </div>
-  </div>
-)}
+            <div className="reservation-datetime-bar vertical">
+              <div className="reservation-datetime-row">
+                <label className="reservation-datetime-label inline" htmlFor="searchStartTime">
+                  Start
+                </label>
+                <input
+                  className="reservation-datetime-input wide"
+                  type="datetime-local"
+                  id="searchStartTime"
+                  value={dateTimeRange.start}
+                  onChange={(e) => handleDateTimeRangeChange("start", e.target.value)}
+                  max={dateTimeRange.end}
+                />
+              </div>
+              <div className="reservation-datetime-row">
+                <label className="reservation-datetime-label inline" htmlFor="searchEndTime">
+                  End
+                </label>
+                <input
+                  className="reservation-datetime-input wide"
+                  type="datetime-local"
+                  id="searchEndTime"
+                  value={dateTimeRange.end}
+                  onChange={(e) => handleDateTimeRangeChange("end", e.target.value)}
+                  min={dateTimeRange.start}
+                />
+              </div>
+            </div>
+          )}
 
-{/* Daily */}
-{reservationType === "daily" && (
-  <div className="reservation-datetime-bar vertical">
-    <div className="reservation-datetime-row">
-      <label className="reservation-datetime-label inline">Start</label>
-      <input
-        className="reservation-datetime-input"
-        type="date"
-        value={dailyDateRange.start}
-        max={dailyDateRange.end}
-        onChange={(e) =>
-          setDailyDateRange((r) => ({ ...r, start: e.target.value }))
-        }
-      />
-      <input
-        className="reservation-datetime-input"
-        type="time"
-        value={dailyStartTime}
-        onChange={(e) => setDailyStartTime(e.target.value)}
-      />
-    </div>
-    <div className="reservation-datetime-row">
-      <label className="reservation-datetime-label inline">End</label>
-      <input
-        className="reservation-datetime-input"
-        type="date"
-        value={dailyDateRange.end}
-        min={dailyDateRange.start}
-        onChange={(e) =>
-          setDailyDateRange((r) => ({ ...r, end: e.target.value }))
-        }
-      />
-      <input
-        className="reservation-datetime-input"
-        type="time"
-        value={dailyEndTime}
-        onChange={(e) => setDailyEndTime(e.target.value)}
-      />
-    </div>
-    <small style={{ color: "#999", marginLeft: "2.5rem" }}>Max span: 15 days</small>
-  </div>
-)}
+          {/* ---------- Daily-mode pickers ---------- */}
+          {reservationType === "daily" && (
+            <div className="reservation-datetime-bar vertical">
+              <div className="reservation-datetime-row">
+                <label className="reservation-datetime-label inline">From (date)</label>
+                <input
+                  className="reservation-datetime-input"
+                  type="date"
+                  value={dailyDateRange.start}
+                  max={dailyDateRange.end}
+                  onChange={(e) =>
+                    setDailyDateRange((r) => ({ ...r, start: e.target.value }))
+                  }
+                />
+              </div>
+              <div className="reservation-datetime-row">
+                <label className="reservation-datetime-label inline">To (date)</label>
+                <input
+                  className="reservation-datetime-input"
+                  type="date"
+                  value={dailyDateRange.end}
+                  min={dailyDateRange.start}
+                  onChange={(e) =>
+                    setDailyDateRange((r) => ({ ...r, end: e.target.value }))
+                  }
+                />
+              </div>
+              <div className="reservation-datetime-row">
+                <label className="reservation-datetime-label inline">Start (time)</label>
+                <input
+                  className="reservation-datetime-input"
+                  type="time"
+                  value={dailyStartTime}
+                  onChange={(e) => setDailyStartTime(e.target.value)}
+                />
+              </div>
+              <div className="reservation-datetime-row">
+                <label className="reservation-datetime-label inline">End (time)</label>
+                <input
+                  className="reservation-datetime-input"
+                  type="time"
+                  value={dailyEndTime}
+                  onChange={(e) => setDailyEndTime(e.target.value)}
+                />
+              </div>
+              <small style={{ color: "#999" }}>Max span: 15 days</small>
+            </div>
+          )}
 
-{/* Semester */}
-{reservationType === "semester" && (
-  <div className="reservation-datetime-bar vertical">
-    <div className="reservation-datetime-row">
-      <label className="reservation-datetime-label inline">Semester</label>
-      <select
-        className="reservation-datetime-input semester"
-        value={semester}
-        onChange={(e) => setSemester(e.target.value)}
-      >
-        <option value="spring">Spring (Jan 20 – May 15)</option>
-        <option value="summer">Summer (May 20 – Aug 10)</option>
-        <option value="fall">Fall (Aug 20 – Dec 20)</option>
-      </select>
-    </div>
-  </div>
-)}
+          {/* ---------- Semester-mode picker ---------- */}
+          {reservationType === "semester" && (
+            <div className="reservation-datetime-bar vertical">
+              <label className="reservation-datetime-label inline">Semester</label>
+              <select
+                className="reservation-datetime-input"
+                value={semester}
+                onChange={(e) => setSemester(e.target.value)}
+              >
+                <option value="spring">Spring (20 Jan – 15 May)</option>
+                <option value="summer">Summer (20 May – 10 Aug)</option>
+                <option value="fall">Fall (20 Aug – 20 Dec)</option>
+              </select>
+            </div>
+          )}
           <div className="filters-panel">
             <div className="filters-header">
               <svg
@@ -850,7 +804,10 @@ const SEMESTER_BOUNDS = {
                           }))
                         }
                       />
-                      <label htmlFor={cat}>{CATEGORY_LABELS[cat] || cat}</label>
+                      <label htmlFor={cat}>
+                      {CATEGORY_LABELS[cat] || cat}
+
+                      </label>
                     </div>
                   ))}
                 </div>
@@ -1046,7 +1003,7 @@ const SEMESTER_BOUNDS = {
                                     alt="Recenter"
                                   />
                                 </button>
-
+                                
                                 <button
                                   className="spot-card-show-spot-btn"
                                   onClick={() => {
@@ -1074,11 +1031,8 @@ const SEMESTER_BOUNDS = {
                                   <img
                                     src={require("../assets/focus.png")}
                                     alt="Show Spot"
-                                    style={{
-                                      filter: svgExists
-                                        ? "none"
-                                        : "grayscale(100%)",
-                                    }}
+                                    style={{ filter: svgExists ? "none" : "grayscale(100%)" }}
+
                                   />
                                 </button>
                               </div>
@@ -1328,8 +1282,8 @@ const SEMESTER_BOUNDS = {
               minWalkTime={spotWalkTimes[selectedDetailSpot]?.min}
               maxWalkTime={spotWalkTimes[selectedDetailSpot]?.max}
               dateTimeRange={appliedDateTimeRange}
-              // minWalkTime={selectedWalkTimes.minWalkTime}
-              // maxWalkTime={selectedWalkTimes.maxWalkTime}
+            // minWalkTime={selectedWalkTimes.minWalkTime}
+            // maxWalkTime={selectedWalkTimes.maxWalkTime}
             />
           </div>
         </div>
