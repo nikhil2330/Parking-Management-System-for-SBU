@@ -25,11 +25,17 @@ function ReservationsPage() {
     endTime: '',
     totalPrice: 0
   });
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const yyyy = tomorrow.getFullYear();
+  const mm = String(tomorrow.getMonth() + 1).padStart(2, '0');
+  const dd = String(tomorrow.getDate()).padStart(2, '0');
+  const tomorrowStr = `${yyyy}-${mm}-${dd}`;
   const [reservationType, setReservationType] = useState('hourly');  // 'hourly' | 'daily' | 'semester'
   const [dailyStartTime, setDailyStartTime] = useState('09:00');
   const [dailyEndTime, setDailyEndTime] = useState('14:00');
-  const [dailyStartDate, setDailyStartDate] = useState('');
-  const [dailyEndDate, setDailyEndDate] = useState('');
+  const [dailyStartDate, setDailyStartDate] = useState(tomorrowStr);
+  const [dailyEndDate, setDailyEndDate] = useState(tomorrowStr);
   const [semester, setSemester] = useState('spring');
   const [showMapModal, setShowMapModal] = useState(false);
   const [mapUrl, setMapUrl] = useState('');
@@ -708,32 +714,51 @@ function ReservationsPage() {
       <div className="reservations-container">
         <div className="page-header">
           <h1>My Reservations</h1>
-          <button className="return-home-btn" onClick={() => navigate('/home')}>
+          <button className="return-home-btn" onClick={() => navigate("/home")}>
             Return to Home
           </button>
         </div>
-        {error && (
-          <div className="error-message">{error}</div>
-        )}
+        {error && <div className="error-message">{error}</div>}
         {!showReservationForm && !loading && (
           <div className="action-buttons">
-            <button className="new-reservation-btn" onClick={() => navigate('/search-parking')}>
+            <button
+              className="new-reservation-btn"
+              onClick={() => navigate("/search-parking")}
+            >
               Find Parking to Reserve
             </button>
-            <button className="new-event-reservation-btn" onClick={() => navigate('/event-reservation')}>
+            <button
+              className="new-event-reservation-btn"
+              onClick={() => navigate("/event-reservation")}
+            >
               Create Event Reservation
             </button>
           </div>
         )}
         {!showReservationForm && !loading && (
           <div className="reservation-tabs">
-            <div className={`reservation-tab ${activeTab === 'all' ? 'active' : ''}`} onClick={() => setActiveTab('all')}>
+            <div
+              className={`reservation-tab ${
+                activeTab === "all" ? "active" : ""
+              }`}
+              onClick={() => setActiveTab("all")}
+            >
               All Reservations
             </div>
-            <div className={`reservation-tab ${activeTab === 'regular' ? 'active' : ''}`} onClick={() => setActiveTab('regular')}>
+            <div
+              className={`reservation-tab ${
+                activeTab === "regular" ? "active" : ""
+              }`}
+              onClick={() => setActiveTab("regular")}
+            >
               Regular Spots
             </div>
-            <div className={`reservation-tab ${activeTab === 'event' ? 'active' : ''}`} onClick={() => setActiveTab('event')}>
+            <div
+              className={`reservation-tab ${
+                activeTab === "event" ? "active" : ""
+              }`}
+              onClick={() => setActiveTab("event")}
+            >
               Event Reservations
             </div>
           </div>
@@ -746,20 +771,31 @@ function ReservationsPage() {
             <div className="reservation-form-body">
               <form onSubmit={handleCreateReservation}>
                 {/* === Reservation Type toggle === */}
-                <ReservationTypeToggle value={reservationType} onChange={setReservationType} />
+                <ReservationTypeToggle
+                  value={reservationType}
+                  onChange={setReservationType}
+                />
 
                 {/* ---------- HOURLY (old behaviour) ---------- */}
-                {reservationType === 'hourly' && (
+                {reservationType === "hourly" && (
                   <>
                     <div className="reservation-form-group">
-                      <label className="reservation-form-label" htmlFor="startTime">Start Time:</label>
+                      <label
+                        className="reservation-form-label"
+                        htmlFor="startTime"
+                      >
+                        Start Time:
+                      </label>
                       <input
                         className="reservation-form-input"
                         type="datetime-local"
                         id="startTime"
                         value={newReservation.startTime}
                         onChange={(e) =>
-                          setNewReservation({ ...newReservation, startTime: e.target.value })
+                          setNewReservation({
+                            ...newReservation,
+                            startTime: e.target.value,
+                          })
                         }
                         min={formatLocalDateTimeInput(new Date())}
                         required
@@ -767,14 +803,22 @@ function ReservationsPage() {
                     </div>
 
                     <div className="reservation-form-group">
-                      <label className="reservation-form-label" htmlFor="endTime">End Time:</label>
+                      <label
+                        className="reservation-form-label"
+                        htmlFor="endTime"
+                      >
+                        End Time:
+                      </label>
                       <input
                         className="reservation-form-input"
                         type="datetime-local"
                         id="endTime"
                         value={newReservation.endTime}
                         onChange={(e) =>
-                          setNewReservation({ ...newReservation, endTime: e.target.value })
+                          setNewReservation({
+                            ...newReservation,
+                            endTime: e.target.value,
+                          })
                         }
                         min={newReservation.startTime}
                         required
@@ -784,18 +828,20 @@ function ReservationsPage() {
                 )}
 
                 {/* ---------- DAILY (admin-approval request) ---------- */}
-                {reservationType === 'daily' && (
+                {reservationType === "daily" && (
                   <>
                     <div className="reservation-form-group">
-                      <label className="reservation-form-label">Daily **time window**:</label>
-                      <div style={{ display: 'flex', gap: 8 }}>
+                      <label className="reservation-form-label">
+                        Daily Time Window:
+                      </label>
+                      <div className="time-range">
                         <input
                           type="time"
                           value={dailyStartTime}
                           onChange={(e) => setDailyStartTime(e.target.value)}
                           required
                         />
-                        <span style={{ alignSelf: 'center' }}>to</span>
+                        <span className="to-label">to</span>
                         <input
                           type="time"
                           value={dailyEndTime}
@@ -804,17 +850,18 @@ function ReservationsPage() {
                         />
                       </div>
                     </div>
-
                     <div className="reservation-form-group">
-                      <label className="reservation-form-label">Date range (≤ 15 days):</label>
-                      <div style={{ display: 'flex', gap: 8 }}>
+                      <label className="reservation-form-label">
+                        Date Range (≤ 15 days):
+                      </label>
+                      <div className="date-range">
                         <input
                           type="date"
                           value={dailyStartDate}
                           onChange={(e) => setDailyStartDate(e.target.value)}
                           required
                         />
-                        <span style={{ alignSelf: 'center' }}>→</span>
+                        <span className="to-label">→</span>
                         <input
                           type="date"
                           value={dailyEndDate}
@@ -827,7 +874,7 @@ function ReservationsPage() {
                 )}
 
                 {/* ---------- SEMESTER (admin-approval request) ---------- */}
-                {reservationType === 'semester' && (
+                {reservationType === "semester" && (
                   <div className="reservation-form-group">
                     <label className="reservation-form-label">Semester:</label>
                     <select
@@ -867,14 +914,15 @@ function ReservationsPage() {
                 </div> */}
                 <div className="reservation-form-footer">
                   <div className="reservation-form-note">
-                    <strong>Note:</strong> Price is calculated at $2.50 per hour based on your selected timeframe.
+                    <strong>Note:</strong> Price is calculated at $2.50 per hour
+                    based on your selected timeframe.
                   </div>
                   <div className="reservation-form-actions">
                     <button
                       type="button"
                       onClick={() => {
                         setShowReservationForm(false);
-                        navigate('/reservations', { replace: true });
+                        navigate("/reservations", { replace: true });
                       }}
                       className="reservation-form-btn reservation-cancel-btn"
                     >
@@ -900,24 +948,70 @@ function ReservationsPage() {
         ) : groupedReservations.all.length === 0 && !showReservationForm ? (
           <div className="no-reservations">
             <div className="no-reservations-icon">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
                 <circle cx="12" cy="12" r="10"></circle>
                 <path d="M8 15h8"></path>
                 <path d="M9 9h.01"></path>
                 <path d="M15 9h.01"></path>
               </svg>
             </div>
-            <h3>No {activeTab !== 'all' ? (activeTab === 'regular' ? 'Regular' : 'Event') : ''} Reservations Found</h3>
-            <p>You don't have any {activeTab !== 'all' ? (activeTab === 'regular' ? 'regular' : 'event') : 'active'} parking reservations at the moment.</p>
+            <h3>
+              No{" "}
+              {activeTab !== "all"
+                ? activeTab === "regular"
+                  ? "Regular"
+                  : "Event"
+                : ""}{" "}
+              Reservations Found
+            </h3>
+            <p>
+              You don't have any{" "}
+              {activeTab !== "all"
+                ? activeTab === "regular"
+                  ? "regular"
+                  : "event"
+                : "active"}{" "}
+              parking reservations at the moment.
+            </p>
           </div>
         ) : (
           !showReservationForm && (
             <div className="reservations-content">
-              {renderReservationGroup("Active Reservations", groupedReservations.active, <span>🟢 </span>)}
-              {renderReservationGroup("Pending Reservations", groupedReservations.pending, <span>🕒 </span>)}
-              {renderReservationGroup("Approved Event Reservations", groupedReservations.approved, <span>✅ </span>)}
-              {renderReservationGroup("Completed Reservations", groupedReservations.completed, <span>✔️ </span>)}
-              {renderReservationGroup("Cancelled & Rejected Reservations", groupedReservations.cancelled, <span>❌ </span>)}
+              {renderReservationGroup(
+                "Active Reservations",
+                groupedReservations.active,
+                <span>🟢 </span>
+              )}
+              {renderReservationGroup(
+                "Pending Reservations",
+                groupedReservations.pending,
+                <span>🕒 </span>
+              )}
+              {renderReservationGroup(
+                "Approved Event Reservations",
+                groupedReservations.approved,
+                <span>✅ </span>
+              )}
+              {renderReservationGroup(
+                "Completed Reservations",
+                groupedReservations.completed,
+                <span>✔️ </span>
+              )}
+              {renderReservationGroup(
+                "Cancelled & Rejected Reservations",
+                groupedReservations.cancelled,
+                <span>❌ </span>
+              )}
             </div>
           )
         )}
