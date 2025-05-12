@@ -7,6 +7,7 @@ const Reservation = require('../models/Reservation');
 const stripeSvc = require('../controllers/StripeController');
 const Ticket = require('../models/Ticket');
 const EventReservation = require('../models/EventReservation');
+const mongoose = require('mongoose');
 
 const Stripe = require('stripe');
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: '2023-10-16' });
@@ -22,22 +23,64 @@ router.post(
   async (req, res) => {
 
     try {
-      const reservation = await Reservation.findById(req.body.reservationId);
-      if (!reservation) return res.status(404).json({ message: 'Reservation not found' });
-      if (reservation.paymentStatus === 'paid')
+      // const reservation = await Reservation.findById(req.body.reservationId);
+      // if (!reservation) return res.status(404).json({ message: 'Reservation not found' });
+      // if (reservation.paymentStatus === 'paid')
+      //   return res.status(400).json({ message: 'Already paid' });
+
+      // const session = await stripeSvc.createCheckoutSession({
+      //   reservation,
+      //   user: req.user,
+      //   successUrl: 'http://localhost:3000/reservations?session_id={CHECKOUT_SESSION_ID}',
+      //   cancelUrl: 'http://localhost:3000/reservations?checkout=cancel',
+      // });
+
+      // reservation.stripeSessionId = session.id;
+      // await reservation.save();
+
+      // res.json({ url: session.url });
+      const { reservationId } = req.body;
+      /* ------------------------------------------------------------
+     The id coming from the UI can be either:
+       • a single Reservation _id (hourly)  OR
+       • the parentRequest _id that owns many children (daily/semester)
+     ------------------------------------------------------------ */
+
+      let reservations = [];
+
+      // 1.  Attempt single-reservation lookup first
+      if (mongoose.Types.ObjectId.isValid(reservationId)) {
+        const one = await Reservation.findById(reservationId);
+        if (one) reservations.push(one);
+      }
+      // 2.  If nothing found, treat it as parentRequest
+      if (reservations.length === 0) {
+        reservations = await Reservation.find({ parentRequest: reservationId });
+        if (reservations.length === 0)
+          return res.status(404).json({ message: 'Reservation not found' });
+      }
+      // 3.  Guard against double-payment
+      if (reservations.every(r => r.paymentStatus === 'paid'))
         return res.status(400).json({ message: 'Already paid' });
 
+      // 4.  Aggregate the grand total
+      const totalPrice = reservations.reduce((sum, r) => sum + r.totalPrice, 0);
+      const base = process.env.CLIENT_URL || 'http://localhost:3000';
+
       const session = await stripeSvc.createCheckoutSession({
-        reservation,
+        reservation: { _id: reservationId, totalPrice }, // synthetic obj
         user: req.user,
-        successUrl: 'https://cse416-client.onrender.com/reservations?session_id={CHECKOUT_SESSION_ID}',
-        cancelUrl: 'https://cse416-client.onrender.com?checkout=cancel',
+        successUrl: `${base}/reservations?session_id={CHECKOUT_SESSION_ID}`,
+        cancelUrl: `${base}/reservations?checkout=cancel`
       });
-
-      reservation.stripeSessionId = session.id;
-      await reservation.save();
-
-      res.json({ url: session.url });
+      // 5.  Store the session id on every sibling so we can mark them ‘paid’ later
+      await Promise.all(
+        reservations.map(r => {
+          r.stripeSessionId = session.id;
+          return r.save();
+        })
+      );
+      return res.json({ url: session.url });
     } catch (err) {
       console.error(err);
       res.status(500).json({ message: 'Stripe session error' });
@@ -94,10 +137,12 @@ router.post(
             await ticket.save();
           }
         } else if (session.metadata.reservationId) {
-          const reservation = await Reservation.findOne({ stripeSessionId: session.id });
-          if (reservation && reservation.paymentStatus !== 'paid') {
-            reservation.paymentStatus = 'paid';
-            await reservation.save();
+          const reservations = await Reservation.find({ stripeSessionId: session.id });
+          for (const r of reservations) {
+            if (r.paymentStatus !== 'paid') {
+              r.paymentStatus = 'paid';
+              await r.save();
+            }
           }
         }
         else if (session.metadata.eventReservationId) {
@@ -128,12 +173,13 @@ router.post(
       const ticket = await Ticket.findById(req.body.ticketId);
       if (!ticket) return res.status(404).json({ message: 'Ticket not found' });
       if (ticket.status === 'paid') return res.status(400).json({ message: 'Already paid' });
+      const base = process.env.CLIENT_URL || 'http://localhost:3000';
 
       const session = await stripeSvc.createTicketCheckoutSession({
         ticket,
         user: req.user,
-        successUrl: 'https://cse416-client.onrender.com/tickets?session_id={CHECKOUT_SESSION_ID}',
-        cancelUrl: 'https://cse416-client.onrender.com/tickets?checkout=cancel'
+        successUrl: `${base}/tickets?session_id={CHECKOUT_SESSION_ID}`,
+        cancelUrl: `${base}/tickets?checkout=cancel`
       });
 
       ticket.stripeSessionId = session.id;
@@ -180,12 +226,13 @@ router.post(
         return res.status(400).json({ message: 'Reservation not approved yet' });
       if (evRes.paymentStatus === 'paid')
         return res.status(400).json({ message: 'Already paid' });
+      const base = process.env.CLIENT_URL || 'http://localhost:3000';
 
       const session = await stripeSvc.createEventReservationCheckoutSession({
         eventReservation: evRes,
         user: req.user,
-        successUrl: 'https://cse416-client.onrender.com/event-reservations?session_id={CHECKOUT_SESSION_ID}',
-        cancelUrl: 'https://cse416-client.onrender.com/event-reservations?checkout=cancel'
+        successUrl: `${base}/event-reservation?session_id={CHECKOUT_SESSION_ID}`,
+        cancelUrl:  `${base}/event-reservation?checkout=cancel`
       });
 
       evRes.stripeSessionId = session.id;

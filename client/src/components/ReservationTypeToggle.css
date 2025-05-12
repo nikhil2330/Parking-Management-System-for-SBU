@@ -1,0 +1,56 @@
+/* ReservationTypeToggle.css  – premium pill buttons  */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* wrapper keeps the three pills on one line */
+.toggle-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;                     /* same spacing as .header-nav */
+  font-family: 'Inter', sans-serif;
+}
+
+/* ------------- default state ------------- */
+.toggle-wrapper button {
+  /* reset */
+  appearance: none;
+  border: none;
+  outline: none;
+  background: transparent;
+
+  /* pill look */
+  padding: 0.5rem 1rem;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  background: var(--gray-50);
+  color: var(--gray-700);
+
+  /* extras */
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+  border: 1px solid var(--gray-100);
+}
+
+/* ------------- hover ------------- */
+.toggle-wrapper button:hover {
+  background: var(--primary-red);
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(153, 0, 0, 0.2);
+}
+
+/* ------------- “active” (selected) ------------- */
+.toggle-wrapper button.active {
+  background: var(--primary-red);
+  color: #fff;
+  box-shadow: 0 6px 15px rgba(153, 0, 0, 0.2);
+  /* keep it slightly raised even when not hovering */
+  transform: translateY(-2px);
+}
+
+/* ------------- focus (keyboard users) ------------- */
+.toggle-wrapper button:focus-visible {
+  outline: 3px solid var(--info-blue);
+  outline-offset: 2px;
+}

@@ -21,7 +21,7 @@ const { transform } = require('@svgr/core');
 const neo4jDriver = require('../neo4j/neo4jDriver');
 const Feedback = require('../models/Feedback');
 
-const upload = multer();
+const upload = multer();const reservationRequestController = require('../controllers/reservationRequestController');
 
 // Protect all routes
 router.use(authenticateJWT, requireAdmin);
@@ -247,6 +247,16 @@ router.get('/pending', async (_req, res) => {
   } catch (err) {
     console.error('Pending fetch error:', err);
     res.status(500).json({ ok: false, message: 'Error fetching pending users' });
+  }
+});
+
+router.get('/users', async (_req, res) => {
+  try {
+    const users = await User.find().select('-password');
+    res.json(users);
+  } catch (err) {
+    console.error('Admin users list error:', err);
+    res.status(500).json({ ok:false, message:'Error fetching users' });
   }
 });
 
@@ -658,6 +668,28 @@ router.post('/users/bulk/reject', async (req, res) => {
     res.status(500).json({ ok: false, message: 'Error in bulk reject' });
   }
 });
+
+/* ──────────────────────────────────────────────────────────────── */
+/* Reservation-request workflow (daily / semester)                 */
+/* ──────────────────────────────────────────────────────────────── */
+// GET  /api/admin/reservation-requests            → list all pending
+router.get(
+  '/reservation-requests',
+  reservationRequestController.listPending
+);
+
+// PATCH  /api/admin/reservation-requests/:id/approve  → bulk-create
+router.patch(
+  '/reservation-requests/:id/approve',
+  reservationRequestController.approve
+);
+
+// PATCH  /api/admin/reservation-requests/:id/reject   → mark rejected
+router.patch(
+  '/reservation-requests/:id/reject',
+  reservationRequestController.reject
+);
+
 
 router.get('/analytics', analyticsController.getAnalytics);
 

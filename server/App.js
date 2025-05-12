@@ -44,6 +44,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Mount routes
+app.use('/api', require('./routes/reservationRequestRoutes'));
 app.use('/api/auth', authRoutes);
 app.use('/api/users', authenticateJWT, userRoutes);
 app.use('/api/reservation', authenticateJWT, reservationRoutes);

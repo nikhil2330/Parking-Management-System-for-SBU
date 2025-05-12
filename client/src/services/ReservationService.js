@@ -39,11 +39,11 @@ const createReservation = async (data) => {
       data: error.response?.data,
       message: error.message
     });
-    
+
     if (error.response?.data?.details) {
       console.error('Server error details:', error.response.data.details);
     }
-    
+
     if (error.response && error.response.data) {
       throw new Error(error.response.data.error || 'Failed to create reservation');
     } else {
@@ -97,9 +97,45 @@ const cancelReservation = async (id) => {
   }
 };
 
+// ①  Create a daily / semester *request* (goes to admin queue)
+const createReservationRequest = async (data) => {
+  try {
+    const res = await API.post('/reservation-requests', data);
+    return res.data;             // ← ReservationRequest doc
+  } catch (err) {
+    if (err.response?.status === 409) {
+      // re-throw with the full list of conflicting windows
+      err.conflicts = err.response.data.conflicts || [];
+    }
+    throw err;
+  }
+};
+
+// ②  Admin dashboard – fetch everything still waiting
+const listPendingRequests = async () => {
+  const res = await API.get('/admin/reservation-requests');
+  return res.data;               // ← array of ReservationRequest docs
+};
+
+// ③  Admin approves
+const approveRequest = async (id) => {
+  const res = await API.patch(`/admin/reservation-requests/${id}/approve`);
+  return res.data;
+};
+
+// ④  Admin rejects
+const rejectRequest = async (id) => {
+  const res = await API.patch(`/admin/reservation-requests/${id}/reject`);
+  return res.data;
+};
+
 export default {
   createReservation,
   getReservations,
   updateReservation,
-  cancelReservation
+  cancelReservation,
+  createReservationRequest,
+  listPendingRequests,
+  approveRequest,
+  rejectRequest
 };

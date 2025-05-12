@@ -70,7 +70,7 @@ function TicketsPage() {
     if (!sessionId) return;
     (async () => {
       try {
-        await api.post('/auth/ping');        // optional keep-alive if you need it
+        // await api.post('/auth/ping');        // optional keep-alive if you need it
         await ApiService.payment.confirmTicket(sessionId);
         // refresh list
         const { data } = await api.get('/tickets/user');
@@ -142,14 +142,14 @@ function TicketsPage() {
     
     setActiveTicket(ticket);
     setShowModal(true);
-    try {
-          const { url } =
-            await ApiService.payment.createTicketCheckoutSession(ticket._id);
-          window.location.href = url;     
-        } catch (err) {
-          console.error(err);
-          alert(err.message || 'Could not start checkout');
-        }
+    // try {
+    //       const { url } =
+    //         await ApiService.payment.createTicketCheckoutSession(ticket._id);
+    //       window.location.href = url;     
+    //     } catch (err) {
+    //       console.error(err);
+    //       alert(err.message || 'Could not start checkout');
+    //     }
   };
 
   // Process payment
@@ -160,10 +160,11 @@ function TicketsPage() {
     
     try {
       // Simulate payment processing delay for a better user experience
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      await api.patch(`/tickets/${activeTicket._id}/status`, { status: 'paid' });
-      
+      // await new Promise(resolve => setTimeout(resolve, 1500));
+      // await api.patch(`/tickets/${activeTicket._id}/status`, { status: 'paid' });
+      const { url } =
+      await ApiService.payment.createTicketCheckoutSession(activeTicket._id);
+      window.location.href = url;          // Stripe will bring us back
       // Update local state
       setTickets(prev => prev.map(t => 
         t._id === activeTicket._id ? { ...t, status: 'paid', paymentDate: new Date() } : t
@@ -172,7 +173,7 @@ function TicketsPage() {
       setShowModal(false);
       
       // Show success message
-      setShowPaymentSuccess(true);
+      //setShowPaymentSuccess(true);
       
       // Focus on success message for screen readers
       setTimeout(() => {
@@ -442,9 +443,9 @@ function TicketsPage() {
       {/* Decorative background elements */}
       <div className="bg-shape bg-shape-1" aria-hidden="true"></div>
       <div className="bg-shape bg-shape-2" aria-hidden="true"></div>
-      
+
       <Header />
-      
+
       <div className="tickets-container">
         <section className="tickets-header">
           <div className="tickets-title">
@@ -452,98 +453,120 @@ function TicketsPage() {
             <p>View and manage your parking violations</p>
           </div>
         </section>
-        
+
         <section className="tickets-stats">
           <div className="stat-card">
             <h3>Total Tickets</h3>
             <div className="stat-value">{stats.total}</div>
           </div>
-          
+
           <div className="stat-card">
             <h3>Pending</h3>
             <div className="stat-value pending">{stats.pending}</div>
           </div>
-          
+
           <div className="stat-card">
             <h3>Paid</h3>
             <div className="stat-value paid">{stats.paid}</div>
           </div>
-          
+
           <div className="stat-card">
             <h3>Overdue</h3>
             <div className="stat-value overdue">{stats.overdue}</div>
           </div>
-          
+
           <div className="stat-card amount">
             <h3>Total Amount</h3>
-            <div className="stat-value">{formatCurrency(stats.totalAmount)}</div>
+            <div className="stat-value">
+              {formatCurrency(stats.totalAmount)}
+            </div>
           </div>
-          
+
           <div className="stat-card amount">
             <h3>Remaining</h3>
-            <div className="stat-value">{formatCurrency(stats.remainingAmount)}</div>
+            <div className="stat-value">
+              {formatCurrency(stats.remainingAmount)}
+            </div>
           </div>
         </section>
-        
+
         {tickets.length === 0 ? (
           <div className="empty-tickets">
             <div className="empty-icon">🎉</div>
             <h2>No Tickets Found</h2>
-            <p>{error || "You don't have any parking tickets at the moment. Great job!"}</p>
+            <p>
+              {error ||
+                "You don't have any parking tickets at the moment. Great job!"}
+            </p>
           </div>
         ) : (
           <section className="tickets-list">
             <h2>Your Tickets</h2>
-            
+
             <div className="tickets-grid">
-              {tickets.map(ticket => {
+              {tickets.map((ticket) => {
                 const daysInfo = getDaysInfo(ticket.dueDate);
-                
+
                 return (
-                  <div 
-                    key={ticket._id} 
+                  <div
+                    key={ticket._id}
                     className={`ticket-card ${ticket.status}`}
                   >
                     <div className="ticket-header">
-                      <div className="ticket-amount">{formatCurrency(ticket.amount)}</div>
+                      <div className="ticket-amount">
+                        {formatCurrency(ticket.amount)}
+                      </div>
                       <div className={`ticket-status ${ticket.status}`}>
-                        {ticket.status === 'paid' ? 'PAID' : 
-                         ticket.status === 'overdue' ? 'OVERDUE' : 'PENDING'}
+                        {ticket.status === "paid"
+                          ? "PAID"
+                          : ticket.status === "overdue"
+                          ? "OVERDUE"
+                          : "PENDING"}
                       </div>
                     </div>
-                    
+
                     <div className="ticket-content">
                       <div className="ticket-reason">{ticket.reason}</div>
-                      
+
                       <div className="ticket-dates">
                         <div className="date-item">
                           <span className="date-label">Issued:</span>
-                          <span className="date-value">{formatDate(ticket.issueDate)}</span>
+                          <span className="date-value">
+                            {formatDate(ticket.issueDate)}
+                          </span>
                         </div>
-                        
+
                         <div className="date-item">
                           <span className="date-label">Due:</span>
-                          <span className="date-value">{formatDate(ticket.dueDate)}</span>
+                          <span className="date-value">
+                            {formatDate(ticket.dueDate)}
+                          </span>
                         </div>
-                        
+
                         {ticket.paymentDate && (
                           <div className="date-item">
                             <span className="date-label">Paid:</span>
-                            <span className="date-value">{formatDate(ticket.paymentDate)}</span>
+                            <span className="date-value">
+                              {formatDate(ticket.paymentDate)}
+                            </span>
                           </div>
                         )}
                       </div>
-                      
-                      {ticket.status !== 'paid' && (
-                        <div className={`days-info ${daysInfo.isOverdue ? 'overdue' : ''}`}>
+
+                      {ticket.status !== "paid" && (
+                        <div
+                          className={`days-info ${
+                            daysInfo.isOverdue ? "overdue" : ""
+                          }`}
+                        >
                           {daysInfo.text}
                         </div>
                       )}
                     </div>
-                    
+
                     <div className="ticket-footer">
-                      {ticket.status !== 'paid' && (
-                        <button 
+                      {ticket.status !== "paid" && (
+                        <button
                           className="pay-button"
                           onClick={() => handlePayTicket(ticket._id)}
                         >
@@ -558,52 +581,70 @@ function TicketsPage() {
           </section>
         )}
       </div>
-      
+
       {/* Payment Modal - Simplified without credit card selection */}
       {showModal && activeTicket && (
         <div className="payment-modal-overlay">
-          <div className="payment-modal" role="dialog" aria-labelledby="payment-title">
+          <div
+            className="payment-modal"
+            role="dialog"
+            aria-labelledby="payment-title"
+          >
             <div className="payment-header">
               <h2 id="payment-title">Payment Confirmation</h2>
-              <button className="close-button" onClick={cancelPayment} aria-label="Close payment dialog">×</button>
+              <button
+                className="close-button"
+                onClick={cancelPayment}
+                aria-label="Close payment dialog"
+              >
+                ×
+              </button>
             </div>
-            
+
             <div className="payment-details">
               <div className="payment-row">
                 <span className="payment-label">Ticket Amount:</span>
-                <span className="payment-value">{formatCurrency(activeTicket.amount)}</span>
+                <span className="payment-value">
+                  {formatCurrency(activeTicket.amount)}
+                </span>
               </div>
-              
               <div className="payment-row">
                 <span className="payment-label">Reason:</span>
                 <span className="payment-value">{activeTicket.reason}</span>
               </div>
-              
               <div className="payment-row">
                 <span className="payment-label">Due Date:</span>
-                <span className="payment-value">{formatDate(activeTicket.dueDate)}</span>
+                <span className="payment-value">
+                  {formatDate(activeTicket.dueDate)}
+                </span>
               </div>
-              
               <hr className="payment-divider" />
-              
               <div className="payment-row total">
                 <span className="payment-label">Total:</span>
-                <span className="payment-value">{formatCurrency(activeTicket.amount)}</span>
+                <span className="payment-value">
+                  {formatCurrency(activeTicket.amount)}
+                </span>
               </div>
             </div>
-            
+
             <div className="payment-methods">
               <h3>Payment Method</h3>
-              <p className="payment-info">Your default payment method will be used for this transaction.</p>
+              <p className="payment-info">
+                Your default payment method will be used for this transaction.
+              </p>
             </div>
-            
+
             <div className="payment-actions">
-              <button className="cancel-payment" onClick={cancelPayment} disabled={paymentProcessing}>
+              <button
+                className="cancel-payment"
+                onClick={cancelPayment}
+                disabled={paymentProcessing}
+              >
                 Cancel
               </button>
-              <button 
-                className="confirm-payment" 
-                onClick={processPayment} 
+              <button
+                className="confirm-payment"
+                onClick={processPayment}
                 disabled={paymentProcessing}
               >
                 {paymentProcessing ? (
@@ -619,15 +660,30 @@ function TicketsPage() {
           </div>
         </div>
       )}
-      
+
       {/* Payment Success Modal */}
       {showPaymentSuccess && activeTicket && (
-        <div className="payment-success-container" role="dialog" aria-labelledby="success-title">
-          <div className="payment-success-card" tabIndex="-1" ref={successMessageRef}>
+        <div
+          className="payment-success-container"
+          role="dialog"
+          aria-labelledby="success-title"
+        >
+          <div
+            className="payment-success-card"
+            tabIndex="-1"
+            ref={successMessageRef}
+          >
             <div className="success-checkmark">✓</div>
-            <h2 id="success-title" className="success-title">Payment Successful!</h2>
-            <p className="success-message">Thank you for your payment. Your parking ticket has been marked as paid.</p>
-            <div className="success-amount">{formatCurrency(activeTicket.amount)}</div>
+            <h2 id="success-title" className="success-title">
+              Payment Successful!
+            </h2>
+            <p className="success-message">
+              Thank you for your payment. Your parking ticket has been marked as
+              paid.
+            </p>
+            <div className="success-amount">
+              {formatCurrency(activeTicket.amount)}
+            </div>
             <div>
               <button className="receipt-button" onClick={downloadReceipt}>
                 <span aria-hidden="true">📄</span> View Receipt
@@ -639,7 +695,7 @@ function TicketsPage() {
           </div>
         </div>
       )}
-      
+
       <Footer />
     </div>
   );

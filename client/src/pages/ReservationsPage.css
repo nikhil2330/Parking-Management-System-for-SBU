@@ -75,6 +75,26 @@
   z-index: 10;
 }
 
+.reservation-datetime-row {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  width: 100%;
+  margin-bottom: 0.1rem;
+}
+
+.reservation-datetime-label.inline {
+  font-size: 0.98rem;
+  font-weight: 600;
+  color: var(--primary-red);
+  min-width: 56px;   /* Make sure both labels have the same width */
+  width: 56px;
+  margin-bottom: 0;
+  margin-right: 0.4rem;
+  text-align: left;
+  display: inline-block;
+}
+
 /* Main content layout */
 .reservations-container {
   max-width: 1200px;
@@ -298,6 +318,41 @@
 
 .reservation-form-group {
   margin-bottom: 1.5rem;
+}
+
+.reservation-form-group .time-range,
+.reservation-form-group .date-range {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.reservation-form-group input[type="time"],
+.reservation-form-group input[type="date"],
+.reservation-form-group select {
+  padding: 0.65rem 1rem;
+  border: 1px solid var(--gray-300);
+  border-radius: 8px;
+  font-size: 1rem;
+  background: var(--gray-50);
+  color: var(--gray-800);
+  transition: border 0.2s;
+  width: auto;
+  min-width: 120px;
+}
+
+.reservation-form-group input[type="time"]:focus,
+.reservation-form-group input[type="date"]:focus,
+.reservation-form-group select:focus {
+  border-color: var(--primary-dark);
+  outline: none;
+}
+
+.reservation-form-group .to-label {
+  color: var(--gray-500);
+  font-weight: 500;
+  font-size: 1rem;
+  margin: 0 0.5rem;
 }
 
 .reservation-form-label {
