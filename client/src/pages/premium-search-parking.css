@@ -1347,21 +1347,22 @@
   flex-direction: column;
   align-items: stretch;
 }
-  .reservation-datetime-label.inline {
-    color: var(--primary-red);
-    font-weight: 700;
-    font-size: 1rem;
-    min-width: 44px;
-    margin-bottom: 0;
-    margin-right: 0.4rem;
-    text-align: left;
-  }
+.reservation-datetime-label.inline {
+  color: var(--primary-red);
+  font-weight: 700;
+  font-size: 1rem;
+  min-width: 56px;   /* Make sure both labels have the same width */
+  width: 56px;
+  margin-bottom: 0;
+  text-align: left;
+  display: inline-block;
+}
   
   /* Compact row for start/end */
   .reservation-datetime-row {
     display: flex;
     align-items: center;
-    gap: 0.7rem;
+    gap: 0.1rem;
     margin-bottom: 0.2rem;
     width: 100%;
   }
@@ -1388,7 +1389,8 @@
 
 /* Semester select */
 .reservation-datetime-input.semester {
-  width: 180px;
+  margin-left: 30px;
+  width: 200px;
   font-weight: 400;
 }
 
