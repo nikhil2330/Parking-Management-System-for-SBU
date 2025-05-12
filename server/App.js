@@ -18,7 +18,7 @@ const feedbackRoutes = require('./routes/feedbackRoutes'); // Import the feedbac
 const app = express();
 const allowedOrigins = [
   'http://localhost:3000',
-  'https://p4sbu-01client.onrender.com'
+  'https://cse416-client.onrender.com'
 ];
 
 // Only allow frontend running on localhost:3000

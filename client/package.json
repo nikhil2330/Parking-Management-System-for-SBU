@@ -1,6 +1,6 @@
 {
   "name": "client",
-  "proxy": "https://p4sbu.onrender.com/api",
+  "proxy": "https://localhost:8000/api",
 
   "version": "0.1.0",
   "private": true,
