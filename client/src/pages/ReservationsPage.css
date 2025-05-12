@@ -300,6 +300,41 @@
   margin-bottom: 1.5rem;
 }
 
+.reservation-form-group .time-range,
+.reservation-form-group .date-range {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.reservation-form-group input[type="time"],
+.reservation-form-group input[type="date"],
+.reservation-form-group select {
+  padding: 0.65rem 1rem;
+  border: 1px solid var(--gray-300);
+  border-radius: 8px;
+  font-size: 1rem;
+  background: var(--gray-50);
+  color: var(--gray-800);
+  transition: border 0.2s;
+  width: auto;
+  min-width: 120px;
+}
+
+.reservation-form-group input[type="time"]:focus,
+.reservation-form-group input[type="date"]:focus,
+.reservation-form-group select:focus {
+  border-color: var(--primary-dark);
+  outline: none;
+}
+
+.reservation-form-group .to-label {
+  color: var(--gray-500);
+  font-weight: 500;
+  font-size: 1rem;
+  margin: 0 0.5rem;
+}
+
 .reservation-form-label {
   display: block;
   font-weight: 600;

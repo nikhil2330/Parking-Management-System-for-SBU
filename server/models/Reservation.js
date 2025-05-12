@@ -35,6 +35,11 @@ const ReservationSchema = new Schema({
     enum: ['unpaid', 'paid'], 
     default: 'unpaid' 
   },
+  parentRequest:{ 
+    type:Schema.Types.ObjectId, 
+    ref:'ReservationRequest',
+    default: null  
+  },
   stripeSessionId: {                
     type: String,
     default: null

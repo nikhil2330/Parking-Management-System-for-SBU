@@ -2,7 +2,8 @@ import axios from 'axios';
 
 // Create axios instance with auth header
 const API = axios.create({
-  baseURL: '/api'
+  baseURL: process.env.REACT_APP_API_URL,  // uses .env or falls back to proxy
+  headers: { 'Content-Type': 'application/json' }
 });
 
 // Add request interceptor to automatically include token

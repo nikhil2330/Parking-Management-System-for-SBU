@@ -16,11 +16,22 @@ const eventReservationRoutes = require('./routes/eventReservationRoutes');
 const feedbackRoutes = require('./routes/feedbackRoutes'); // Import the feedback routes
 
 const app = express();
+const allowedOrigins = [
+  'http://localhost:3000',
+  'https://cse416-client.onrender.com'
+];
 
 // Only allow frontend running on localhost:3000
 app.use(cors({
-  // origin: 'http://localhost:3000',
-  origin: 'https://cse416-client.onrender.com',
+  origin: function(origin, callback) {
+    // allow requests with no origin (like mobile apps, curl, etc.)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    } else {
+      return callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
@@ -33,6 +44,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Mount routes
+app.use('/api', require('./routes/reservationRequestRoutes'));
 app.use('/api/auth', authRoutes);
 app.use('/api/users', authenticateJWT, userRoutes);
 app.use('/api/reservation', authenticateJWT, reservationRoutes);

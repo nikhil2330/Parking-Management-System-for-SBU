@@ -8,7 +8,7 @@ import { useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import SpotDetails from "../components/SpotDetails";
 import GoogleMapsService from "../services/GoogleMapService";
 import "./premium-search-parking.css";
-import dayjs from "dayjs"; 
+import dayjs from "dayjs";
 
 
 const DEFAULT_FILTERS = {
@@ -64,45 +64,63 @@ function SearchParkingPage() {
     useState(null);
   const [isCollapsed, setIsCollapsed] = useState(true);
   const [mapCenter, setMapCenter] = useState(undefined);
-  const [autoCenter, setAutoCenter] = useState(true); 
+  const [autoCenter, setAutoCenter] = useState(true);
+  const [reservationType, setReservationType] = useState("hourly");
+
+// Hourly
+function getNextHourDate() {
+  const now = new Date();
+  now.setMinutes(0, 0, 0);
+  now.setHours(now.getHours() + 1);
+  return now;
+}
+function formatDateForInput(date) {
+  const pad = (n) => n.toString().padStart(2, "0");
+  return (
+    date.getFullYear() +
+    "-" +
+    pad(date.getMonth() + 1) +
+    "-" +
+    pad(date.getDate()) +
+    "T" +
+    pad(date.getHours()) +
+    ":" +
+    pad(date.getMinutes())
+  );
+}
+const defaultStart = getNextHourDate();
+const defaultEnd = new Date(defaultStart);
+defaultEnd.setHours(defaultEnd.getHours() + 1);
+const [dateTimeRange, setDateTimeRange] = useState({
+  start: formatDateForInput(defaultStart),
+  end: formatDateForInput(defaultEnd),
+});
+
+// Daily
+const [dailyStartTime, setDailyStartTime] = useState(dayjs().hour(8).minute(0).format("HH:mm"));
+const [dailyEndTime, setDailyEndTime] = useState(dayjs().hour(12).minute(0).format("HH:mm"));
+const [dailyDateRange, setDailyDateRange] = useState({
+  start: dayjs().add(1, "day").format("YYYY-MM-DD"),
+  end: dayjs().add(1, "day").format("YYYY-MM-DD"),
+});
+
+// Semester
+const [semester, setSemester] = useState("summer");
+const SEMESTER_BOUNDS = {
+  summer: { start: "2025-05-20T00:00", end: "2025-08-10T23:59" },
+  fall: { start: "2025-08-20T00:00", end: "2025-12-20T23:59" },
+  winter: { start: "2026-01-01T00:00", end: "2025-01-28T23:59" },
+};
   const [spotWalkTimes, setSpotWalkTimes] = useState({});
   const [draftFilters, setDraftFilters] = useState(DEFAULT_FILTERS);
   // "Active" filters are only set when you click Apply Filters
   const [activeFilters, setActiveFilters] = useState(DEFAULT_FILTERS);
 
-  function getNextHourDate() {
-    const now = new Date();
-    now.setMinutes(0, 0, 0);
-    now.setHours(now.getHours() + 1);
-    return now;
-  }
-  function formatDateForInput(date) {
-    const pad = (n) => n.toString().padStart(2, "0");
-    return (
-      date.getFullYear() +
-      "-" +
-      pad(date.getMonth() + 1) +
-      "-" +
-      pad(date.getDate()) +
-      "T" +
-      pad(date.getHours()) +
-      ":" +
-      pad(date.getMinutes())
-    );
-  }
-  const defaultStart = getNextHourDate();
-  const defaultEnd = new Date(defaultStart);
-  defaultEnd.setHours(defaultEnd.getHours() + 1);
-  
-  const [dateTimeRange, setDateTimeRange] = useState({
-    start: formatDateForInput(defaultStart),
-    end: formatDateForInput(defaultEnd),
-  });
   const [appliedDateTimeRange, setAppliedDateTimeRange] = useState({
     start: formatDateForInput(defaultStart),
     end: formatDateForInput(defaultEnd),
   });
-  
+
   const handleDateTimeRangeChange = (field, value) => {
     setDateTimeRange((prev) => {
       const updated = { ...prev, [field]: value };
@@ -110,12 +128,12 @@ function SearchParkingPage() {
       return updated;
     });
   };
-  
+
   const handleApplyDateTimeRange = () => {
     setAppliedDateTimeRange({ ...dateTimeRange });
     // Optionally, trigger a search or update map here
   };
-  
+
   // Helper to get filter labels for tags
   const getActiveFilterLabels = () => {
     const labels = [];
@@ -267,10 +285,10 @@ function SearchParkingPage() {
     setLoading(true);
     setIsCollapsed(false);
     setError(null);
-  
+
     let buildingId = "";
     let buildingToUse = null;
-  
+
     // Determine which building to use
     if (selectedBuilding) {
       buildingToUse = selectedBuilding;
@@ -298,22 +316,22 @@ function SearchParkingPage() {
       setLoading(false);
       return;
     }
-  
+
     setBuildingSuggestions([]);
-  
+
     // Recenter map if building has centroid
     if (buildingToUse && buildingToUse.centroid) {
       setAutoCenter(true);
       setMapCenter([buildingToUse.centroid.y, buildingToUse.centroid.x]);
     }
-  
+
     // Abort previous search if any
     if (spotsAbortControllerRef.current) {
       spotsAbortControllerRef.current.abort();
     }
     const controller = new AbortController();
     spotsAbortControllerRef.current = controller;
-  
+
     try {
       navigate(
         getSearchParkingUrl({
@@ -321,12 +339,23 @@ function SearchParkingPage() {
           lotId: selectedLotId || undefined,
         })
       );
-      // Only call fetchClosestSpots, passing filters, time, and signal
+      /* work out the start / end pair based on reservationType */
+      let searchStart, searchEnd;
+      if (reservationType === "hourly") {
+        searchStart = dateTimeRange.start;
+        searchEnd = dateTimeRange.end;
+      } else if (reservationType === "daily") {
+        searchStart = `${dailyDateRange.start}T${dailyStartTime}`;
+        searchEnd = `${dailyDateRange.end}T${dailyEndTime}`;
+      } else if (reservationType === "semester") {
+        searchStart = SEMESTER_BOUNDS[semester].start;
+        searchEnd = SEMESTER_BOUNDS[semester].end;
+      }
       const data = await ParkingService.fetchClosestSpots(
         buildingId,
         activeFilters,
-        appliedDateTimeRange.start,
-        appliedDateTimeRange.end,
+        searchStart,
+        searchEnd,
         { signal: controller.signal }
       );
       console.log("Closest spots:", data.spots);
@@ -397,6 +426,14 @@ function SearchParkingPage() {
         searchedBuilding,
         startTime: appliedDateTimeRange.start,
         endTime: appliedDateTimeRange.end,
+        reservationType,
+        hourlyRange: { ...appliedDateTimeRange },
+        dailyParams: {
+        dateRange: dailyDateRange,
+        startTime: dailyStartTime,
+        endTime: dailyEndTime,
+      },
+      semester,
       },
     });
   };
@@ -588,44 +625,142 @@ function SearchParkingPage() {
       <div className="search-container">
         {/* Filters Panel */}
         <div className="filters-sidebar">
-          <div className="reservation-datetime-bar vertical">
-            <div className="reservation-datetime-row">
-              <label
-                className="reservation-datetime-label inline"
-                htmlFor="searchStartTime"
-              >
-                Start
-              </label>
-              <input
-                className="reservation-datetime-input wide"
-                type="datetime-local"
-                id="searchStartTime"
-                value={dateTimeRange.start}
-                onChange={(e) =>
-                  handleDateTimeRangeChange("start", e.target.value)
-                }
-                max={dateTimeRange.end}
-              />
-            </div>
-            <div className="reservation-datetime-row">
-              <label
-                className="reservation-datetime-label inline"
-                htmlFor="searchEndTime"
-              >
-                End
-              </label>
-              <input
-                className="reservation-datetime-input wide"
-                type="datetime-local"
-                id="searchEndTime"
-                value={dateTimeRange.end}
-                onChange={(e) =>
-                  handleDateTimeRangeChange("end", e.target.value)
-                }
-                min={dateTimeRange.start}
-              />
-            </div>
+          {/* Reservation Type Toggle */}
+          <div className="reservation-type-toggle">
+            <button
+              type="button"
+              className={`reservation-type-toggle-btn${
+                reservationType === "hourly" ? " active" : ""
+              }`}
+              onClick={() => setReservationType("hourly")}
+              aria-pressed={reservationType === "hourly"}
+            >
+              Hourly
+            </button>
+            <button
+              type="button"
+              className={`reservation-type-toggle-btn${
+                reservationType === "daily" ? " active" : ""
+              }`}
+              onClick={() => setReservationType("daily")}
+              aria-pressed={reservationType === "daily"}
+            >
+              Daily
+            </button>
+            <button
+              type="button"
+              className={`reservation-type-toggle-btn${
+                reservationType === "semester" ? " active" : ""
+              }`}
+              onClick={() => setReservationType("semester")}
+              aria-pressed={reservationType === "semester"}
+            >
+              Semester
+            </button>
           </div>
+
+          {/* Hourly */}
+          {reservationType === "hourly" && (
+  <div className="reservation-datetime-bar vertical">
+    <div className="reservation-datetime-row">
+      <label className="reservation-datetime-label inline" htmlFor="searchStartTime">
+        Start
+      </label>
+      <input
+        className="reservation-datetime-input"
+        type="datetime-local"
+        id="searchStartTime"
+        value={dateTimeRange.start}
+        onChange={(e) =>
+          setDateTimeRange((prev) => ({
+            ...prev,
+            start: e.target.value,
+          }))
+        }
+        max={dateTimeRange.end}
+      />
+    </div>
+    <div className="reservation-datetime-row">
+      <label className="reservation-datetime-label inline" htmlFor="searchEndTime">
+        End
+      </label>
+      <input
+        className="reservation-datetime-input"
+        type="datetime-local"
+        id="searchEndTime"
+        value={dateTimeRange.end}
+        onChange={(e) =>
+          setDateTimeRange((prev) => ({
+            ...prev,
+            end: e.target.value,
+          }))
+        }
+        min={dateTimeRange.start}
+      />
+    </div>
+  </div>
+)}
+
+{/* Daily */}
+{reservationType === "daily" && (
+  <div className="reservation-datetime-bar vertical">
+    <div className="reservation-datetime-row">
+      <label className="reservation-datetime-label inline">Start</label>
+      <input
+        className="reservation-datetime-input"
+        type="date"
+        value={dailyDateRange.start}
+        max={dailyDateRange.end}
+        onChange={(e) =>
+          setDailyDateRange((r) => ({ ...r, start: e.target.value }))
+        }
+      />
+      <input
+        className="reservation-datetime-input"
+        type="time"
+        value={dailyStartTime}
+        onChange={(e) => setDailyStartTime(e.target.value)}
+      />
+    </div>
+    <div className="reservation-datetime-row">
+      <label className="reservation-datetime-label inline">End</label>
+      <input
+        className="reservation-datetime-input"
+        type="date"
+        value={dailyDateRange.end}
+        min={dailyDateRange.start}
+        onChange={(e) =>
+          setDailyDateRange((r) => ({ ...r, end: e.target.value }))
+        }
+      />
+      <input
+        className="reservation-datetime-input"
+        type="time"
+        value={dailyEndTime}
+        onChange={(e) => setDailyEndTime(e.target.value)}
+      />
+    </div>
+    <small style={{ color: "#999", marginLeft: "2.5rem" }}>Max span: 15 days</small>
+  </div>
+)}
+
+{/* Semester */}
+{reservationType === "semester" && (
+  <div className="reservation-datetime-bar vertical">
+    <div className="reservation-datetime-row">
+      <label className="reservation-datetime-label inline">Semester</label>
+      <select
+        className="reservation-datetime-input semester"
+        value={semester}
+        onChange={(e) => setSemester(e.target.value)}
+      >
+        <option value="spring">Spring (Jan 20 – May 15)</option>
+        <option value="summer">Summer (May 20 – Aug 10)</option>
+        <option value="fall">Fall (Aug 20 – Dec 20)</option>
+      </select>
+    </div>
+  </div>
+)}
           <div className="filters-panel">
             <div className="filters-header">
               <svg
@@ -715,10 +850,7 @@ function SearchParkingPage() {
                           }))
                         }
                       />
-                      <label htmlFor={cat}>
-                      {CATEGORY_LABELS[cat] || cat}
-
-                      </label>
+                      <label htmlFor={cat}>{CATEGORY_LABELS[cat] || cat}</label>
                     </div>
                   ))}
                 </div>
@@ -914,7 +1046,7 @@ function SearchParkingPage() {
                                     alt="Recenter"
                                   />
                                 </button>
-                                
+
                                 <button
                                   className="spot-card-show-spot-btn"
                                   onClick={() => {
@@ -942,8 +1074,11 @@ function SearchParkingPage() {
                                   <img
                                     src={require("../assets/focus.png")}
                                     alt="Show Spot"
-                                    style={{ filter: svgExists ? "none" : "grayscale(100%)" }}
-
+                                    style={{
+                                      filter: svgExists
+                                        ? "none"
+                                        : "grayscale(100%)",
+                                    }}
                                   />
                                 </button>
                               </div>

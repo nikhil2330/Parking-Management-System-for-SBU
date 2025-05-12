@@ -6,6 +6,7 @@ import Footer from '../components/Footer';
 import AdminFeedbackPanel from '../components/AdminFeedbackPanel';
 import AdminEventApproval from '../components/AdminEventApproval';
 import adminService from '../services/AdminService';
+import AdminPendingList from '../components/AdminPendingList';
 import { FaCommentAlt, FaParking, FaPlusCircle, FaTrashAlt, FaEdit, FaSave, FaTimes } from 'react-icons/fa';
 import './admin-dashboard.css';
 
@@ -36,7 +37,7 @@ function AdminDashboard() {
   const fileInputRef = useRef(null);
 
   /* ----------------------------- state ---------------------------- */
-  const [activeTab, setActiveTab] = useState('users');   // 'users' | 'bookings' | 'analytics' | 'tickets' | 'events' | 'feedback' | 'lots'
+  const [activeTab, setActiveTab] = useState('users');   // 'users' | 'bookings' | 'pending' | 'analytics' | 'tickets' | 'events' | 'feedback' | 'lots'
   const [isLoading, setIsLoading] = useState(true);
 
   const [userRequests, setUserRequests] = useState([]);
@@ -143,68 +144,68 @@ function AdminDashboard() {
 
   /* ------------------------ initial fetch ------------------------- */
   // Updated initial fetch section in AdminDashboard.js
-/* ------------------------ initial fetch ------------------------- */
-useEffect(() => {
-  (async () => {
-    setIsLoading(true);
-    try {
-      // Fetch stats
-      const { data: statsData } = await api.get('/admin/stats');
-      if (statsData) setStats(statsData);
-
-      // Fetch pending users
-      const { data: pendingUsers } = await api.get('/admin/pending');
-      setUserRequests(pendingUsers.map(u => ({
-        id: u._id,
-        name: u.username,
-        email: u.email,
-        department: u.userType,
-        requestDate: u.createdAt,
-        status: 'pending'
-      })));
-
-      // Fetch all users for tickets dropdown
-      const { data: allUsers } = await api.get('/admin/users');
-      setUsers(allUsers);
-
-      // Fetch tickets for stats
+  /* ------------------------ initial fetch ------------------------- */
+  useEffect(() => {
+    (async () => {
+      setIsLoading(true);
       try {
-        const { data: ticketsData } = await api.get('/tickets/all');
-        // Update stats from ticket data
-        const pendingCount = ticketsData.filter(t => t.status === 'pending').length;
-        const paidCount = ticketsData.filter(t => t.status === 'paid').length;
-        const overdueCount = ticketsData.filter(t => t.status === 'overdue').length;
-        const totalRevenue = ticketsData.reduce((sum, ticket) => {
-          return sum + (ticket.status === 'paid' ? ticket.amount : 0);
-        }, 0);
-        
-        setStats(prev => ({
-          ...prev,
-          pendingTickets: pendingCount,
-          paidTickets: paidCount,
-          overdueTickets: overdueCount,
-          totalTicketRevenue: totalRevenue
-        }));
-      } catch (err) {
-        console.error('Error fetching ticket stats:', err);
-      }
+        // Fetch stats
+        const { data: statsData } = await api.get('/admin/stats');
+        if (statsData) setStats(statsData);
 
-      // Fetch feedback for stats
-      try {
-        const { data: feedbackData } = await api.get('/feedback/all');
-        const pendingFeedbackCount = feedbackData.filter(f => f.status === 'pending').length;
-        const reviewedFeedbackCount = feedbackData.filter(f => f.status === 'reviewed').length;
-        const resolvedFeedbackCount = feedbackData.filter(f => f.status === 'resolved').length;
-        
-        setStats(prev => ({
-          ...prev,
-          pendingFeedback: pendingFeedbackCount,
-          reviewedFeedback: reviewedFeedbackCount,
-          resolvedFeedback: resolvedFeedbackCount
-        }));
-      } catch (err) {
-        console.error('Error fetching feedback stats:', err);
-      }
+        // Fetch pending users
+        const { data: pendingUsers } = await api.get('/admin/pending');
+        setUserRequests(pendingUsers.map(u => ({
+          id: u._id,
+          name: u.username,
+          email: u.email,
+          department: u.userType,
+          requestDate: u.createdAt,
+          status: 'pending'
+        })));
+
+        // Fetch all users for tickets dropdown
+        const { data: allUsers } = await api.get('/admin/users');
+        setUsers(allUsers);
+
+        // Fetch tickets for stats
+        try {
+          const { data: ticketsData } = await api.get('/tickets/all');
+          // Update stats from ticket data
+          const pendingCount = ticketsData.filter(t => t.status === 'pending').length;
+          const paidCount = ticketsData.filter(t => t.status === 'paid').length;
+          const overdueCount = ticketsData.filter(t => t.status === 'overdue').length;
+          const totalRevenue = ticketsData.reduce((sum, ticket) => {
+            return sum + (ticket.status === 'paid' ? ticket.amount : 0);
+          }, 0);
+
+          setStats(prev => ({
+            ...prev,
+            pendingTickets: pendingCount,
+            paidTickets: paidCount,
+            overdueTickets: overdueCount,
+            totalTicketRevenue: totalRevenue
+          }));
+        } catch (err) {
+          console.error('Error fetching ticket stats:', err);
+        }
+
+        // Fetch feedback for stats
+        try {
+          const { data: feedbackData } = await api.get('/feedback/all');
+          const pendingFeedbackCount = feedbackData.filter(f => f.status === 'pending').length;
+          const reviewedFeedbackCount = feedbackData.filter(f => f.status === 'reviewed').length;
+          const resolvedFeedbackCount = feedbackData.filter(f => f.status === 'resolved').length;
+
+          setStats(prev => ({
+            ...prev,
+            pendingFeedback: pendingFeedbackCount,
+            reviewedFeedback: reviewedFeedbackCount,
+            resolvedFeedback: resolvedFeedbackCount
+          }));
+        } catch (err) {
+          console.error('Error fetching feedback stats:', err);
+        }
 
       // Fetch parking lots
       try {
@@ -258,15 +259,15 @@ useEffect(() => {
         ]);
       }
 
-      // Placeholder for bookings
-      setBookingRequests([]);
-    } catch (error) {
-      console.error('Admin load error:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  })();
-}, []);
+        // Placeholder for bookings
+        setBookingRequests([]);
+      } catch (error) {
+        console.error('Admin load error:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    })();
+  }, []);
 
   function spotNumbersToRanges(numbers) {
     if (!numbers.length) return "";
@@ -305,7 +306,7 @@ useEffect(() => {
       try {
         const { data } = await api.get('/tickets/all');
         setTickets(data);
-        
+
         // Update stats from ticket data
         const pendingCount = data.filter(t => t.status === 'pending').length;
         const paidCount = data.filter(t => t.status === 'paid').length;
@@ -313,7 +314,7 @@ useEffect(() => {
         const totalRevenue = data.reduce((sum, ticket) => {
           return sum + (ticket.status === 'paid' ? ticket.amount : 0);
         }, 0);
-        
+
         setStats(prev => ({
           ...prev,
           pendingTickets: pendingCount,
@@ -334,7 +335,7 @@ useEffect(() => {
     year: 'numeric', month: 'short', day: 'numeric',
     hour: '2-digit', minute: '2-digit'
   });
-  
+
   const formatCurrency = amount => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -414,11 +415,11 @@ useEffect(() => {
   const handleCreateTicket = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+
     try {
       // Create the ticket using the email address
       const { data } = await api.post('/tickets/create', newTicket);
-      
+
       // Add the new ticket to the list with populated user info
       const ticketWithUser = {
         ...data.ticket,
@@ -428,15 +429,15 @@ useEffect(() => {
           email: newTicket.userEmail
         }
       };
-      
+
       setTickets(prev => [ticketWithUser, ...prev]);
-      
+
       // Update stats
       setStats(prev => ({
         ...prev,
         pendingTickets: prev.pendingTickets + 1
       }));
-      
+
       // Reset form
       setNewTicket({
         userEmail: '',
@@ -444,17 +445,17 @@ useEffect(() => {
         reason: '',
         dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
       });
-      
+
       // Show success notification
       setNotificationTitle('Ticket Created');
       setNotificationMessage('Parking ticket was successfully issued.');
       setShowNotification(true);
-      
+
       // Auto hide notification after 4 seconds
       setTimeout(() => {
         setShowNotification(false);
       }, 4000);
-      
+
     } catch (error) {
       console.error('Error creating ticket:', error);
       let errorMessage = 'Failed to create ticket. Please try again.';
@@ -470,22 +471,22 @@ useEffect(() => {
   const handleTicketStatusChange = async (ticketId, newStatus) => {
     try {
       const { data } = await api.patch(`/tickets/${ticketId}/status`, { status: newStatus });
-      
+
       // Update ticket in list
-      setTickets(prev => prev.map(t => 
+      setTickets(prev => prev.map(t =>
         t._id === ticketId ? { ...t, status: newStatus, paymentDate: newStatus === 'paid' ? new Date() : t.paymentDate } : t
       ));
-      
+
       // Update stats based on old and new status
       const ticket = tickets.find(t => t._id === ticketId);
       setStats(prev => {
         const newStats = { ...prev };
-        
+
         // Decrement old status count
         if (ticket.status === 'pending') newStats.pendingTickets--;
         else if (ticket.status === 'paid') newStats.paidTickets--;
         else if (ticket.status === 'overdue') newStats.overdueTickets--;
-        
+
         // Increment new status count
         if (newStatus === 'pending') newStats.pendingTickets++;
         else if (newStatus === 'paid') {
@@ -496,20 +497,20 @@ useEffect(() => {
           }
         }
         else if (newStatus === 'overdue') newStats.overdueTickets++;
-        
+
         return newStats;
       });
-      
+
       // Show success notification
       setNotificationTitle('Status Updated');
       setNotificationMessage(`Ticket status changed to ${newStatus.toUpperCase()}.`);
       setShowNotification(true);
-      
+
       // Auto hide notification after 4 seconds
       setTimeout(() => {
         setShowNotification(false);
       }, 4000);
-      
+
     } catch (error) {
       console.error('Error updating ticket status:', error);
       alert('Failed to update ticket status. Please try again.');
@@ -519,11 +520,11 @@ useEffect(() => {
   const handleDeleteTicket = async (ticketId) => {
     try {
       await api.delete(`/tickets/${ticketId}`);
-      
+
       // Remove from list
       const ticket = tickets.find(t => t._id === ticketId);
       setTickets(prev => prev.filter(t => t._id !== ticketId));
-      
+
       // Update stats
       setStats(prev => {
         const newStats = { ...prev };
@@ -535,17 +536,17 @@ useEffect(() => {
         else if (ticket.status === 'overdue') newStats.overdueTickets--;
         return newStats;
       });
-      
+
       // Show success notification
       setNotificationTitle('Ticket Deleted');
       setNotificationMessage('The ticket has been permanently removed.');
       setShowNotification(true);
-      
+
       // Auto hide notification after 4 seconds
       setTimeout(() => {
         setShowNotification(false);
       }, 4000);
-      
+
     } catch (error) {
       console.error('Error deleting ticket:', error);
       alert('Failed to delete ticket. Please try again.');
@@ -932,7 +933,7 @@ useEffect(() => {
   const paginate = n => setCurrentPage(n);
   const getCurrentItems = () => {
     let arr;
-    
+
     if (activeTab === 'users') {
       // Filter user requests based on selected filter
       if (userFilterStatus === 'all') {
@@ -949,20 +950,20 @@ useEffect(() => {
     }
     else if (activeTab === 'lots') arr = parkingLots;
     else arr = [];
-    
+
     const end = currentPage * itemsPerPage;
     return arr.slice(end - itemsPerPage, end);
   };
-  
+
   const totalPages = Math.max(
     1,
     Math.ceil(
-      (activeTab === 'users' ? 
-        (userFilterStatus === 'all' ? userRequests.length : 
-         userRequests.filter(u => u.status === userFilterStatus).length) : 
-       activeTab === 'bookings' ? bookingRequests.length :
-       activeTab === 'tickets' ? (ticketFilter === 'all' ? tickets.length : 
-                               tickets.filter(t => t.status === ticketFilter).length) : 
+      (activeTab === 'users' ?
+        (userFilterStatus === 'all' ? userRequests.length :
+          userRequests.filter(u => u.status === userFilterStatus).length) :
+        activeTab === 'bookings' ? bookingRequests.length :
+          activeTab === 'tickets' ? (ticketFilter === 'all' ? tickets.length :
+            tickets.filter(t => t.status === ticketFilter).length) : 
        activeTab === 'lots' ? parkingLots.length : 0) /
       itemsPerPage
     )
@@ -975,7 +976,7 @@ useEffect(() => {
   // Prepare analytics data for export
   const prepareExportData = () => {
     if (!analytics) return null;
-    
+
     // Basic summary data
     const summaryData = {
       totalRevenue: analytics.totalRevenue,
@@ -983,21 +984,21 @@ useEffect(() => {
       averageDailyReservations: derivedAnalytics.avgDailyReservations,
       peakDay: `${derivedAnalytics.peakDay.date} (${derivedAnalytics.peakDay.count} reservations)`
     };
-    
+
     // Format parking lot data
     const parkingLotData = analytics.reservationsPerLot.map(lot => ({
       lotName: lot.officialLotName,
       reservations: lot.count,
       revenueShare: `$${derivedAnalytics.revenuePerLot.find(l => l.officialLotName === lot.officialLotName)?.revenue || '0'}`
     }));
-    
+
     // Format daily data
     const dailyData = analytics.reservationsByDate.map(day => ({
       date: day.date,
       reservations: day.count,
       estimatedRevenue: `$${((day.count / summaryData.totalReservations) * analytics.totalRevenue).toFixed(2)}`
     }));
-    
+
     return {
       summary: summaryData,
       parkingLots: parkingLotData,
@@ -1006,7 +1007,7 @@ useEffect(() => {
       exportDate: new Date().toISOString()
     };
   };
-  
+
   // Helper to convert object to CSV
   const convertToCSV = (objArray) => {
     const array = typeof objArray !== 'object' ? JSON.parse(objArray) : objArray;
@@ -1053,11 +1054,11 @@ useEffect(() => {
   const handleExportCSV = () => {
     const data = prepareExportData();
     if (!data) return;
-    
+
     // Create CSV files for each section
-    const summary = [{ 
-      Category: 'Total Revenue', 
-      Value: `$${data.summary.totalRevenue.toFixed(2)}` 
+    const summary = [{
+      Category: 'Total Revenue',
+      Value: `$${data.summary.totalRevenue.toFixed(2)}`
     }, {
       Category: 'Total Reservations',
       Value: data.summary.totalReservations
@@ -1068,27 +1069,27 @@ useEffect(() => {
       Category: 'Peak Day',
       Value: data.summary.peakDay
     }];
-    
+
     // Combine all data into a single CSV
     let csvContent = "Parking Analytics Summary\r\n\r\n";
-    
+
     // Add summary section
     csvContent += "Summary:\r\n";
     csvContent += convertToCSV(summary);
     csvContent += "\r\n";
-    
+
     // Add parking lots section
     csvContent += "Parking Lot Data:\r\n";
     csvContent += convertToCSV(data.parkingLots);
     csvContent += "\r\n";
-    
+
     // Add daily reservations section
     csvContent += "Daily Reservations:\r\n";
     csvContent += convertToCSV(data.dailyReservations);
-    
+
     // Generate filename with current date
     const filename = `parking_analytics_${new Date().toISOString().split('T')[0]}.csv`;
-    
+
     // Download the file
     downloadFile(csvContent, filename, 'text/csv;charset=utf-8;');
   };
@@ -1097,7 +1098,7 @@ useEffect(() => {
   const handleExportExcel = () => {
     const data = prepareExportData();
     if (!data) return;
-    
+
     // Create HTML table with Excel-friendly formatting
     const excelHtml = `
       <html xmlns:o="urn:schemas-microsoft-com:office:office" 
@@ -1234,7 +1235,7 @@ useEffect(() => {
       </body>
       </html>
     `;
-    
+
     // Convert HTML to blob with Excel MIME type
     const blob = new Blob([excelHtml], { type: 'application/vnd.ms-excel' });
     const url = URL.createObjectURL(blob);
@@ -1253,17 +1254,17 @@ useEffect(() => {
   const handleExportPDF = () => {
     // Since PDF generation typically requires a library (like jsPDF),
     // we'll implement a simple method using browser's print functionality
-    
+
     // Store original body overflow
     const originalOverflow = document.body.style.overflow;
-    
+
     // Create a printable version
     const printContent = document.createElement('div');
     printContent.className = 'pdf-export-container';
-    
+
     const data = prepareExportData();
     if (!data) return;
-    
+
     // Add styling to print content
     printContent.innerHTML = `
       <style>
@@ -1353,12 +1354,12 @@ useEffect(() => {
         <p>Report generated on ${new Date().toLocaleString()} • Period: ${analyticsPeriod}</p>
       </div>
     `;
-    
+
     // Create popup window for PDF
     const printWindow = window.open('', '_blank');
     printWindow.document.write(printContent.innerHTML);
     printWindow.document.close();
-    
+
     // Wait for content to load then print
     printWindow.onload = () => {
       printWindow.print();
@@ -1371,11 +1372,11 @@ useEffect(() => {
     // Create a printable version of the analytics section
     const analyticsContainer = analyticsRef.current;
     if (!analyticsContainer) return;
-    
+
     // Store original body content and styles
     const originalContent = document.body.innerHTML;
     const originalBodyStyle = document.body.style.cssText;
-    
+
     // Create a new printable page with only the analytics content
     const printContent = `
       <html>
@@ -1404,10 +1405,10 @@ useEffect(() => {
           
           <div class="print-content">
             ${(() => {
-              const data = prepareExportData();
-              if (!data) return '<p>No data available</p>';
-              
-              return `
+        const data = prepareExportData();
+        if (!data) return '<p>No data available</p>';
+
+        return `
                 <div class="print-section">
                   <h2>Summary</h2>
                   <div class="summary-grid">
@@ -1479,17 +1480,17 @@ useEffect(() => {
                   <button class="no-print" onclick="window.print()">Print This Page</button>
                 </div>
               `;
-            })()}
+      })()}
           </div>
         </body>
       </html>
     `;
-    
+
     // Open print window
     const printWindow = window.open('', '_blank');
     printWindow.document.write(printContent);
     printWindow.document.close();
-    
+
     // Wait for content to load then print
     printWindow.onload = () => {
       printWindow.focus(); // Focus on the new window
@@ -1518,25 +1519,25 @@ useEffect(() => {
   /* Calculate some additional metrics from actual data */
   const getAnalyticsDerivedData = () => {
     if (!analytics) return null;
-    
+
     // Calculate average daily reservations
     const avgDailyReservations = analytics.reservationsByDate.reduce(
-      (sum, day) => sum + day.count, 
+      (sum, day) => sum + day.count,
       0
     ) / analytics.reservationsByDate.length;
-    
+
     // Calculate peak day
     const peakDay = analytics.reservationsByDate.reduce(
-      (max, day) => day.count > max.count ? day : max, 
+      (max, day) => day.count > max.count ? day : max,
       { count: 0 }
     );
-    
+
     // Calculate revenue per lot
     const revenuePerLot = analytics.reservationsPerLot.map(lot => ({
       ...lot,
       revenue: (lot.count * (analytics.totalRevenue / analytics.reservationsPerLot.reduce((sum, l) => sum + l.count, 0))).toFixed(2)
     }));
-    
+
     return {
       avgDailyReservations,
       peakDay,
@@ -1576,10 +1577,10 @@ useEffect(() => {
                 strokeLinecap="round"
                 strokeLinejoin="round"
               >
-                <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-                <line x1="16" y1="2" x2="16" y2="6" />
-                <line x1="8" y1="2" x2="8" y2="6" />
-                <line x1="3" y1="10" x2="21" y2="10" />
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"  />
+                <line x1="16" y1="2" x2="16" y2="6"  />
+                <line x1="8" y1="2" x2="8" y2="6"  />
+                <line x1="3" y1="10" x2="21" y2="10"  />
               </svg>
               <span>
                 {new Date().toLocaleDateString("en-US", {
@@ -1615,9 +1616,9 @@ useEffect(() => {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                   >
-                    <circle cx="12" cy="12" r="10" />
-                    <line x1="12" y1="6" x2="12" y2="12" />
-                    <line x1="12" y1="16" x2="12.01" y2="16" />
+                    <circle cx="12" cy="12" r="10"  />
+                    <line x1="12" y1="6" x2="12" y2="12"  />
+                    <line x1="12" y1="16" x2="12.01" y2="16"  />
                   </svg>
                 </div>
                 <div className="stat-content">
@@ -1653,8 +1654,8 @@ useEffect(() => {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                   >
-                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-                    <polyline points="22 4 12 14.01 9 11.01" />
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"  />
+                    <polyline points="22 4 12 14.01 9 11.01"  />
                   </svg>
                 </div>
                 <div className="stat-content">
@@ -1672,15 +1673,15 @@ useEffect(() => {
               </div>
 
               {/* Resolved Items */}
-              <div className="stat-card">
-                <div
+                            <div className="stat-card">
+                              <div
                   className="stat-icon"
                   style={{
                     backgroundColor: "var(--blue-50)",
                     color: "var(--info-blue)",
                   }}
                 >
-                  <svg
+                                <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="20"
                     height="20"
@@ -1691,20 +1692,20 @@ useEffect(() => {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                   >
-                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-                    <polyline points="22 4 12 14.01 9 11.01" />
-                  </svg>
-                </div>
-                <div className="stat-content">
-                  <h4>Resolved Items</h4>
-                  <div className="stat-value">
-                    {(stats.paidTickets || 0) + (stats.resolvedFeedback || 0)}
-                  </div>
-                  <div className="stat-trend trend-up">
-                    <span className="trend-icon">🔄</span> Completed
-                  </div>
-                </div>
-              </div>
+                                  <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"  />
+                                  <polyline points="22 4 12 14.01 9 11.01"  />
+                                </svg>
+                              </div>
+                              <div className="stat-content">
+                                <h4>Resolved Items</h4>
+                                <div className="stat-value">
+                                  {(stats.paidTickets || 0) + (stats.resolvedFeedback || 0)}
+                                </div>
+                                <div className="stat-trend trend-up">
+                                  <span className="trend-icon">🔄</span> Completed
+                                </div>
+                              </div>
+                            </div>
 
               {/* Total Managed */}
               <div className="stat-card">
@@ -1726,7 +1727,7 @@ useEffect(() => {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                   >
-                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"  />
                   </svg>
                 </div>
                 <div className="stat-content">
@@ -1757,6 +1758,9 @@ useEffect(() => {
               onClick={() => setActiveTab("lots")}
             >
               Parking Lots
+            </button>
+            <button className={`admin-tab ${activeTab === 'pending' ? 'active' : ''}`} onClick={() => setActiveTab('pending')}>
+              Pending Reservations
             </button>
             <button
               className={`admin-tab ${activeTab === "events" ? "active" : ""}`}
@@ -1796,6 +1800,9 @@ useEffect(() => {
 
           {/* ===== Content Area ===== */}
           <div className="admin-content-area">
+            {/* Pending Reservations */}
+            {activeTab === 'pending' && (<div className="admin-table-container">
+                <AdminPendingList /> </div> )}
             {activeTab === "analytics" && analytics && (
               <div className="analytics-container" ref={analyticsRef}>
                 <h2 className="analytics-title">Analytics Dashboard</h2>
@@ -1969,12 +1976,12 @@ useEffect(() => {
                               offset="5%"
                               stopColor="#4158D0"
                               stopOpacity={0.8}
-                            />
+                             />
                             <stop
                               offset="95%"
                               stopColor="#4158D0"
                               stopOpacity={0.1}
-                            />
+                             />
                           </linearGradient>
                         </defs>
                         <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -2103,12 +2110,12 @@ useEffect(() => {
                                 offset="0%"
                                 stopColor={color}
                                 stopOpacity={0.8}
-                              />
+                               />
                               <stop
                                 offset="100%"
                                 stopColor={color}
                                 stopOpacity={0.3}
-                              />
+                               />
                             </linearGradient>
                           ))}
                         </defs>
@@ -2193,9 +2200,9 @@ useEffect(() => {
                         strokeLinecap="round"
                         strokeLinejoin="round"
                       >
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                        <polyline points="7 10 12 15 17 10" />
-                        <line x1="12" y1="15" x2="12" y2="3" />
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"  />
+                        <polyline points="7 10 12 15 17 10"  />
+                        <line x1="12" y1="15" x2="12" y2="3"  />
                       </svg>
                       CSV
                     </button>
@@ -2214,9 +2221,9 @@ useEffect(() => {
                         strokeLinecap="round"
                         strokeLinejoin="round"
                       >
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                        <polyline points="7 10 12 15 17 10" />
-                        <line x1="12" y1="15" x2="12" y2="3" />
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"  />
+                        <polyline points="7 10 12 15 17 10"  />
+                        <line x1="12" y1="15" x2="12" y2="3"  />
                       </svg>
                       Excel
                     </button>
@@ -2235,9 +2242,9 @@ useEffect(() => {
                         strokeLinecap="round"
                         strokeLinejoin="round"
                       >
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                        <polyline points="7 10 12 15 17 10" />
-                        <line x1="12" y1="15" x2="12" y2="3" />
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"  />
+                        <polyline points="7 10 12 15 17 10"  />
+                        <line x1="12" y1="15" x2="12" y2="3"  />
                       </svg>
                       PDF
                     </button>
@@ -2253,9 +2260,9 @@ useEffect(() => {
                         strokeLinecap="round"
                         strokeLinejoin="round"
                       >
-                        <polyline points="6 9 6 2 18 2 18 9" />
-                        <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2" />
-                        <rect x="6" y="14" width="12" height="8" />
+                        <polyline points="6 9 6 2 18 2 18 9"  />
+                        <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"  />
+                        <rect x="6" y="14" width="12" height="8"  />
                       </svg>
                       Print
                     </button>
@@ -2540,7 +2547,7 @@ useEffect(() => {
                           </td>
                           <td>
                             <div className="lots-container">
-                              {booking.lots.map((lot, i) => (
+                              {booking.lots.map((lot,  i) => (
                                 <span key={i} className="lot-badge">
                                   {lot}
                                 </span>
@@ -2567,7 +2574,7 @@ useEffect(() => {
                                 <button
                                   className="approve-btn"
                                   onClick={() =>
-                                    handleBookingAction(booking.id, "approved")
+                                    handleBookingAction(booking.id,  "approved")
                                   }
                                 >
                                   Approve
@@ -2575,7 +2582,7 @@ useEffect(() => {
                                 <button
                                   className="reject-btn"
                                   onClick={() =>
-                                    handleBookingAction(booking.id, "rejected")
+                                    handleBookingAction(booking.id,  "rejected")
                                   }
                                 >
                                   Reject
