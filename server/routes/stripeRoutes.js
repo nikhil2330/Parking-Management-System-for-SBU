@@ -65,12 +65,13 @@ router.post(
 
       // 4.  Aggregate the grand total
       const totalPrice = reservations.reduce((sum, r) => sum + r.totalPrice, 0);
+      const base = process.env.CLIENT_URL || 'http://localhost:3000';
 
       const session = await stripeSvc.createCheckoutSession({
         reservation: { _id: reservationId, totalPrice }, // synthetic obj
         user: req.user,
-        successUrl: 'http://localhost:3000/reservations?session_id={CHECKOUT_SESSION_ID}',
-        cancelUrl: 'http://localhost:3000/reservations?checkout=cancel'
+        successUrl: `${base}/reservations?session_id={CHECKOUT_SESSION_ID}`,
+        cancelUrl: `${base}/reservations?checkout=cancel`
       });
       // 5.  Store the session id on every sibling so we can mark them ‘paid’ later
       await Promise.all(
@@ -172,12 +173,13 @@ router.post(
       const ticket = await Ticket.findById(req.body.ticketId);
       if (!ticket) return res.status(404).json({ message: 'Ticket not found' });
       if (ticket.status === 'paid') return res.status(400).json({ message: 'Already paid' });
+      const base = process.env.CLIENT_URL || 'http://localhost:3000';
 
       const session = await stripeSvc.createTicketCheckoutSession({
         ticket,
         user: req.user,
-        successUrl: 'https://cse416-client.onrender.com/tickets?session_id={CHECKOUT_SESSION_ID}',
-        cancelUrl: 'https://cse416-client.onrender.com/tickets?checkout=cancel'
+        successUrl: `${base}/tickets?session_id={CHECKOUT_SESSION_ID}`,
+        cancelUrl: `${base}/tickets?checkout=cancel`
       });
 
       ticket.stripeSessionId = session.id;
@@ -224,14 +226,13 @@ router.post(
         return res.status(400).json({ message: 'Reservation not approved yet' });
       if (evRes.paymentStatus === 'paid')
         return res.status(400).json({ message: 'Already paid' });
-      const base =
-  process.env.CLIENT_URL || 'http://localhost:3000';
+      const base = process.env.CLIENT_URL || 'http://localhost:3000';
 
       const session = await stripeSvc.createEventReservationCheckoutSession({
         eventReservation: evRes,
         user: req.user,
-       successUrl: `${base}/event-reservation?session_id={CHECKOUT_SESSION_ID}`,
-  cancelUrl:  `${base}/event-reservation?checkout=cancel`
+        successUrl: `${base}/event-reservation?session_id={CHECKOUT_SESSION_ID}`,
+        cancelUrl:  `${base}/event-reservation?checkout=cancel`
       });
 
       evRes.stripeSessionId = session.id;
