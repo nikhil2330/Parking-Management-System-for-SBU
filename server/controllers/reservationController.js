@@ -56,28 +56,7 @@ async function updateSpotAndLotStatus(spotId, lotId) {
   await lot.save();
 }
 
-// Helper function to calculate date ranges for semester
-function semesterToDates(sem) {
-  const year = new Date().getUTCFullYear();
-  switch (sem) {
-    case 'spring': return {
-      startDate: new Date(`${year}-01-20T00:00:00Z`),
-      endDate: new Date(`${year}-05-15T23:59:59Z`)
-    };
-    case 'summer': return {
-      startDate: new Date(`${year}-05-20T00:00:00Z`),
-      endDate: new Date(`${year}-08-10T23:59:59Z`)
-    };
-    case 'fall': return {
-      startDate: new Date(`${year}-08-20T00:00:00Z`),
-      endDate: new Date(`${year}-12-20T23:59:59Z`)
-    };
-    default: return {
-      startDate: new Date(),
-      endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
-    };
-  }
-}
+
 
 // Helper to create date ranges for daily reservations
 function enumerateDates(start, end) {
@@ -98,20 +77,42 @@ exports.createReservation = async (req, res) => {
   const userId = req.user?.id;
 
   // Validate required fields (these should be present for ALL reservation types)
-  if (!lotId || !spotId || !startTime || !endTime || totalPrice === undefined) {
-    console.log('Missing required fields:', { lotId, spotId, startTime, endTime, totalPrice });
+  if (!lotId || !spotId || totalPrice === undefined) {
+  return res.status(400).json({
+    error: 'Missing required fields',
+    details: {
+      lotId: lotId ? 'present' : 'missing',
+      spotId: spotId ? 'present' : 'missing',
+      totalPrice: totalPrice !== undefined ? 'present' : 'missing',
+      receivedBody: req.body
+    }
+  });
+}
+
+if (reservationType === 'hourly' || reservationType === 'semester') {
+  if (!startTime || !endTime) {
     return res.status(400).json({
       error: 'Missing required fields',
       details: {
-        lotId: lotId ? 'present' : 'missing',
-        spotId: spotId ? 'present' : 'missing',
         startTime: startTime ? 'present' : 'missing',
         endTime: endTime ? 'present' : 'missing',
-        totalPrice: totalPrice !== undefined ? 'present' : 'missing',
         receivedBody: req.body
       }
     });
   }
+}
+
+if (reservationType === 'daily') {
+  if (!Array.isArray(req.body.dailyWindows) || req.body.dailyWindows.length === 0) {
+    return res.status(400).json({
+      error: 'Missing required fields',
+      details: {
+        dailyWindows: 'missing or empty',
+        receivedBody: req.body
+      }
+    });
+  }
+}
 
   // Validate user ID
   if (!userId) {
@@ -174,20 +175,23 @@ exports.createReservation = async (req, res) => {
 
     // Common conflict detection for all reservation types
     // Find conflicts based on the time window
-    const conflicts = await Reservation.find({
-      spot: spotObjectId,
-      status: { $in: ['pending', 'active'] },
-      $or: [
-        { startTime: { $lt: new Date(endTime) }, endTime: { $gt: new Date(startTime) } }
-      ]
-    }).session(session);
+    if (reservationType === 'hourly' || reservationType === 'semester') {
+  // Conflict check for single window
+      const conflicts = await Reservation.find({
+        spot: spotObjectId,
+        status: { $in: ['pending', 'active'] },
+        $or: [
+          { startTime: { $lt: new Date(endTime) }, endTime: { $gt: new Date(startTime) } }
+        ]
+      }).session(session);
 
-    if (conflicts.length > 0) {
-      await session.abortTransaction();
-      return res.status(409).json({ 
-        error: 'Spot already reserved for this time window.',
-        conflicts: conflicts.map(c => ({ startTime: c.startTime, endTime: c.endTime }))
-      });
+      if (conflicts.length > 0) {
+        await session.abortTransaction();
+        return res.status(409).json({ 
+          error: 'Spot already reserved for this time window.',
+          conflicts: conflicts.map(c => ({ startTime: c.startTime, endTime: c.endTime }))
+        });
+      }
     }
 
     // Create base reservation data (common for all types)
@@ -211,67 +215,39 @@ exports.createReservation = async (req, res) => {
       await session.commitTransaction();
       return res.status(201).json(newRes);
       
-    } else if (reservationType === 'daily') {
-      // For daily, we create multiple reservations if specified
-      const dailyStartDate = req.body.startDate;
-      const dailyEndDate = req.body.endDate;
-      const dailyStartTime = req.body.startTimeDaily;
-      const dailyEndTime = req.body.endTimeDaily;
-      
-      // If additional daily fields are present, create a reservation for each day
-      if (dailyStartDate && dailyEndDate && dailyStartTime && dailyEndTime) {
-        const sDate = new Date(dailyStartDate);
-        const eDate = new Date(dailyEndDate);
-        
-        // Check 15 day limit
-        const diffDays = Math.ceil((eDate - sDate) / (24 * 60 * 60 * 1000));
-        if (diffDays > 15) {
-          await session.abortTransaction();
-          return res.status(400).json({ error: 'Daily reservations limited to 15 days' });
-        }
-        
-        // Create reservations for each day
-        const dates = enumerateDates(sDate, eDate);
-        const reservations = [];
-        
-        // Calculate price per day
-        const [startHour, startMinute] = dailyStartTime.split(':').map(Number);
-        const [endHour, endMinute] = dailyEndTime.split(':').map(Number);
-        let minutes = (endHour * 60 + endMinute) - (startHour * 60 + startMinute);
-        if (minutes <= 0) minutes += 24 * 60; // Handle cross-midnight
-        const hoursPerDay = minutes / 60;
-        const pricePerDay = hoursPerDay * 2.5;
-        
-        for (const day of dates) {
-          const dayStr = day.toISOString().slice(0, 10);
-          const dayStart = new Date(`${dayStr}T${dailyStartTime}:00Z`);
-          const dayEnd = new Date(`${dayStr}T${dailyEndTime}:00Z`);
-          
-          const dayReservation = {
-            ...reservationData,
-            startTime: dayStart,
-            endTime: dayEnd,
-            totalPrice: pricePerDay, // Price for just this day
-          };
-          
-          const [newRes] = await Reservation.create([dayReservation], { session });
-          reservations.push(newRes);
-        }
-        
-        await updateSpotAndLotStatus(spotObjectId, lotObjectId);
-        await session.commitTransaction();
-        
-        // Return the first reservation as representative
-        return res.status(201).json(reservations[0]);
+    } else if (reservationType === 'daily' && Array.isArray(req.body.dailyWindows)) {
+    // Conflict check for each window
+    for (const window of req.body.dailyWindows) {
+      const conflicts = await Reservation.find({
+        spot: spotObjectId,
+        status: { $in: ['pending', 'active'] },
+        startTime: { $lt: new Date(window.end) },
+        endTime: { $gt: new Date(window.start) }
+      }).session(session);
+      if (conflicts.length > 0) {
+        await session.abortTransaction();
+        return res.status(409).json({
+          error: 'Spot already reserved for one or more selected windows.',
+          conflicts: conflicts.map(c => ({ startTime: c.startTime, endTime: c.endTime }))
+        });
       }
-      
-      // If no daily specific fields, create a single reservation using the provided startTime/endTime
-      const [newRes] = await Reservation.create([reservationData], { session });
-      await updateSpotAndLotStatus(spotObjectId, lotObjectId);
-      await session.commitTransaction();
-      return res.status(201).json(newRes);
-      
-    } else if (reservationType === 'semester') {
+    }
+    // Create a reservation for each window
+    const reservations = [];
+    for (const window of req.body.dailyWindows) {
+      const dayReservation = {
+        ...reservationData,
+        startTime: new Date(window.start),
+        endTime: new Date(window.end),
+        totalPrice: parseFloat(totalPrice) / req.body.dailyWindows.length,
+      };
+      const [newRes] = await Reservation.create([dayReservation], { session });
+      reservations.push(newRes);
+    }
+    await updateSpotAndLotStatus(spotObjectId, lotObjectId);
+    await session.commitTransaction();
+    return res.status(201).json(reservations[0]);
+  }else if (reservationType === 'semester') {
       // For semester, just create a single reservation spanning the entire semester
       // The frontend is responsible for setting the correct start/end times
       const [newRes] = await Reservation.create([reservationData], { session });

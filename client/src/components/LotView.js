@@ -4,7 +4,7 @@ import ParkingService from "../services/ParkingService";
 import PanZoomControls from "./PanZoomControls";
 import "./LotView.css";
 
-const LotMapView = ({ lotId, onBack, highlightedSpot, dateTimeRange }) => {
+const LotMapView = ({ lotId, onBack, reservationType, highlightedSpot, dailyWindows, dateTimeRange }) => {
   const [lotDetails, setLotDetails] = useState(null);
   const [SvgComponent, setSvgComponent] = useState(null);
   const [scale, setScale] = useState(1);
@@ -22,15 +22,19 @@ const LotMapView = ({ lotId, onBack, highlightedSpot, dateTimeRange }) => {
       .catch((err) => console.error("Error fetching lot details", err));
   }, [lotId]);
   useEffect(() => {
-    // Fetch lot availability for the selected time window
-    const fetchAvailability = async () => {
-      const start = encodeURIComponent(dateTimeRange.start);
-      const end = encodeURIComponent(dateTimeRange.end);
+  const fetchAvailability = async () => {
+    if (reservationType === "daily" && dailyWindows && dailyWindows.length) {
+      // For daily, send all windows as an array
+      const data = await ParkingService.fetchLotAvailabilityForWindows(lotId, dailyWindows);
+      setLotAvailability(data);
+    } else {
+      // Hourly/semester: single window
       const data = await ParkingService.fetchLotAvailability(lotId, dateTimeRange.start, dateTimeRange.end);
       setLotAvailability(data);
-    };
-    fetchAvailability();
-  }, [lotId, dateTimeRange]);
+    }
+  };
+  fetchAvailability();
+}, [lotId, dateTimeRange, reservationType, dailyWindows]);
 
 
   const [svgLoadError, setSvgLoadError] = useState(false);

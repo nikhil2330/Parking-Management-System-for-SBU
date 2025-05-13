@@ -20,6 +20,9 @@ router.get('/search/buildings', parkingController.searchBuildings);
 
 router.get('/lot/:lotId/availability', parkingController.getLotAvailability);
 
+router.post('/lot/:lotId/availability-windows', parkingController.getLotAvailabilityForWindows);
+
+
 // router.post('/closest-lots', parkingController.getClosestLotsWithEnoughSpots);
 
 // GET /api/popularTimes/:lotId
