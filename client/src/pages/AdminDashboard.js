@@ -6,7 +6,6 @@ import Footer from '../components/Footer';
 import AdminFeedbackPanel from '../components/AdminFeedbackPanel';
 import AdminEventApproval from '../components/AdminEventApproval';
 import adminService from '../services/AdminService';
-import AdminPendingList from '../components/AdminPendingList';
 import { FaCommentAlt, FaParking, FaPlusCircle, FaTrashAlt, FaEdit, FaSave, FaTimes } from 'react-icons/fa';
 import './admin-dashboard.css';
 
@@ -1759,9 +1758,7 @@ function AdminDashboard() {
             >
               Parking Lots
             </button>
-            <button className={`admin-tab ${activeTab === 'pending' ? 'active' : ''}`} onClick={() => setActiveTab('pending')}>
-              Pending Reservations
-            </button>
+      
             <button
               className={`admin-tab ${activeTab === "events" ? "active" : ""}`}
               onClick={() => setActiveTab("events")}
@@ -1801,8 +1798,7 @@ function AdminDashboard() {
           {/* ===== Content Area ===== */}
           <div className="admin-content-area">
             {/* Pending Reservations */}
-            {activeTab === 'pending' && (<div className="admin-table-container">
-                <AdminPendingList /> </div> )}
+  
             {activeTab === "analytics" && analytics && (
               <div className="analytics-container" ref={analyticsRef}>
                 <h2 className="analytics-title">Analytics Dashboard</h2>

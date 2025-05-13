@@ -418,25 +418,33 @@ const SEMESTER_BOUNDS = {
     setAutoCenter(false);
   };
 
-  const handleReserveSpot = (spotInfo) => {
-    setSelectedSpotForReservation(spotInfo);
-    navigate(`/reservations/${spotInfo.spotId}`, {
-      state: {
-        spotInfo,
-        searchedBuilding,
-        startTime: appliedDateTimeRange.start,
-        endTime: appliedDateTimeRange.end,
-        reservationType,
-        hourlyRange: { ...appliedDateTimeRange },
-        dailyParams: {
-        dateRange: dailyDateRange,
-        startTime: dailyStartTime,
-        endTime: dailyEndTime,
-      },
-      semester,
-      },
-    });
+  // Inside handleReserveSpot function in SearchParkingPage.js
+
+const handleReserveSpot = (spotInfo) => {
+  setSelectedSpotForReservation(spotInfo);
+  
+  // Prepare the correct parameters based on reservation type
+  const navigationState = {
+    spotInfo,
+    searchedBuilding,
+    startTime: appliedDateTimeRange.start,
+    endTime: appliedDateTimeRange.end,
+    reservationType,
   };
+  
+  // Add type-specific parameters
+  if (reservationType === 'daily') {
+    navigationState.dailyParams = {
+      dateRange: dailyDateRange,
+      startTime: dailyStartTime,
+      endTime: dailyEndTime,
+    };
+  } else if (reservationType === 'semester') {
+    navigationState.semester = semester;
+  }
+  
+  navigate(`/reservations/${spotInfo.spotId}`, { state: navigationState });
+};
 
   const handleRecenter = (lotCoordinates) => {
     if (!lotCoordinates) return;

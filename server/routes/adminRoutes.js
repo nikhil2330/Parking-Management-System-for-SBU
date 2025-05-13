@@ -21,7 +21,7 @@ const { transform } = require('@svgr/core');
 const neo4jDriver = require('../neo4j/neo4jDriver');
 const Feedback = require('../models/Feedback');
 
-const upload = multer();const reservationRequestController = require('../controllers/reservationRequestController');
+const upload = multer();
 
 // Protect all routes
 router.use(authenticateJWT, requireAdmin);
@@ -668,28 +668,6 @@ router.post('/users/bulk/reject', async (req, res) => {
     res.status(500).json({ ok: false, message: 'Error in bulk reject' });
   }
 });
-
-/* ──────────────────────────────────────────────────────────────── */
-/* Reservation-request workflow (daily / semester)                 */
-/* ──────────────────────────────────────────────────────────────── */
-// GET  /api/admin/reservation-requests            → list all pending
-router.get(
-  '/reservation-requests',
-  reservationRequestController.listPending
-);
-
-// PATCH  /api/admin/reservation-requests/:id/approve  → bulk-create
-router.patch(
-  '/reservation-requests/:id/approve',
-  reservationRequestController.approve
-);
-
-// PATCH  /api/admin/reservation-requests/:id/reject   → mark rejected
-router.patch(
-  '/reservation-requests/:id/reject',
-  reservationRequestController.reject
-);
-
 
 router.get('/analytics', analyticsController.getAnalytics);
 

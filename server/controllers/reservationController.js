@@ -56,16 +56,49 @@ async function updateSpotAndLotStatus(spotId, lotId) {
   await lot.save();
 }
 
+// Helper function to calculate date ranges for semester
+function semesterToDates(sem) {
+  const year = new Date().getUTCFullYear();
+  switch (sem) {
+    case 'spring': return {
+      startDate: new Date(`${year}-01-20T00:00:00Z`),
+      endDate: new Date(`${year}-05-15T23:59:59Z`)
+    };
+    case 'summer': return {
+      startDate: new Date(`${year}-05-20T00:00:00Z`),
+      endDate: new Date(`${year}-08-10T23:59:59Z`)
+    };
+    case 'fall': return {
+      startDate: new Date(`${year}-08-20T00:00:00Z`),
+      endDate: new Date(`${year}-12-20T23:59:59Z`)
+    };
+    default: return {
+      startDate: new Date(),
+      endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+    };
+  }
+}
+
+// Helper to create date ranges for daily reservations
+function enumerateDates(start, end) {
+  const arr = [], cur = new Date(start);
+  while (cur <= end) { 
+    arr.push(new Date(cur)); 
+    cur.setUTCDate(cur.getUTCDate() + 1); 
+  }
+  return arr;
+}
+
 /**
  * Create a new reservation with enhanced error handling.
+ * Now handles hourly, daily, and semester reservations without admin approval
  */
 exports.createReservation = async (req, res) => {
-
-  const { lotId, spotId, building, startTime, endTime, totalPrice } = req.body;
+  const { lotId, spotId, building, startTime, endTime, totalPrice, reservationType = 'hourly' } = req.body;
   const userId = req.user?.id;
 
-  // Validate required fields
-  if (!lotId || !spotId || !startTime || !endTime || !totalPrice) {
+  // Validate required fields (these should be present for ALL reservation types)
+  if (!lotId || !spotId || !startTime || !endTime || totalPrice === undefined) {
     console.log('Missing required fields:', { lotId, spotId, startTime, endTime, totalPrice });
     return res.status(400).json({
       error: 'Missing required fields',
@@ -74,7 +107,8 @@ exports.createReservation = async (req, res) => {
         spotId: spotId ? 'present' : 'missing',
         startTime: startTime ? 'present' : 'missing',
         endTime: endTime ? 'present' : 'missing',
-        totalPrice: totalPrice ? 'present' : 'missing'
+        totalPrice: totalPrice !== undefined ? 'present' : 'missing',
+        receivedBody: req.body
       }
     });
   }
@@ -84,15 +118,17 @@ exports.createReservation = async (req, res) => {
     console.log('User ID not found in JWT token');
     return res.status(401).json({ error: 'User not authenticated properly' });
   }
-  const reservationType = req.body.reservationType || 'hourly';
+  
   if(!VALID_TYPES.includes(reservationType)){
      return res.status(400).json({error:'Invalid reservationType'});
   }
 
-  // Convert string IDs to ObjectIds if needed
+  // Convert string IDs to ObjectIds
   let lotObjectId, spotObjectId, buildingObjectId;
 
   try {
+    // ID resolution logic (unchanged)
+    // ...
     // First try to find parking spot by spotId string field
     const spot = await ParkingSpot.findOne({ spotId });
     if (spot) {
@@ -136,8 +172,9 @@ exports.createReservation = async (req, res) => {
   try {
     session.startTransaction();
 
-    // Overlap checker INSIDE the transaction
-    const overlap = await Reservation.findOne({
+    // Common conflict detection for all reservation types
+    // Find conflicts based on the time window
+    const conflicts = await Reservation.find({
       spot: spotObjectId,
       status: { $in: ['pending', 'active'] },
       $or: [
@@ -145,12 +182,15 @@ exports.createReservation = async (req, res) => {
       ]
     }).session(session);
 
-    if (overlap) {
+    if (conflicts.length > 0) {
       await session.abortTransaction();
-      return res.status(409).json({ error: 'Spot already reserved for this time window.' });
+      return res.status(409).json({ 
+        error: 'Spot already reserved for this time window.',
+        conflicts: conflicts.map(c => ({ startTime: c.startTime, endTime: c.endTime }))
+      });
     }
 
-    // Create reservation INSIDE the transaction
+    // Create base reservation data (common for all types)
     const reservationData = {
       lot: lotObjectId,
       spot: spotObjectId,
@@ -158,23 +198,97 @@ exports.createReservation = async (req, res) => {
       user: userId,
       startTime: new Date(startTime),
       endTime: new Date(endTime),
-      totalPrice,
+      totalPrice: parseFloat(totalPrice),
       paymentStatus: 'unpaid',
       reservationType,
       status: 'pending'
     };
-    const [newRes] = await Reservation.create([reservationData], { session });
 
-    await updateSpotAndLotStatus(spotObjectId, lotObjectId);
+    if (reservationType === 'hourly') {
+      // Create a single hourly reservation
+      const [newRes] = await Reservation.create([reservationData], { session });
+      await updateSpotAndLotStatus(spotObjectId, lotObjectId);
+      await session.commitTransaction();
+      return res.status(201).json(newRes);
+      
+    } else if (reservationType === 'daily') {
+      // For daily, we create multiple reservations if specified
+      const dailyStartDate = req.body.startDate;
+      const dailyEndDate = req.body.endDate;
+      const dailyStartTime = req.body.startTimeDaily;
+      const dailyEndTime = req.body.endTimeDaily;
+      
+      // If additional daily fields are present, create a reservation for each day
+      if (dailyStartDate && dailyEndDate && dailyStartTime && dailyEndTime) {
+        const sDate = new Date(dailyStartDate);
+        const eDate = new Date(dailyEndDate);
+        
+        // Check 15 day limit
+        const diffDays = Math.ceil((eDate - sDate) / (24 * 60 * 60 * 1000));
+        if (diffDays > 15) {
+          await session.abortTransaction();
+          return res.status(400).json({ error: 'Daily reservations limited to 15 days' });
+        }
+        
+        // Create reservations for each day
+        const dates = enumerateDates(sDate, eDate);
+        const reservations = [];
+        
+        // Calculate price per day
+        const [startHour, startMinute] = dailyStartTime.split(':').map(Number);
+        const [endHour, endMinute] = dailyEndTime.split(':').map(Number);
+        let minutes = (endHour * 60 + endMinute) - (startHour * 60 + startMinute);
+        if (minutes <= 0) minutes += 24 * 60; // Handle cross-midnight
+        const hoursPerDay = minutes / 60;
+        const pricePerDay = hoursPerDay * 2.5;
+        
+        for (const day of dates) {
+          const dayStr = day.toISOString().slice(0, 10);
+          const dayStart = new Date(`${dayStr}T${dailyStartTime}:00Z`);
+          const dayEnd = new Date(`${dayStr}T${dailyEndTime}:00Z`);
+          
+          const dayReservation = {
+            ...reservationData,
+            startTime: dayStart,
+            endTime: dayEnd,
+            totalPrice: pricePerDay, // Price for just this day
+          };
+          
+          const [newRes] = await Reservation.create([dayReservation], { session });
+          reservations.push(newRes);
+        }
+        
+        await updateSpotAndLotStatus(spotObjectId, lotObjectId);
+        await session.commitTransaction();
+        
+        // Return the first reservation as representative
+        return res.status(201).json(reservations[0]);
+      }
+      
+      // If no daily specific fields, create a single reservation using the provided startTime/endTime
+      const [newRes] = await Reservation.create([reservationData], { session });
+      await updateSpotAndLotStatus(spotObjectId, lotObjectId);
+      await session.commitTransaction();
+      return res.status(201).json(newRes);
+      
+    } else if (reservationType === 'semester') {
+      // For semester, just create a single reservation spanning the entire semester
+      // The frontend is responsible for setting the correct start/end times
+      const [newRes] = await Reservation.create([reservationData], { session });
+      await updateSpotAndLotStatus(spotObjectId, lotObjectId);
+      await session.commitTransaction();
+      return res.status(201).json(newRes);
+    }
 
-    await session.commitTransaction();
-    return res.status(201).json(newRes);
   } catch (err) {
+    // Error handling (unchanged)
+    // ...
     try {
       if (session.inTransaction()) {
         await session.abortTransaction();
       }
     } catch (abortErr) {
+      // Handle abort error
     }
     console.error('Error creating reservation:', err);
     if (err.code === 11000) {
@@ -301,6 +415,5 @@ exports.cancelReservation = async (req, res) => {
     return res.status(500).json({ error: 'Internal server error', details: err.message });
   }
 };
-
 
 exports.updateSpotAndLotStatus = updateSpotAndLotStatus;
