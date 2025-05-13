@@ -377,8 +377,7 @@ function EventReservationPage() {
       const data = await ParkingService.fetchClosestSpots(
         buildingId,
         activeFilters,
-        appliedDateTimeRange.start,
-        appliedDateTimeRange.end,
+        { start: appliedDateTimeRange.start, end: appliedDateTimeRange.end },
         { signal: controller.signal, limit: 200 }
       );
 
@@ -483,6 +482,7 @@ function EventReservationPage() {
 
 
   const handleCreateEventReservation = async () => {
+    console.log("Submit event reservation clicked");
     // Prevent event reservations for times less than a week from now
     const minStart = getNextWeekDate();
     if (new Date(appliedDateTimeRange.start) < minStart) {
@@ -509,6 +509,7 @@ function EventReservationPage() {
         eventName,
         reason: eventReason
       };
+      console.log("Submit event reservation clicked");
       await EventReservationService.createEventReservation(reservationData);
       alert("Event reservation request submitted successfully. Waiting for admin approval.");
       navigate('/reservations');

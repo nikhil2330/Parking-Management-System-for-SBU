@@ -36,7 +36,7 @@ function ReservationsPage() {
   const [dailyEndTime, setDailyEndTime] = useState('14:00');
   const [dailyStartDate, setDailyStartDate] = useState(tomorrowStr);
   const [dailyEndDate, setDailyEndDate] = useState(tomorrowStr);
-  const [semester, setSemester] = useState('spring');
+  const [semester, setSemester] = useState('summer');
   const [showMapModal, setShowMapModal] = useState(false);
   const [mapUrl, setMapUrl] = useState('');
 
@@ -48,6 +48,22 @@ function ReservationsPage() {
   // Check if we're coming from the search page with spot info to create a new reservation
   const spotInfo = location.state?.spotInfo;
   const searchedBuilding = location.state?.searchedBuilding;
+
+  const SEMESTER_BOUNDS = {
+  summer: { start: "2025-05-25T00:00", end: "2025-08-20T23:59" },
+  fall: { start: "2025-08-21T00:00", end: "2025-12-18T23:59" },
+  winter: { start: "2025-12-27T00:00", end: "2026-01-28T23:59" },
+};
+
+useEffect(() => {
+  if (reservationType === "semester") {
+    setNewReservation((prev) => ({
+      ...prev,
+      startTime: SEMESTER_BOUNDS[semester].start,
+      endTime: SEMESTER_BOUNDS[semester].end,
+    }));
+  }
+}, [reservationType, semester]);
 
   useEffect(() => {
     // If we have spotInfo from search page, prepare to create a new reservation
@@ -90,28 +106,59 @@ function ReservationsPage() {
 
       // Extract building ID if available
       const buildingId = searchedBuilding?._id || null;
-      const navStart = location.state?.startTime;
-      const navEnd = location.state?.endTime;
+      const navReservationType = location.state?.reservationType;
+    const navStart = location.state?.startTime;
+    const navEnd = location.state?.endTime;
+    const navDailyStartDate = location.state?.dailyStartDate;
+    const navDailyEndDate = location.state?.dailyEndDate;
+    const navDailyStartTime = location.state?.dailyStartTime;
+    const navDailyEndTime = location.state?.dailyEndTime;
+    const navSemester = location.state?.semester;
+    if (navSemester) setSemester(navSemester);
 
+    // Set reservation type if passed
+    if (navReservationType) setReservationType(navReservationType);
+
+    // Set hourly form values if passed
+    if (navReservationType === "hourly" && navStart && navEnd) {
       setNewReservation({
         lotId: lotId,
         spotId: spotId,
         building: buildingId,
-        startTime: navStart || formatDateForInput(now),
-        endTime: navEnd || formatDateForInput(end),
-        totalPrice: 5.00 // Default price, will be calculated based on duration
+        startTime: utcToLocalDateTimeInput(navStart),
+        endTime: utcToLocalDateTimeInput(navEnd),
+        totalPrice: 5.00
       });
-
-      console.log('Setting new reservation with:', {
-        lotId, spotId, building: buildingId
+    } else {
+      // Default to now + 1hr and now + 3hr
+      setNewReservation({
+        lotId: lotId,
+        spotId: spotId,
+        building: buildingId,
+        startTime: formatDateForInput(now),
+        endTime: formatDateForInput(end),
+        totalPrice: 5.00
       });
-
-      setShowReservationForm(true);
     }
 
-    // Fetch existing reservations
-    fetchReservations();
-  }, [spotInfo, searchedBuilding, routeSpotId]);
+    // Set daily form values if passed
+    if (navReservationType === "daily") {
+      if (navDailyStartDate) setDailyStartDate(navDailyStartDate);
+      if (navDailyEndDate) setDailyEndDate(navDailyEndDate);
+      if (navDailyStartTime) setDailyStartTime(navDailyStartTime);
+      if (navDailyEndTime) setDailyEndTime(navDailyEndTime);
+    }
+
+    console.log('Setting new reservation with:', {
+      lotId, spotId, building: buildingId
+    });
+
+    setShowReservationForm(true);
+  }
+
+  // Fetch existing reservations
+  fetchReservations();
+}, [spotInfo, searchedBuilding, routeSpotId]);
 
   const fetchReservations = async () => {
     setLoading(true);
@@ -165,6 +212,39 @@ function ReservationsPage() {
     );
   }
 
+  function localDateTimeToUTC(dateTimeLocalStr) {
+  const local = new Date(dateTimeLocalStr);
+  return local.toISOString();
+  }
+  function utcToLocalDateTimeInput(utcStr) {
+  if (!utcStr) return '';
+  const d = new Date(utcStr);
+  const pad = n => n.toString().padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+function enumerateDailyUTCRanges(dateStart, dateEnd, timeStart, timeEnd) {
+  const days = [];
+  let cur = new Date(dateStart);
+  const last = new Date(dateEnd);
+  while (cur <= last) {
+    const [startHour, startMinute] = timeStart.split(":").map(Number);
+    const [endHour, endMinute] = timeEnd.split(":").map(Number);
+
+    const s = new Date(cur);
+    s.setHours(startHour, startMinute, 0, 0);
+    const e = new Date(cur);
+    e.setHours(endHour, endMinute, 0, 0);
+
+    days.push({
+      start: s.toISOString(),
+      end: e.toISOString(),
+    });
+    cur.setDate(cur.getDate() + 1);
+  }
+  return days;
+}
+
   // Inside ReservationsPage.js, update the handleCreateReservation function
 
   const handleCreateReservation = async (e) => {
@@ -189,8 +269,8 @@ function ReservationsPage() {
           lotId: newReservation.lotId,
           spotId: newReservation.spotId,
           building: newReservation.building,
-          startTime: startDate.toISOString(),
-          endTime: endDate.toISOString(),
+          startTime: localDateTimeToUTC(newReservation.startTime),
+          endTime: localDateTimeToUTC(newReservation.endTime),
           totalPrice: parseFloat(totalPrice),
           reservationType: 'hourly'
         });
@@ -222,6 +302,13 @@ function ReservationsPage() {
         const pricePerDay = hoursPerDay * 2.5;
         const days = diff + 1; // Include both start and end day
         const totalPrice = pricePerDay * days;
+
+        const dailyWindows = enumerateDailyUTCRanges(
+          dailyStartDate,
+          dailyEndDate,
+          dailyStartTime,
+          dailyEndTime
+        );
   
         await ReservationService.createReservation({
           lotId: newReservation.lotId,
@@ -229,14 +316,10 @@ function ReservationsPage() {
           building: newReservation.building,
           reservationType: 'daily',
           // Always include these required fields
-          startTime: startTimeObj.toISOString(),
-          endTime: endTimeObj.toISOString(),
           totalPrice: totalPrice,
           // Daily-specific fields
-          startDate: dailyStartDate,
-          endDate: dailyEndDate,
-          startTimeDaily: dailyStartTime,
-          endTimeDaily: dailyEndTime
+          reservationType: 'daily',
+          dailyWindows: dailyWindows,
         });
         
       } else if (reservationType === 'semester') {
@@ -245,13 +328,15 @@ function ReservationsPage() {
           return alert('Please select a semester.');
         
         // Get date range for semester using the same function as the backend
-        const semesterDates = getSemesterDates(semester);
-        const startDate = semesterDates.startDate;
-        const endDate = semesterDates.endDate;
-        
-        // Calculate price ($2.50 per hour for the entire semester)
-        const days = Math.ceil((endDate - startDate) / (24 * 60 * 60 * 1000)) + 1;
-        const totalPrice = days * 24 * 2.5; // $2.50 per hour, 24 hours per day
+        const startTime = SEMESTER_BOUNDS[semester].start;
+        const endTime = SEMESTER_BOUNDS[semester].end;
+
+        // Calculate price: $2.50 per hour, 24 hours per day, for the full semester
+        const startDate = new Date(startTime);
+        const endDate = new Date(endTime);
+        const msPerDay = 24 * 60 * 60 * 1000;
+        const days = Math.ceil((endDate - startDate) / msPerDay) + 1;
+        const totalPrice = days * 24 * 2.5;
         
         await ReservationService.createReservation({
           lotId: newReservation.lotId,
@@ -259,8 +344,8 @@ function ReservationsPage() {
           building: newReservation.building,
           reservationType: 'semester',
           // Always include these required fields
-          startTime: startDate.toISOString(),
-          endTime: endDate.toISOString(),
+          startTime,
+          endTime,
           totalPrice: totalPrice,
           // Semester-specific field
           semester: semester
@@ -426,9 +511,7 @@ function ReservationsPage() {
       return 'rejected';
     } else if (reservation.status === 'approved') {
       return 'approved';
-    } else if (reservation.status === 'pending' && startTime > now) {
-      return 'pending';
-    }
+    } 
 
     if (now < startTime) {
       return 'pending';
@@ -951,9 +1034,15 @@ function ReservationsPage() {
                       onChange={(e) => setSemester(e.target.value)}
                       required
                     >
-                      <option value="spring">Spring (Jan 20 – May 15)</option>
-                      <option value="summer">Summer (May 20 – Aug 10)</option>
-                      <option value="fall">Fall (Aug 20 – Dec 20)</option>
+                      <option value="summer">
+                        Summer (May 25th – August 20th)
+                      </option>
+                      <option value="fall">
+                        Fall (August 21st – December 18th)
+                      </option>
+                      <option value="winter">
+                        Winter (December 27th – January 28th)
+                      </option>
                     </select>
                   </div>
                 )}

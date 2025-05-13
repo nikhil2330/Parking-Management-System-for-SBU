@@ -8,9 +8,17 @@ const API = axios.create({
   headers: { 'Content-Type': 'application/json' }
 });
 
-const fetchClosestSpots = async (buildingId, filters, startTime, endTime, { limit, signal } = {}) => {
+const fetchClosestSpots = async (buildingId, filters, timeOrWindows, { limit, signal } = {}) => {
   try {
-    const data = { buildingId, filters, startTime, endTime, ...(limit ? { limit } : {}) };
+    let data = { buildingId, filters, ...(limit ? { limit } : {}) };
+    // If timeOrWindows is an array, it's daily windows
+    if (Array.isArray(timeOrWindows)) {
+      data.windows = timeOrWindows;
+    } else {
+      // Otherwise, it's {start, end} for hourly/semester
+      data.startTime = timeOrWindows.start;
+      data.endTime = timeOrWindows.end;
+    }
     const response = await API.post('/parking/closest-spots', data, { signal });
     return response.data;
   } catch (error) {
@@ -23,6 +31,11 @@ const fetchLotAvailability = async (lotId, start, end) => {
   const res = await API.get(`/parking/lot/${lotId}/availability`, {
     params: { startTime: start, endTime: end }
   });
+  return res.data;
+};
+
+const fetchLotAvailabilityForWindows = async (lotId, windows) => {
+  const res = await API.post(`/parking/lot/${lotId}/availability-windows`, { windows });
   return res.data;
 };
 
@@ -107,4 +120,5 @@ export default {
   fetchLotAvailability,
   fetchSpotReservations,
   fetchClosestLots,
+  fetchLotAvailabilityForWindows
 };

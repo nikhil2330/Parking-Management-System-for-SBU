@@ -1377,7 +1377,7 @@
     color: var(--primary-dark);
     outline: none;
     transition: border 0.2s;
-    width: 220px; /* increased width for full date/time visibility */
+    width: 220; /* increased width for full date/time visibility */
     height: 32px;
   }
 
@@ -1483,15 +1483,15 @@
 }
 
 /* Constrain input sizes */
-.reservation-datetime-input {
+/* .reservation-datetime-input {
   flex: 1;
   padding: 8px 10px;
   border: 1px solid var(--gray-300);
   border-radius: 4px;
   font-size: 0.9rem;
-  min-width: 0; /* Prevent overflow */
+  min-width: 0;
   max-width: 140px;
-}
+} */
 
 /* Special styling for time inputs to make them smaller */
 .reservation-datetime-input[type="time"] {
@@ -1543,54 +1543,56 @@
 .daily-inputs-container {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 6px;
   width: 100%;
+  margin-left: 0.2rem; /* More to the left */
 }
 
-/* Row styling */
 .daily-input-row {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   width: 100%;
+  margin-bottom: 0;
 }
 
-/* Label styling */
 .daily-input-label {
   font-weight: 600;
-  color: var(--gray-700);
-  min-width: 50px;
+  color: var(--primary-red);
+  min-width: 38px;
+  font-size: 0.93rem;
   flex-shrink: 0;
+  margin-right: 2px;
 }
 
-/* Input group styling */
 .daily-input-group {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 4px;
   flex: 1;
-  max-width: calc(100% - 60px); /* Account for label width + gap */
+  max-width: 260px; /* Shorter length */
 }
 
-/* Date input styling */
-.daily-date-input {
-  flex: 3;
-  padding: 8px 10px;
-  border: 1px solid var(--gray-300);
-  border-radius: 4px;
-  font-size: 0.9rem;
-  min-width: 0;
-}
-
-/* Time input styling */
+.daily-date-input,
 .daily-time-input {
-  flex: 2;
-  padding: 8px 10px;
-  border: 1px solid var(--gray-300);
-  border-radius: 4px;
-  font-size: 0.9rem;
+  flex: 1 1 0;
+  padding: 5px 8px;
+  border: 1.2px solid var(--gray-300);
+  border-radius: 6px; /* Less curve, more rectangular */
+  font-size: 0.93rem;
   min-width: 0;
-  max-width: 100px;
+  background: var(--white);
+  color: var(--primary-dark);
+  transition: border 0.2s;
+  height: 28px;
+  box-sizing: border-box;
+  max-width: 130px; /* Squish horizontally */
+}
+
+.daily-date-input:focus,
+.daily-time-input:focus {
+  border-color: var(--primary-red);
+  outline: none;
 }
 
 /* Helper text */

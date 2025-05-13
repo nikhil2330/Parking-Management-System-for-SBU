@@ -1,36 +1,26 @@
 const mongoose = require('mongoose');
-require('dotenv').config({ path: '../config/.env' });
+const Reservation = require('../models/Reservation');
 
-const mainUri = process.env.MONGO_URI;
-const testUri = process.env.MONGO_URI_TEST;
+const path = require('path');
 
-const collections = ['parkingspots', 'Parking Lots', 'buildings'];
+require('dotenv').config({ path: path.resolve(__dirname, '../config/.env') });
 
-async function copyCollections() {
-  const mainConn = await mongoose.createConnection(mainUri).asPromise();
-  const testConn = await mongoose.createConnection(testUri).asPromise();
+const MONGO_URI = process.env.MONGO_URI
 
-  // Use the native MongoDB driver via getClient()
-  const mainDb = mainConn.getClient().db();
-  const testDb = testConn.getClient().db();
+async function deleteRecentReservations() {
+  await mongoose.connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true });
 
-  for (const coll of collections) {
-    const docs = await mainDb.collection(coll).find({}).toArray();
-    if (docs.length > 0) {
-      await testDb.collection(coll).deleteMany({});
-      await testDb.collection(coll).insertMany(docs);
-      console.log(`Copied ${docs.length} documents to ${coll} in test DB.`);
-    } else {
-      console.log(`No documents found in ${coll}.`);
-    }
-  }
+  const threeDaysAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000);
 
-  await mainConn.close();
-  await testConn.close();
-  console.log('Copy complete.');
+  const result = await Reservation.deleteMany({
+    createdAt: { $gte: threeDaysAgo }
+  });
+
+  console.log(`Deleted ${result.deletedCount} reservations created in the last 3 days.`);
+  await mongoose.disconnect();
 }
 
-copyCollections().catch(err => {
-  console.error(err);
+deleteRecentReservations().catch(err => {
+  console.error('Error deleting reservations:', err);
   process.exit(1);
 });

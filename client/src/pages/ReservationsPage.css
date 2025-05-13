@@ -1121,14 +1121,12 @@
   z-index: 1;
 }
 
-/* Add these styles to your ReservationsPage.css */
-
-/* ===== Reservation Form Improvements ===== */
 
 /* Time and date range containers */
 .time-range,
 .date-range {
   display: flex;
+  flex-direction: row;
   align-items: center;
   background: var(--gray-50);
   border-radius: 8px;
@@ -1150,6 +1148,14 @@
   min-width: 0; /* Prevent overflow */
   flex: 1;
   max-width: 140px;
+}
+
+.date-range input[type="date"] {
+  flex: 1 1 0;
+  min-width: 160px;   /* Make each date input longer */
+  max-width: 240px;
+  padding: 10px 14px;
+  font-size: 1rem;
 }
 
 /* Separator label */

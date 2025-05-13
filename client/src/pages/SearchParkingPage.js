@@ -9,6 +9,8 @@ import SpotDetails from "../components/SpotDetails";
 import GoogleMapsService from "../services/GoogleMapService";
 import "./premium-search-parking.css";
 import dayjs from "dayjs";
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
+dayjs.extend(isSameOrBefore);
 
 
 const DEFAULT_FILTERS = {
@@ -59,6 +61,7 @@ function SearchParkingPage() {
   const [closestSpots, setClosestSpots] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [dailyWindows, setDailyWindows] = useState([]);
   const [selectedDetailSpot, setSelectedDetailSpot] = useState(null);
   const [selectedSpotForReservation, setSelectedSpotForReservation] =
     useState(null);
@@ -74,6 +77,8 @@ function getNextHourDate() {
   now.setHours(now.getHours() + 1);
   return now;
 }
+
+
 function formatDateForInput(date) {
   const pad = (n) => n.toString().padStart(2, "0");
   return (
@@ -88,51 +93,104 @@ function formatDateForInput(date) {
     pad(date.getMinutes())
   );
 }
+
+function localDateTimeToUTC(dateTimeLocalStr) {
+  const local = new Date(dateTimeLocalStr);
+  return local.toISOString();
+}
 const defaultStart = getNextHourDate();
 const defaultEnd = new Date(defaultStart);
 defaultEnd.setHours(defaultEnd.getHours() + 1);
-const [dateTimeRange, setDateTimeRange] = useState({
+const [hourlyRange, setHourlyRange] = useState({
   start: formatDateForInput(defaultStart),
   end: formatDateForInput(defaultEnd),
 });
+const [dailyRange, setDailyRange] = useState({
+  dateStart: dayjs().add(1, "day").format("YYYY-MM-DD"),
+  dateEnd: dayjs().add(1, "day").format("YYYY-MM-DD"),
+  timeStart: dayjs().hour(8).minute(0).format("HH:mm"),
+  timeEnd: dayjs().hour(12).minute(0).format("HH:mm"),
+});
+const [semester, setSemester] = useState("summer");
 
-// Daily
-const [dailyStartTime, setDailyStartTime] = useState(dayjs().hour(8).minute(0).format("HH:mm"));
-const [dailyEndTime, setDailyEndTime] = useState(dayjs().hour(12).minute(0).format("HH:mm"));
-const [dailyDateRange, setDailyDateRange] = useState({
-  start: dayjs().add(1, "day").format("YYYY-MM-DD"),
-  end: dayjs().add(1, "day").format("YYYY-MM-DD"),
+// --- 2. Single dateTimeRange for availability/search ---
+const [dateTimeRange, setDateTimeRange] = useState({
+  start: hourlyRange.start,
+  end: hourlyRange.end,
 });
 
-// Semester
-const [semester, setSemester] = useState("summer");
-const SEMESTER_BOUNDS = {
-  summer: { start: "2025-05-20T00:00", end: "2025-08-10T23:59" },
-  fall: { start: "2025-08-20T00:00", end: "2025-12-20T23:59" },
-  winter: { start: "2026-01-01T00:00", end: "2025-01-28T23:59" },
-};
-  const [spotWalkTimes, setSpotWalkTimes] = useState({});
-  const [draftFilters, setDraftFilters] = useState(DEFAULT_FILTERS);
-  // "Active" filters are only set when you click Apply Filters
-  const [activeFilters, setActiveFilters] = useState(DEFAULT_FILTERS);
-
-  const [appliedDateTimeRange, setAppliedDateTimeRange] = useState({
-    start: formatDateForInput(defaultStart),
-    end: formatDateForInput(defaultEnd),
-  });
-
-  const handleDateTimeRangeChange = (field, value) => {
-    setDateTimeRange((prev) => {
-      const updated = { ...prev, [field]: value };
-      setAppliedDateTimeRange(updated); // Immediately apply
-      return updated;
+function enumerateDailyUTCRanges(dateStart, dateEnd, timeStart, timeEnd) {
+  const days = [];
+  let cur = dayjs(dateStart);
+  const last = dayjs(dateEnd);
+  while (cur.isSameOrBefore(last, 'day')) {
+    const s = cur.hour(Number(timeStart.split(":")[0])).minute(Number(timeStart.split(":")[1]));
+    const e = cur.hour(Number(timeEnd.split(":")[0])).minute(Number(timeEnd.split(":")[1]));
+    days.push({
+      start: s.toDate().toISOString(),
+      end: e.toDate().toISOString(),
     });
-  };
+    cur = cur.add(1, 'day');
+  }
+  return days;
+}
 
-  const handleApplyDateTimeRange = () => {
-    setAppliedDateTimeRange({ ...dateTimeRange });
-    // Optionally, trigger a search or update map here
-  };
+useEffect(() => {
+  if (reservationType === "daily") {
+    setDailyWindows(
+      enumerateDailyUTCRanges(
+        dailyRange.dateStart,
+        dailyRange.dateEnd,
+        dailyRange.timeStart,
+        dailyRange.timeEnd
+      )
+    );
+  } else {
+    setDailyWindows([]);
+  }
+}, [
+  reservationType,
+  dailyRange.dateStart,
+  dailyRange.dateEnd,
+  dailyRange.timeStart,
+  dailyRange.timeEnd,
+]);
+
+const SEMESTER_BOUNDS = {
+  summer: { start: "2025-05-25T00:00", end: "2025-08-20T23:59" },
+  fall: { start: "2025-08-21T00:00", end: "2025-12-18T23:59" },
+  winter: { start: "2025-12-27T00:00", end: "2026-01-28T23:59" },
+};
+const [spotWalkTimes, setSpotWalkTimes] = useState({});
+const [draftFilters, setDraftFilters] = useState(DEFAULT_FILTERS);
+// "Active" filters are only set when you click Apply Filters
+const [activeFilters, setActiveFilters] = useState(DEFAULT_FILTERS);
+
+// --- 3. Keep dateTimeRange in sync with reservationType and its state ---
+useEffect(() => {
+  if (reservationType === "hourly") {
+    setDateTimeRange({ start: hourlyRange.start, end: hourlyRange.end });
+  } else if (reservationType === "daily") {
+    setDateTimeRange({
+      start: `${dailyRange.dateStart}T${dailyRange.timeStart}`,
+      end: `${dailyRange.dateEnd}T${dailyRange.timeEnd}`,
+    });
+  } else if (reservationType === "semester") {
+    setDateTimeRange({
+      start: SEMESTER_BOUNDS[semester].start,
+      end: SEMESTER_BOUNDS[semester].end,
+    });
+  }
+}, [
+  reservationType,
+  hourlyRange.start,
+  hourlyRange.end,
+  dailyRange.dateStart,
+  dailyRange.dateEnd,
+  dailyRange.timeStart,
+  dailyRange.timeEnd,
+  semester,
+]);
 
   // Helper to get filter labels for tags
   const getActiveFilterLabels = () => {
@@ -339,23 +397,12 @@ const SEMESTER_BOUNDS = {
           lotId: selectedLotId || undefined,
         })
       );
-      /* work out the start / end pair based on reservationType */
-      let searchStart, searchEnd;
-      if (reservationType === "hourly") {
-        searchStart = dateTimeRange.start;
-        searchEnd = dateTimeRange.end;
-      } else if (reservationType === "daily") {
-        searchStart = `${dailyDateRange.start}T${dailyStartTime}`;
-        searchEnd = `${dailyDateRange.end}T${dailyEndTime}`;
-      } else if (reservationType === "semester") {
-        searchStart = SEMESTER_BOUNDS[semester].start;
-        searchEnd = SEMESTER_BOUNDS[semester].end;
-      }
+
+      
       const data = await ParkingService.fetchClosestSpots(
         buildingId,
         activeFilters,
-        searchStart,
-        searchEnd,
+        reservationType === "daily" ? dailyWindows : [{ start: utcStart, end: utcEnd }],
         { signal: controller.signal }
       );
       console.log("Closest spots:", data.spots);
@@ -378,6 +425,9 @@ const SEMESTER_BOUNDS = {
       }
     }
   };
+
+  const utcStart = localDateTimeToUTC(dateTimeRange.start);
+  const utcEnd = localDateTimeToUTC(dateTimeRange.end);
 
   useEffect(() => {
     // Only run when closestSpots changes
@@ -418,33 +468,24 @@ const SEMESTER_BOUNDS = {
     setAutoCenter(false);
   };
 
-  // Inside handleReserveSpot function in SearchParkingPage.js
-
-const handleReserveSpot = (spotInfo) => {
-  setSelectedSpotForReservation(spotInfo);
-  
-  // Prepare the correct parameters based on reservation type
-  const navigationState = {
-    spotInfo,
-    searchedBuilding,
-    startTime: appliedDateTimeRange.start,
-    endTime: appliedDateTimeRange.end,
-    reservationType,
+  const handleReserveSpot = (spotInfo) => {
+    setSelectedSpotForReservation(spotInfo);
+    navigate(`/reservations/${spotInfo.spotId}`, {
+      state: {
+        spotInfo,
+        searchedBuilding,
+        reservationType,
+        dailyWindows: reservationType === "daily" ? dailyWindows : undefined,
+        startTime: utcStart,
+        endTime: utcEnd,
+        semester, 
+        dailyStartDate: dailyRange.dateStart,
+        dailyEndDate: dailyRange.dateEnd,
+        dailyStartTime: dailyRange.timeStart,
+        dailyEndTime: dailyRange.timeEnd,   
+      },
+    });
   };
-  
-  // Add type-specific parameters
-  if (reservationType === 'daily') {
-    navigationState.dailyParams = {
-      dateRange: dailyDateRange,
-      startTime: dailyStartTime,
-      endTime: dailyEndTime,
-    };
-  } else if (reservationType === 'semester') {
-    navigationState.semester = semester;
-  }
-  
-  navigate(`/reservations/${spotInfo.spotId}`, { state: navigationState });
-};
 
   const handleRecenter = (lotCoordinates) => {
     if (!lotCoordinates) return;
@@ -669,112 +710,130 @@ const handleReserveSpot = (spotInfo) => {
 
           {/* Hourly */}
           {reservationType === "hourly" && (
-  <div className="reservation-datetime-bar vertical">
-    <div className="reservation-datetime-row">
-      <label className="reservation-datetime-label inline" htmlFor="searchStartTime">
-        Start
-      </label>
-      <input
-        className="reservation-datetime-input"
-        type="datetime-local"
-        id="searchStartTime"
-        value={dateTimeRange.start}
-        onChange={(e) =>
-          setDateTimeRange((prev) => ({
-            ...prev,
-            start: e.target.value,
-          }))
-        }
-        max={dateTimeRange.end}
-      />
-    </div>
-    <div className="reservation-datetime-row">
-      <label className="reservation-datetime-label inline" htmlFor="searchEndTime">
-        End
-      </label>
-      <input
-        className="reservation-datetime-input"
-        type="datetime-local"
-        id="searchEndTime"
-        value={dateTimeRange.end}
-        onChange={(e) =>
-          setDateTimeRange((prev) => ({
-            ...prev,
-            end: e.target.value,
-          }))
-        }
-        min={dateTimeRange.start}
-      />
-    </div>
-  </div>
-)}
+            <div className="reservation-datetime-bar vertical">
+              <div className="reservation-datetime-row">
+                <label
+                  className="reservation-datetime-label inline"
+                  htmlFor="searchStartTime"
+                >
+                  Start
+                </label>
+                <input
+                  className="reservation-datetime-input"
+                  type="datetime-local"
+                  id="searchStartTime"
+                  value={hourlyRange.start}
+                  onChange={(e) =>
+                    setHourlyRange((r) => ({ ...r, start: e.target.value }))
+                  }
+                  max={hourlyRange.end}
+                />
+              </div>
+              <div className="reservation-datetime-row">
+                <label
+                  className="reservation-datetime-label inline"
+                  htmlFor="searchEndTime"
+                >
+                  End
+                </label>
+                <input
+                  className="reservation-datetime-input"
+                  type="datetime-local"
+                  id="searchEndTime"
+                  value={hourlyRange.end}
+                  onChange={(e) =>
+                    setHourlyRange((r) => ({ ...r, end: e.target.value }))
+                  }
+                  min={hourlyRange.start}
+                />
+              </div>
+            </div>
+          )}
 
-{/* Daily */}
-{reservationType === "daily" && (
-  <div className="daily-inputs-container">
-    <div className="daily-input-row">
-      <label className="daily-input-label">Start</label>
-      <div className="daily-input-group">
-        <input
-          className="daily-date-input"
-          type="date"
-          value={dailyDateRange.start}
-          max={dailyDateRange.end}
-          onChange={(e) =>
-            setDailyDateRange((r) => ({ ...r, start: e.target.value }))
-          }
-        />
-        <input
-          className="daily-time-input"
-          type="time"
-          value={dailyStartTime}
-          onChange={(e) => setDailyStartTime(e.target.value)}
-        />
-      </div>
-    </div>
-    <div className="daily-input-row">
-      <label className="daily-input-label">End</label>
-      <div className="daily-input-group">
-        <input
-          className="daily-date-input"
-          type="date"
-          value={dailyDateRange.end}
-          min={dailyDateRange.start}
-          onChange={(e) =>
-            setDailyDateRange((r) => ({ ...r, end: e.target.value }))
-          }
-        />
-        <input
-          className="daily-time-input"
-          type="time"
-          value={dailyEndTime}
-          onChange={(e) => setDailyEndTime(e.target.value)}
-        />
-      </div>
-    </div>
-    <div className="daily-helper-text">
-      <span>Maximum: 15 Days</span>
-    </div>
-  </div>
-)}
+          {/* Daily */}
+          {reservationType === "daily" && (
+            <div className="daily-inputs-container">
+              <div className="daily-input-row">
+                <label className="daily-input-label">Start</label>
+                <div className="daily-input-group">
+                  <input
+                    className="daily-date-input"
+                    type="date"
+                    value={dailyRange.dateStart}
+                    max={dailyRange.dateEnd}
+                    onChange={(e) =>
+                      setDailyRange((r) => ({
+                        ...r,
+                        dateStart: e.target.value,
+                      }))
+                    }
+                  />
+                  <input
+                    className="daily-time-input"
+                    type="time"
+                    value={dailyRange.timeStart}
+                    onChange={(e) =>
+                      setDailyRange((r) => ({
+                        ...r,
+                        timeStart: e.target.value,
+                      }))
+                    }
+                  />
+                </div>
+              </div>
+              <div className="daily-input-row">
+                <label className="daily-input-label">End</label>
+                <div className="daily-input-group">
+                  <input
+                    className="daily-date-input"
+                    type="date"
+                    value={dailyRange.dateEnd}
+                    min={dailyRange.dateStart}
+                    onChange={(e) =>
+                      setDailyRange((r) => ({ ...r, dateEnd: e.target.value }))
+                    }
+                  />
+                  <input
+                    className="daily-time-input"
+                    type="time"
+                    value={dailyRange.timeEnd}
+                    onChange={(e) =>
+                      setDailyRange((r) => ({ ...r, timeEnd: e.target.value }))
+                    }
+                  />
+                </div>
+              </div>
+              <div className="daily-helper-text">
+                <span>Maximum: 15 Days</span>
+              </div>
+            </div>
+          )}
 
-{/* Semester */}
-{reservationType === "semester" && (
-  <div className="reservation-datetime-bar vertical">
-    <div className="reservation-datetime-row">
-      <label className="reservation-datetime-label inline">Semester</label>
-      <select
-        className="reservation-datetime-input semester"
-        value={semester}
-        onChange={(e) => setSemester(e.target.value)}
-      >
-        <option value="spring">Spring (Jan 20 – May 15)</option>
-        <option value="summer">Summer (May 20 – Aug 10)</option>
-        <option value="fall">Fall (Aug 20 – Dec 20)</option>
-      </select>
-    </div>
-  </div>
-)}
+          {/* Semester */}
+          {reservationType === "semester" && (
+            <div className="reservation-datetime-bar vertical">
+              <div className="reservation-datetime-row">
+                <label className="reservation-datetime-label inline">
+                  Semester
+                </label>
+                <select
+                  className="reservation-datetime-input semester"
+                  value={semester}
+                  onChange={(e) => setSemester(e.target.value)}
+                >
+                  <option value="summer">
+                    Summer (May 25th – August 20th)
+                  </option>
+                  <option value="fall">
+                    Fall (August 21st – December 18th)
+                  </option>
+                  <option value="winter">
+                    Winter (December 27th – January 28th)
+                  </option>
+                </select>
+              </div>
+            </div>
+          )}
           <div className="filters-panel">
             <div className="filters-header">
               <svg
@@ -1276,12 +1335,17 @@ const handleReserveSpot = (spotInfo) => {
                   />
                 </div>
               ) : selectedLotId ? (
-                isValidDateTimeRange(appliedDateTimeRange) ? (
+                isValidDateTimeRange(dateTimeRange) ? (
                   <LotMapView
                     lotId={selectedLotId}
                     onBack={handleBackFromLot}
+                    reservationType={reservationType}
                     highlightedSpot={highlightedSpot}
-                    dateTimeRange={appliedDateTimeRange}
+                    dailyWindows={dailyWindows}
+                    dateTimeRange={{
+                      start: utcStart,
+                      end: utcEnd,
+                    }}
                   />
                 ) : (
                   <div
@@ -1333,6 +1397,7 @@ const handleReserveSpot = (spotInfo) => {
                   })
                 );
               }}
+              reservationType={reservationType}
               onReserve={handleReserveSpot}
               onGetDirections={(spotData) => {
                 handleGetDirections(spotData);
@@ -1341,7 +1406,11 @@ const handleReserveSpot = (spotInfo) => {
               }}
               minWalkTime={spotWalkTimes[selectedDetailSpot]?.min}
               maxWalkTime={spotWalkTimes[selectedDetailSpot]?.max}
-              dateTimeRange={appliedDateTimeRange}
+              dateTimeRange={{
+                start: utcStart,
+                end: utcEnd,
+              }}
+              dailyWindows={dailyWindows}
               // minWalkTime={selectedWalkTimes.minWalkTime}
               // maxWalkTime={selectedWalkTimes.maxWalkTime}
             />

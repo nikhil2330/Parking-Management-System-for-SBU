@@ -119,7 +119,7 @@ const CATEGORY_LABELS = {
   evCharging: "Electric Vehicle",
 };
 
-const SpotDetails = ({ spotId, onClose, onReserve, onGetDirections, minWalkTime, maxWalkTime, dateTimeRange }) => {
+const SpotDetails = ({ spotId, onClose, reservationType, onReserve, onGetDirections, minWalkTime, maxWalkTime, dateTimeRange, dailyWindows }) => {
   const [spotData, setSpotData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -149,14 +149,23 @@ const SpotDetails = ({ spotId, onClose, onReserve, onGetDirections, minWalkTime,
     fetchDetails();
   }, [spotId]);
 
+
   useEffect(() => {
-    if (!spotData?.lot?.lotId || !dateTimeRange) return;
-    ParkingService.fetchLotAvailability(
-      spotData.lot.lotId,
-      dateTimeRange.start,
-      dateTimeRange.end
-    ).then((data) => setLotAvailability(data));
-  }, [spotData, dateTimeRange]);
+  if (!spotData?.lot?.lotId || !dateTimeRange) return;
+
+  const fetchAvailability = async () => {
+    if (reservationType === "daily" && dailyWindows && dailyWindows.length) {
+      // For daily, send all windows as an array
+      const data = await ParkingService.fetchLotAvailabilityForWindows(spotData.lot.lotId, dailyWindows);
+      setLotAvailability(data);
+    } else {
+      // Hourly/semester: single window
+      const data = await ParkingService.fetchLotAvailability(spotData.lot.lotId, dateTimeRange.start, dateTimeRange.end);
+      setLotAvailability(data);
+    }
+  };
+  fetchAvailability();
+}, [spotData, dateTimeRange, reservationType, dailyWindows]);
 
   useEffect(() => {
     if (!spotData?.spotId || !dateTimeRange) return;
