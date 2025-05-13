@@ -7,7 +7,6 @@ import ApiService from '../services/api';
 import GoogleMapService from '../services/GoogleMapService';
 import EventReservationService from '../services/EventReservationService';
 import './ReservationsPage.css';
-import dayjs from 'dayjs';
 import ReservationTypeToggle from '../components/ReservationTypeToggle';
 
 function ReservationsPage() {
