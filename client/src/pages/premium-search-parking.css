@@ -1414,6 +1414,217 @@
   transform: translateY(-1px);
 }
 
+/* Add these styles to your premium-search-parking.css */
+
+/* ===== Reservation Type Toggle in Search Page ===== */
+.reservation-type-toggle {
+  display: flex;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--gray-200);
+  background-color: var(--gray-100);
+  width: 100%;
+}
+
+.reservation-type-toggle-btn {
+  flex: 1;
+  padding: 10px 16px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--gray-700);
+  transition: all 0.2s ease;
+  position: relative;
+  outline: none;
+}
+
+.reservation-type-toggle-btn:not(:last-child) {
+  border-right: 1px solid var(--gray-200);
+}
+
+.reservation-type-toggle-btn:hover {
+  background-color: var(--gray-200);
+}
+
+.reservation-type-toggle-btn.active {
+  background-color: var(--primary-red);
+  color: white;
+}
+
+/* ===== Fix for Date/Time Input in Search Page ===== */
+
+/* Date/time container for better containment */
+.reservation-datetime-bar.vertical {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px;
+  background-color: var(--gray-50);
+  border-radius: 8px;
+  border: 1px solid var(--gray-200);
+  margin-bottom: 1rem;
+}
+
+/* Fix alignment of rows */
+.reservation-datetime-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+/* Ensure labels have consistent width */
+.reservation-datetime-label.inline {
+  min-width: 40px;
+  font-weight: 600;
+  color: var(--gray-700);
+}
+
+/* Constrain input sizes */
+.reservation-datetime-input {
+  flex: 1;
+  padding: 8px 10px;
+  border: 1px solid var(--gray-300);
+  border-radius: 4px;
+  font-size: 0.9rem;
+  min-width: 0; /* Prevent overflow */
+  max-width: 140px;
+}
+
+/* Special styling for time inputs to make them smaller */
+.reservation-datetime-input[type="time"] {
+  max-width: 100px;
+}
+
+/* Semester dropdown should be larger */
+.reservation-datetime-input.semester {
+  max-width: 100%;
+  width: 100%;
+}
+
+/* Media queries for smaller screens */
+@media (max-width: 768px) {
+  .reservation-datetime-row {
+    flex-wrap: wrap;
+  }
+  
+  .reservation-datetime-input {
+    max-width: none;
+    width: 100%;
+  }
+}
+
+/* Improve filter panel styling */
+.filters-panel {
+  margin-top: 1rem;
+}
+
+/* Fix for the search bar alignment */
+.search-bar-container {
+  margin-bottom: 1rem;
+}
+
+.premium-search-bar {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.search-input-wrapper {
+  flex: 1;
+  position: relative;
+}
+
+/* Additional Daily Inputs Specific Fix */
+
+/* Container for daily inputs in the search page */
+.daily-inputs-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+/* Row styling */
+.daily-input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+/* Label styling */
+.daily-input-label {
+  font-weight: 600;
+  color: var(--gray-700);
+  min-width: 50px;
+  flex-shrink: 0;
+}
+
+/* Input group styling */
+.daily-input-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  max-width: calc(100% - 60px); /* Account for label width + gap */
+}
+
+/* Date input styling */
+.daily-date-input {
+  flex: 3;
+  padding: 8px 10px;
+  border: 1px solid var(--gray-300);
+  border-radius: 4px;
+  font-size: 0.9rem;
+  min-width: 0;
+}
+
+/* Time input styling */
+.daily-time-input {
+  flex: 2;
+  padding: 8px 10px;
+  border: 1px solid var(--gray-300);
+  border-radius: 4px;
+  font-size: 0.9rem;
+  min-width: 0;
+  max-width: 100px;
+}
+
+/* Helper text */
+.daily-helper-text {
+  color: #999;
+  font-size: 0.8rem;
+  text-align: center;
+  margin-top: 6px;
+  width: 100%;
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+  .daily-input-group {
+    flex-direction: column;
+    align-items: flex-start;
+    max-width: 100%;
+  }
+  
+  .daily-date-input,
+  .daily-time-input {
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  .daily-input-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .daily-input-label {
+    margin-bottom: 4px;
+  }
+}
 
 
 

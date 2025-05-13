@@ -711,44 +711,50 @@ const handleReserveSpot = (spotInfo) => {
 
 {/* Daily */}
 {reservationType === "daily" && (
-  <div className="reservation-datetime-bar vertical">
-    <div className="reservation-datetime-row">
-      <label className="reservation-datetime-label inline">Start</label>
-      <input
-        className="reservation-datetime-input"
-        type="date"
-        value={dailyDateRange.start}
-        max={dailyDateRange.end}
-        onChange={(e) =>
-          setDailyDateRange((r) => ({ ...r, start: e.target.value }))
-        }
-      />
-      <input
-        className="reservation-datetime-input"
-        type="time"
-        value={dailyStartTime}
-        onChange={(e) => setDailyStartTime(e.target.value)}
-      />
+  <div className="daily-inputs-container">
+    <div className="daily-input-row">
+      <label className="daily-input-label">Start</label>
+      <div className="daily-input-group">
+        <input
+          className="daily-date-input"
+          type="date"
+          value={dailyDateRange.start}
+          max={dailyDateRange.end}
+          onChange={(e) =>
+            setDailyDateRange((r) => ({ ...r, start: e.target.value }))
+          }
+        />
+        <input
+          className="daily-time-input"
+          type="time"
+          value={dailyStartTime}
+          onChange={(e) => setDailyStartTime(e.target.value)}
+        />
+      </div>
     </div>
-    <div className="reservation-datetime-row">
-      <label className="reservation-datetime-label inline">End</label>
-      <input
-        className="reservation-datetime-input"
-        type="date"
-        value={dailyDateRange.end}
-        min={dailyDateRange.start}
-        onChange={(e) =>
-          setDailyDateRange((r) => ({ ...r, end: e.target.value }))
-        }
-      />
-      <input
-        className="reservation-datetime-input"
-        type="time"
-        value={dailyEndTime}
-        onChange={(e) => setDailyEndTime(e.target.value)}
-      />
+    <div className="daily-input-row">
+      <label className="daily-input-label">End</label>
+      <div className="daily-input-group">
+        <input
+          className="daily-date-input"
+          type="date"
+          value={dailyDateRange.end}
+          min={dailyDateRange.start}
+          onChange={(e) =>
+            setDailyDateRange((r) => ({ ...r, end: e.target.value }))
+          }
+        />
+        <input
+          className="daily-time-input"
+          type="time"
+          value={dailyEndTime}
+          onChange={(e) => setDailyEndTime(e.target.value)}
+        />
+      </div>
     </div>
-    <small style={{ color: "#999", marginLeft: "2.5rem" }}>Max span: 15 days</small>
+    <div className="daily-helper-text">
+      <span>Maximum: 15 Days</span>
+    </div>
   </div>
 )}
 

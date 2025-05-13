@@ -921,7 +921,7 @@ function ReservationsPage() {
                     </div>
                     <div className="reservation-form-group">
                       <label className="reservation-form-label">
-                        Date Range (≤ 15 days):
+                        Date Range:
                       </label>
                       <div className="date-range">
                         <input

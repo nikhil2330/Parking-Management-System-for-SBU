@@ -1120,3 +1120,165 @@
   position: relative;
   z-index: 1;
 }
+
+/* Add these styles to your ReservationsPage.css */
+
+/* ===== Reservation Form Improvements ===== */
+
+/* Time and date range containers */
+.time-range,
+.date-range {
+  display: flex;
+  align-items: center;
+  background: var(--gray-50);
+  border-radius: 8px;
+  padding: 8px 12px;
+  border: 1px solid var(--gray-200);
+  width: 100%;
+  max-width: 400px;
+}
+
+/* Time and date inputs */
+.time-range input,
+.date-range input {
+  border: 1px solid var(--gray-300);
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 0.95rem;
+  color: var(--gray-800);
+  background-color: white;
+  min-width: 0; /* Prevent overflow */
+  flex: 1;
+  max-width: 140px;
+}
+
+/* Separator label */
+.to-label {
+  margin: 0 10px;
+  color: var(--gray-600);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* Reservation form group spacing */
+.reservation-form-group {
+  margin-bottom: 24px;
+}
+
+/* Reservation form label */
+.reservation-form-label {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: 600;
+  color: var(--gray-700);
+}
+
+/* Daily time window section */
+.reservation-form-group:has(.time-range),
+.reservation-form-group:has(.date-range) {
+  background-color: var(--gray-50);
+  border-radius: 10px;
+  padding: 16px;
+  border: 1px solid var(--gray-200);
+  margin-top: 20px;
+}
+
+/* Semester select styling */
+.reservation-form-group select {
+  width: 100%;
+  max-width: 400px;
+  padding: 12px;
+  border: 1px solid var(--gray-300);
+  border-radius: 8px;
+  background-color: white;
+  font-size: 1rem;
+  color: var(--gray-800);
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+}
+
+/* Semester form group */
+.reservation-form-group:has(select) {
+  background-color: var(--gray-50);
+  border-radius: 10px;
+  padding: 16px;
+  border: 1px solid var(--gray-200);
+  margin-top: 20px;
+}
+
+/* Hourly reservation datetime inputs */
+.reservation-form-input[type="datetime-local"] {
+  padding: 12px;
+  font-size: 1rem;
+  background-color: white;
+}
+
+/* Improve note box */
+.reservation-form-note {
+  background-color: var(--gold-50);
+  border-left: 4px solid var(--amber-500);
+  padding: 14px 16px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  color: var(--gray-700);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* Reservation form container */
+.new-reservation-form {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  margin-bottom: 30px;
+  overflow: hidden;
+}
+
+/* Reservation form header */
+.reservation-form-header {
+  background: linear-gradient(135deg, var(--primary-dark) 0%, #153b63 100%);
+  padding: 20px 24px;
+}
+
+.reservation-form-header h2 {
+  color: white;
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+/* Reservation form body */
+.reservation-form-body {
+  padding: 24px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+  .time-range,
+  .date-range {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    padding: 12px;
+  }
+  
+  .time-range input,
+  .date-range input {
+    max-width: none;
+  }
+  
+  .to-label {
+    margin: 0;
+    text-align: center;
+  }
+  
+  .reservation-form-group:has(.time-range),
+  .reservation-form-group:has(.date-range),
+  .reservation-form-group:has(select) {
+    padding: 12px;
+  }
+}
