@@ -218,5 +218,5 @@ For major changes, please discuss in advance via [GitHub Issues](https://github.
 
 ## 📧 Contact & Support
 
-For questions, contact Team SBU0 or reach out to [nikhil2330](https://github.com/nikhil2330), who can also help you contact the rest of the team members.
+For questions, contact Team SBU01 or reach out to [nikhil2330](https://github.com/nikhil2330), who can also help you contact the rest of the team members.
 
