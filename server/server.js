@@ -1,3 +1,4 @@
+// server/server.js
 require('dotenv').config({ path: './config/.env' });
 const app = require('./App');
 const mongoose = require('mongoose');

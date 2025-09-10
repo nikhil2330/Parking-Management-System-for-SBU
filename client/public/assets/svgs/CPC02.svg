@@ -1,0 +1,86 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:vectornator="http://vectornator.io" xml:space="preserve" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" clip-rule="evenodd" width="481px" height="462px">
+  <g vectornator:layerName="Layer 1">
+    <g vectornator:layerName="Group 1" stroke-linecap="butt">
+      <path vectornator:layerName="Curve 2" fill="#acd19e" stroke="#acd19e" stroke-width="10" d="M0 462h207.13l-37.481-96.317H-.609L0 462Z"/>
+      <path vectornator:layerName="Curve 3" fill="#acd19e" stroke="#acd19e" stroke-width="10" d="m.3288.043-.9379 385.936 92.6758 12.063L151.371-2.0011.3288.043Z"/>
+      <path vectornator:layerName="Curve 4" fill="#acd19e" stroke="#acd19e" stroke-width="10" d="m230.593 0-88.398-.3995L85.921 69.3 207.13 92.8881 230.593 0Z"/>
+      <path vectornator:layerName="Curve 11" fill="#ffffe5" stroke="#ffffe5" stroke-width="10" d="m481.71 194.319-4.983-1.758-21.396 9.086-17 122.222 43.379 8.207-2.345 31.948-16.12-6.742-156.354 104.72-48.087-1.469L415.912 349.31l35.239-232.359.734-6.607-64.238-8.443 14.316-98.7432 77.555-1.3171 2.192 192.4783Z"/>
+      <path vectornator:layerName="Curve 7" fill="#cdeab0" stroke="#cdeab0" stroke-width="10" d="M211.454 465.096h40.519l6.125-54.182-72.323-18.641 25.679 72.823Z"/>
+      <path vectornator:layerName="Curve 12" fill="#ffffe5" stroke="#ffffe5" stroke-width="10" d="m266.162-2.0011-6.32 31.6032 94.809 24.2291-8.954 43.7177 27.389 2.1069 17.382-101.657H266.162Z"/>
+      <path vectornator:layerName="Curve 6" fill="#cdeab0" stroke="#cdeab0" stroke-width="10" d="m397.153 346.306-10.431 32.57-136.162 81.98 14.134-50.884 132.459-63.666Z"/>
+      <path vectornator:layerName="Curve 8" fill="#cdeab0" stroke="#cdeab0" stroke-width="10" d="m235.417-.8707 22.55 2.0207-2.819 33.8456 94.425 25.2579-6.577 39.4023-130.128-19.7011L235.417-.8707Z"/>
+      <path vectornator:layerName="Curve 9" fill="#cdeab0" stroke="#cdeab0" stroke-width="10" d="m477.368 199.357-16.422 9.685-15.58 112.428 33.687 3.79-1.685-125.903Z"/>
+      <path vectornator:layerName="Curve 10" fill="#cdeab0" stroke="#cdeab0" stroke-width="10" d="m480.316 370.315-14.738-4.632-151.588 95.585 165.905-.842.421-90.111Z"/>
+      <path vectornator:layerName="Rectangle 1" fill="#d9d9d9" stroke="#d9d9d9" stroke-width="4.1059" d="m387.09 112.61 5.656 1.046-.222 1.198-5.655-1.046.221-1.198Z"/>
+    </g>
+    <g vectornator:layerName="ParkingLot16B">
+      <path vectornator:layerName="ParkingLot1" fill="#d9d9d9" stroke="#768596" stroke-linecap="butt" stroke-width="5" d="m446.119 117.211-37.93 232.768-35.795 13.76-107.539 41.338-176.3408-33.619L136.463 69.6763l309.656 47.5347Z"/>
+      <path vectornator:layerName="Path to ParkingLot2" fill="#d9d9d9" stroke="#d9d9d9" stroke-linecap="butt" stroke-width="10" d="M366.239 108.083 385.728.1057l24.229-2.1068L387.834 111.77l-21.595-3.687Z"/>
+      <path vectornator:layerName="Curve 15" fill="#d9d9d9" d="M390.193 115.64c-1.181-.007-2.389.152-3.484.207-.594-.21-1.326.332-1.684 1.216-2.393.2-4.691.85-7.075 1.093-3.667.373-7.367.247-11.044.459-4.33.25-9.471.571-12.493 4.102-.043.111.062.256.234.322.172.066.347.028.39-.084 3.018-3.537 8.422-3.49 12.673-3.325 3.179.123 6.358.455 9.542.411 2.297-.031 4.537-.456 6.84-.387 1.32.04 2.777-.057 4.076.191 1.158.221 2.375.71 3.573.591 2.13-.21 4.045-2.602 1.775-4.007-.987-.61-2.142-.783-3.323-.789Z"/>
+      <path vectornator:layerName="Curve 16" fill="none" stroke="#768596" stroke-linecap="butt" stroke-width="5" d="M394.548 111.77 414.775-2.2696"/>
+      <path vectornator:layerName="Curve 17" fill="none" stroke="#768596" stroke-linecap="butt" stroke-width="5" d="M362.598 106.944 382.291-3.8405"/>
+    </g>
+    <g vectornator:layerName="a" fill="#c4ccd6" stroke="#fff" stroke-linecap="butt">
+      <path vectornator:layerName="Rectangle 19" d="m395.32 112.503 47.052 7.391-18.47 113.779-46.887-8.154 18.305-113.016Z"/>
+      <path vectornator:layerName="Rectangle 24" d="m376.975 225.661 46.886 8.154-18.471 113.78-46.886-8.155 18.471-113.779Z"/>
+      <path vectornator:layerName="Spot10" d="m362.258 316.284 46.844 8.12-3.765 23.153-46.844-8.12 3.765-23.153Z"/>
+      <path vectornator:layerName="Spot9" d="m365.886 293.784 46.782 7.887-3.541 22.489-46.782-7.886 3.541-22.49Z"/>
+      <path vectornator:layerName="Spot8" d="m369.665 270.703 46.771 8.038-3.708 23.025-46.771-8.038 3.708-23.025Z"/>
+      <path vectornator:layerName="Spot7" d="m373.32 248.176 46.824 8.143-3.658 22.471-46.823-8.143 3.657-22.471Z"/>
+      <path vectornator:layerName="Spot6" d="m376.965 225.521 46.824 8.143-3.658 22.471-46.823-8.143 3.657-22.471Z"/>
+      <path vectornator:layerName="Spot5" d="m380.77 202.363 46.843 8.12-3.765 23.153-46.843-8.12 3.765-23.153Z"/>
+      <path vectornator:layerName="Spot4" d="m384.397 179.863 46.782 7.886-3.54 22.49-46.782-7.886 3.54-22.49Z"/>
+      <path vectornator:layerName="Spot3" d="m388.177 156.782 46.771 8.038-3.708 23.025-46.772-8.038 3.709-23.025Z"/>
+      <path vectornator:layerName="Spot2" d="m391.832 134.254 46.823 8.144-3.658 22.471-46.823-8.144 3.658-22.471Z"/>
+      <path vectornator:layerName="Spot1" d="m395.417 112.508 46.955 7.445-3.743 22.563-46.891-8.059 3.679-21.949Z"/>
+    </g>
+    <g vectornator:layerName="b" fill="#c4ccd6" stroke="#fff" stroke-linecap="butt">
+      <path vectornator:layerName="Rectangle 19" d="m281.395 144.576 47.099 7.085-17.73 113.897-46.939-7.85 17.57-113.132Z"/>
+      <path vectornator:layerName="Spot17" d="m260.278 280.389 46.875 7.838-3.512 22.495-46.875-7.839 3.512-22.494Z"/>
+      <path vectornator:layerName="Spot16" d="m263.775 257.711 46.876 7.838-3.512 22.495-46.875-7.839 3.511-22.494Z"/>
+      <path vectornator:layerName="Spot15" d="m267.429 234.528 46.895 7.815-3.614 23.178-46.896-7.815 3.615-23.178Z"/>
+      <path vectornator:layerName="Spot14" d="m270.91 212.005 46.832 7.582-3.394 22.512-46.832-7.581 3.394-22.513Z"/>
+      <path vectornator:layerName="Spot13" d="m274.54 188.9 46.822 7.734-3.559 23.048-46.822-7.733 3.559-23.049Z"/>
+      <path vectornator:layerName="Spot12" d="m278.048 166.349 46.875 7.839-3.511 22.495-46.876-7.839 3.512-22.495Z"/>
+      <path vectornator:layerName="Spot11" d="m281.492 144.58 47.003 7.139-3.597 22.588-46.942-7.755 3.536-21.972Z"/>
+    </g>
+    <g vectornator:layerName="c" fill="#c4ccd6" stroke="#fff" stroke-linecap="butt">
+      <path vectornator:layerName="Rectangle 19" d="m234.153 137.42 47.099 7.085-17.73 113.897-46.939-7.849 17.57-113.133Z"/>
+      <path vectornator:layerName="Spot18" d="m234.25 137.424 47.003 7.14-3.256 22.124-47.283-7.291 3.536-21.973Z"/>
+      <path vectornator:layerName="Spot19" d="m230.806 159.193 47.072 7.419-3.547 22.194-47.037-7.118 3.512-22.495Z"/>
+      <path vectornator:layerName="Spot20" d="m227.298 181.744 46.875 7.032-3.293 23.257-47.218-7.337 3.636-22.952Z"/>
+      <path vectornator:layerName="Spot21" d="m223.668 204.85 47.113 7.16-3.682 22.49-46.825-7.138 3.394-22.512Z"/>
+      <path vectornator:layerName="Spot22" d="m220.187 227.372 46.958 7.149-3.644 23.311-46.929-7.282 3.615-23.178Z"/>
+      <path vectornator:layerName="Spot23" d="m216.533 250.555 47.012 7.088-3.435 22.631-47.088-7.225 3.511-22.494Z"/>
+      <path vectornator:layerName="Spot24" d="m213.036 273.233 47.088 6.965-3.608 22.672-46.876-7.838 3.396-21.799Z"/>
+      <path vectornator:layerName="Spot25" d="m209.648 295.301 47.117 7.879-3.511 22.495-47.116-7.879 3.51-22.495Z"/>
+    </g>
+    <g vectornator:layerName="d" fill="#c4ccd6" stroke="#fff" stroke-linecap="butt">
+      <path vectornator:layerName="Rectangle 19" d="m138.689 73.2398 47.085 7.1789L167.816 194.28l-46.922-7.943 17.795-113.0972Z"/>
+      <path vectornator:layerName="Rectangle 24" d="m120.854 186.479 46.922 7.943-17.958 113.862-46.922-7.943 17.958-113.862Z"/>
+      <path vectornator:layerName="Spot38" d="m95.7273 345.579 46.8797 7.909-3.661 23.17-46.8793-7.909 3.6606-23.17Z"/>
+      <path vectornator:layerName="Spot37" d="m99.2533 323.063 24.7987 4.066 22.019 3.61-3.439 22.505-46.8177-7.675 3.439-22.506Z"/>
+      <path vectornator:layerName="Spot36" d="m102.929 299.965 46.674 7.805-3.604 23.039-46.6748-7.805 3.6048-23.039Z"/>
+      <path vectornator:layerName="Spot35" d="m106.546 277.168 46.879 7.909-3.66 23.17-46.88-7.909 3.661-23.17Z"/>
+      <path vectornator:layerName="Spot34" d="m110.072 254.652 46.817 7.675-3.439 22.506-46.817-7.676 3.439-22.505Z"/>
+      <path vectornator:layerName="Spot33" d="m113.747 231.554 46.807 7.827-3.604 23.041-46.807-7.826 3.604-23.042Z"/>
+      <path vectornator:layerName="Spot32" d="m117.301 209.01 46.859 7.932-3.556 22.488-46.86-7.933 3.557-22.487Z"/>
+      <path vectornator:layerName="Spot31" d="m120.844 186.339 46.86 7.933-3.557 22.487-46.86-7.932 3.557-22.488Z"/>
+      <path vectornator:layerName="Spot30" d="m124.544 163.164 46.879 7.909-3.66 23.17-46.88-7.909 3.661-23.17Z"/>
+      <path vectornator:layerName="Spot29" d="m128.07 140.648 46.817 7.676-3.439 22.505-46.817-7.675 3.439-22.506Z"/>
+      <path vectornator:layerName="Spot28" d="m131.745 117.55 46.807 7.827-3.604 23.042-46.807-7.827 3.604-23.042Z"/>
+      <path vectornator:layerName="Spot27" d="m135.299 95.0064 46.859 7.9326-3.556 22.487-46.86-7.932 3.557-22.4876Z"/>
+      <path vectornator:layerName="Spot26" d="m138.786 73.2443 46.989 7.233-3.642 22.5797-46.927-7.8477 3.58-21.965Z"/>
+    </g>
+    <g vectornator:layerName="Group 4" fill="none" stroke="#fff" stroke-linecap="butt">
+      <path vectornator:layerName="Line 1" d="m358.493 339.437-4.606 28.491"/>
+      <path vectornator:layerName="Line 2" d="m358.493 339.437 10.771 22.816"/>
+      <path vectornator:layerName="Line 3" d="m378.589 342.994 6.565 13.176"/>
+    </g>
+    <g vectornator:layerName="Group 8" fill="none" stroke="#fff" stroke-linecap="butt">
+      <path vectornator:layerName="Line 1" d="m303.539 310.722-49.909 14.953"/>
+      <path vectornator:layerName="Line 2" d="m256.766 303.223 12.427 17.91"/>
+      <path vectornator:layerName="Line 3" d="m275.452 306.17 7.528 10.63"/>
+    </g>
+  </g>
+</svg>

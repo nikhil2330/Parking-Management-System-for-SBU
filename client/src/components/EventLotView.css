@@ -1,0 +1,248 @@
+/* EventLotView.css - Styling for the event lot view component */
+
+.event-lot-view {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background-color: #f5f5f5;
+    overflow: hidden;
+  }
+  
+  .back-button {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    padding: 8px 15px;
+    background-color: #0A2541;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    z-index: 10;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+  
+  .back-button:hover {
+    background-color: #0d3154;
+  }
+  
+  .event-selection-instructions {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 300px;
+    background-color: white;
+    border-radius: 8px;
+    padding: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    z-index: 10;
+  }
+  
+  .event-selection-instructions h3 {
+    margin: 0 0 8px 0;
+    color: #0A2541;
+    font-size: 1.1rem;
+  }
+  
+  .event-selection-instructions p {
+    margin: 0 0 10px 0;
+    color: #555;
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+  
+  .spot-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 12px;
+    padding-top: 8px;
+    border-top: 1px solid #eee;
+  }
+  
+  .spot-legend-item {
+    display: flex;
+    align-items: center;
+    font-size: 0.85rem;
+    color: #555;
+  }
+  
+  .spot-legend-color {
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
+    margin-right: 5px;
+  }
+  
+  .spot-legend-color.available {
+    background-color: #c4ccd6;
+  }
+  
+  .spot-legend-color.selected {
+    background-color: #4CAF50;
+  }
+  
+  .spot-legend-color.reserved {
+    background-color: #ffcccc;
+  }
+  
+  .svg-container {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    position: relative;
+    cursor: grab;
+  }
+  
+  .svg-container:active {
+    cursor: grabbing;
+  }
+  
+  /* Highlight styles for selected spots */
+  .selected-spot {
+    fill: #4CAF50 !important;
+    stroke-width: 1.5px;
+    stroke: #2E7D32;
+    transition: fill 0.2s ease;
+  }
+  
+  .selected-spot:hover {
+    fill: #388E3C !important;
+  }
+  
+  /* Available spot interaction */
+  [data-vectornator-layer-name^="Spot"] {
+    transition: fill 0.2s ease;
+  }
+  
+  /* Highlighted spot animation */
+  .highlighted-spot {
+    animation: pulse 1.5s infinite;
+  }
+  
+  @keyframes pulse {
+    0% {
+      stroke-width: 1;
+      stroke: rgba(255, 255, 255, 0.7);
+    }
+    50% {
+      stroke-width: 3;
+      stroke: rgba(255, 255, 255, 1);
+    }
+    100% {
+      stroke-width: 1;
+      stroke: rgba(255, 255, 255, 0.7);
+    }
+  }
+  
+  /* Spot count badge */
+  .spot-count-badge {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #0A2541;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 30px;
+    font-weight: 500;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .spot-count-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+  }
+  
+  /* Loading state */
+  .loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.8);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 20;
+  }
+  
+  .loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(0, 0, 0, 0.1);
+    border-radius: 50%;
+    border-top: 4px solid #0A2541;
+    animation: spin 1s linear infinite;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  /* Pan zoom controls - complementary to main PanZoomControls component */
+  .pan-zoom-controls {
+    position: absolute;
+    bottom: 15px;
+    right: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    z-index: 10;
+  }
+  
+  .pan-zoom-controls button {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    background-color: white;
+    color: #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  }
+  
+  .pan-zoom-controls button:hover {
+    background-color: #f5f5f5;
+  }
+  
+  .pan-zoom-controls button:disabled {
+    color: #ccc;
+    cursor: not-allowed;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .event-selection-instructions {
+      width: calc(100% - 20px);
+      max-width: 300px;
+      top: 60px;
+      right: 10px;
+    }
+    
+    .back-button {
+      top: 10px;
+      left: 10px;
+      padding: 6px 12px;
+      font-size: 0.9rem;
+    }
+  }

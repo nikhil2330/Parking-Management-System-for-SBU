@@ -1,0 +1,93 @@
+/* Admin Event Approval Styles */
+.admin-section {
+  width: 100%;
+}
+
+.admin-error {
+  background-color: #ffebee;
+  color: #c62828;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.admin-error button {
+  background-color: #f44336;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.3s;
+}
+
+.admin-error button:hover {
+  background-color: #d32f2f;
+}
+
+/* Empty state styles that match admin-dashboard.css */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 3rem 0;
+  height: 100%;
+  width: 100%;
+}
+
+.empty-state p {
+  font-size: 1rem;
+  color: var(--gray-500);
+  font-weight: 500;
+}
+
+/* User info styling */
+.user-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.user-name {
+  font-weight: 600;
+  color: var(--gray-800);
+}
+
+.user-email {
+  font-size: 12px;
+  color: var(--gray-500);
+  margin-top: 4px;
+}
+
+/* Spots count styling */
+.spots-count {
+  font-size: 0.85rem;
+  color: var(--gray-600);
+  margin-top: 5px;
+  display: inline-block;
+  background-color: var(--blue-50);
+  border-radius: 4px;
+  padding: 2px 8px;
+}
+
+/* Additional date range styling if needed */
+.date-range {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.85rem;
+}
+
+/* Ensure proper row animation styles are applied */
+.animate-approved td {
+  animation: approveAnimation 0.6s ease forwards;
+}
+
+.animate-rejected td {
+  animation: rejectAnimation 0.6s ease forwards;
+}

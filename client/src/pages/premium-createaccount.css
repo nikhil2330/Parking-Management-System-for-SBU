@@ -1,0 +1,1132 @@
+/* premium-createaccount.css */
+
+/* ====================================
+   CSS Variables & Base Settings
+==================================== */
+:root {
+  --primary-red: #900;
+  --primary-dark: #0A2541;
+  --accent-gold: #d4af37;
+  --white: #ffffff;
+  --gray-50: #fafafa;
+  --gray-100: #f5f5f5;
+  --gray-200: #eeeeee;
+  --gray-300: #e0e0e0;
+  --gray-600: #757575;
+  --gray-700: #616161;
+  --gray-800: #424242;
+  --blue-50: #e3f2fd;
+  --error-light: #ffebee;
+  --error-dark: #c62828;
+  --success-green: #2e7d32;
+}
+
+/* ====================================
+   Animations
+==================================== */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInNext {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideInBack {
+  from { transform: translateX(-100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+@keyframes shine {
+  0% { background-position: -100% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* ====================================
+   Premium Background Enhancements
+==================================== */
+.premium-create-account {
+  min-height: 100vh;
+  font-family: 'Inter', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  overflow-x: hidden;
+  position: relative;
+  padding: 3rem 1rem;
+  /* Added flex centering to ensure the form is centered */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* New base gradient for extra depth */
+  background: linear-gradient(135deg, #3b0011 0%, #20000b 100%);
+}
+
+/* Glowing radial gradients layer */
+.premium-create-account::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.08), transparent 70%),
+              radial-gradient(circle at 70% 70%, rgba(255,255,255,0.08), transparent 70%);
+  opacity: 0.5;
+  filter: blur(80px);
+  z-index: -2;
+  animation: pulseBackground 20s infinite ease-in-out;
+}
+
+@keyframes pulseBackground {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  50% { transform: scale(1.1) rotate(5deg); }
+}
+
+/* Shiny overlay layer */
+.premium-create-account::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, transparent, rgba(255,255,255,0.05), transparent);
+  opacity: 0.2;
+  filter: blur(120px);
+  z-index: -1;
+  animation: shineBackground 10s linear infinite;
+}
+
+@keyframes shineBackground {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(100%); }
+}
+
+/* ====================================
+   Background Patterns & Floating Accents
+==================================== */
+.bg-pattern {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.04;
+  pointer-events: none;
+  background-image: 
+    radial-gradient(circle at 20% 30%, rgba(255,255,255,0.1) 0%, transparent 8%),
+    radial-gradient(circle at 80% 70%, rgba(255,255,255,0.1) 0%, transparent 8%);
+  background-size: 60px 60px;
+}
+
+.floating-accent {
+  position: absolute;
+  background-color: var(--accent-gold);
+  opacity: 0.05;
+  border-radius: 50%;
+  z-index: 1;
+}
+
+.accent-1 {
+  width: 300px;
+  height: 300px;
+  top: -100px;
+  right: 5%;
+}
+
+.accent-2 {
+  width: 200px;
+  height: 200px;
+  bottom: -50px;
+  left: 10%;
+}
+
+.floating-shape {
+  position: absolute;
+  z-index: 1;
+  animation: float 6s ease-in-out infinite;
+}
+
+.shape-1 {
+  top: 15%;
+  left: 20%;
+  width: 30px;
+  height: 30px;
+  background-color: rgba(255,255,255,0.1);
+  border-radius: 50%;
+  animation-delay: 1s;
+}
+
+.shape-2 {
+  bottom: 20%;
+  right: 15%;
+  width: 50px;
+  height: 50px;
+  background-color: rgba(255,255,255,0.1);
+  border-radius: 8px;
+  transform: rotate(15deg);
+}
+
+.shape-3 {
+  top: 30%;
+  right: 25%;
+  width: 20px;
+  height: 20px;
+  background-color: rgba(255,255,255,0.1);
+  border-radius: 4px;
+  transform: rotate(45deg);
+  animation-delay: 2s;
+}
+
+/* ====================================
+   Card Styling & Layout
+==================================== */
+.account-card {
+  width: 100%;
+  max-width: 700px;
+  background-color: var(--white);
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  position: relative;
+  animation: fadeIn 0.8s ease-out forwards;
+  z-index: 10;
+}
+
+.card-decoration {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 6px;
+  background: linear-gradient(90deg, var(--primary-red) 0%, var(--accent-gold) 50%, var(--primary-dark) 100%);
+  z-index: 10;
+}
+
+.card-content {
+  padding: 3rem 3.5rem;
+}
+
+/* ====================================
+   Form Header & Logo
+==================================== */
+.form-header {
+  margin-bottom: 2.5rem;
+  text-align: center;
+}
+
+.university-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.logo-icon {
+  width: 60px;
+  height: 60px;
+  margin-right: 0.75rem;
+}
+
+.logo-text {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--primary-dark);
+  letter-spacing: -0.5px;
+}
+
+.form-title {
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: var(--primary-dark);
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.5px;
+  animation: fadeIn 0.8s ease-out forwards;
+  animation-delay: 0.3s;
+  opacity: 0;
+}
+
+.form-subtitle {
+  font-size: 1.1rem;
+  color: var(--gray-600);
+  margin-bottom: 1rem;
+  animation: fadeIn 0.8s ease-out forwards;
+  animation-delay: 0.5s;
+  opacity: 0;
+}
+
+/* ====================================
+   Progress Steps Indicator
+==================================== */
+.progress-steps {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  position: relative;
+}
+
+.progress-steps::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 5%;
+  right: 5%;
+  height: 2px;
+  background-color: var(--gray-200);
+  transform: translateY(-50%);
+  z-index: 1;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 2;
+}
+
+.step-number {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: var(--white);
+  border: 2px solid var(--gray-300);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  color: var(--gray-600);
+  margin-bottom: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.step.completed .step-number {
+  background-color: var(--success-green);
+  border-color: var(--success-green);
+  color: var(--white);
+  box-shadow: 0 0 8px rgba(46, 125, 50, 0.5);
+}
+
+.step.active .step-number {
+  background-color: var(--primary-red);
+  border-color: var(--primary-red);
+  color: var(--white);
+  box-shadow: 0 0 0 4px rgba(153, 0, 0, 0.15);
+}
+
+.step-text {
+  font-size: 0.85rem;
+  color: var(--gray-600);
+  font-weight: 500;
+}
+
+/* ====================================
+   Form Grid & Step Transitions
+==================================== */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  animation-fill-mode: both;
+}
+.form-grid.full-width { 
+  grid-column: span 2; 
+}
+
+/* Transition animations based on navigation direction */
+.form-grid.step-next {
+  animation: slideInNext 0.5s ease-out;
+}
+.form-grid.step-back {
+  animation: slideInBack 0.5s ease-out;
+}
+
+/* ====================================
+   Input & Field Styling
+==================================== */
+.input-group {
+  position: relative;
+}
+
+.input-label {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--gray-700);
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+}
+
+.required-mark {
+  color: var(--primary-red);
+  margin-left: 4px;
+}
+
+.input-field {
+  width: 100%;
+  padding: 1rem 1.25rem;
+  border: 2px solid var(--gray-200);
+  border-radius: 10px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background-color: var(--white);
+}
+
+.input-field:focus {
+  outline: none;
+  border-color: var(--primary-dark);
+  box-shadow: 0 0 0 4px rgba(10, 37, 65, 0.1);
+}
+
+.input-field::placeholder {
+  color: var(--gray-300);
+}
+
+.field-error {
+  color: var(--error-dark);
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background-color: rgba(198, 40, 40, 0.08);
+  border-radius: 6px;
+  animation: slideIn 0.3s ease;
+}
+
+.helper-text {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--gray-600);
+  margin-top: 0.5rem;
+}
+
+/* ====================================
+   Button Styling
+==================================== */
+.action-buttons {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: space-between;
+}
+
+.next-btn,
+.back-btn,
+.create-account-btn {
+  padding: 1rem;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--primary-red) 0%, #7a0000 100%);
+  color: var(--white);
+  font-size: 1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  flex: 1;
+  margin: 0 0.25rem;
+}
+
+.back-btn {
+  background: transparent;
+  color: var(--primary-dark);
+  border: 2px solid var(--primary-dark);
+}
+
+.next-btn:hover,
+.back-btn:hover,
+.create-account-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 7px 14px rgba(153, 0, 0, 0.2), 0 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+.create-account-btn:after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.3) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: rotate(30deg);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.create-account-btn:hover:after {
+  opacity: 1;
+  animation: shine 1.5s infinite;
+}
+
+/* ====================================
+   Sign In Prompt Section
+==================================== */
+.signin-prompt {
+  text-align: center;
+  margin-top: 1.5rem;
+}
+
+.signin-prompt p {
+  color: var(--gray-700);
+  font-size: 0.95rem;
+  margin-bottom: 0.75rem;
+}
+
+.signin-link {
+  padding: 0.75rem 1.5rem;
+  background-color: var(--white);
+  border: 2px solid var(--primary-dark);
+  color: var(--primary-dark);
+  font-weight: 600;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  display: inline-block;
+}
+
+.signin-link:hover {
+  background-color: var(--primary-dark);
+  color: var(--white);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(10, 37, 65, 0.2);
+}
+
+/* ====================================
+   Loading Overlay & Spinner
+==================================== */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(5px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.spinner-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.spinner {
+  position: relative;
+  width: 60px;
+  height: 60px;
+}
+
+.spinner-outer {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border: 3px solid transparent;
+  border-top-color: var(--primary-red);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.spinner-inner {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
+  border: 3px solid transparent;
+  border-top-color: var(--primary-dark);
+  border-radius: 50%;
+  animation: spin 1.5s linear infinite reverse;
+}
+
+.spinner-center {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  right: 20px;
+  bottom: 20px;
+  border: 3px solid transparent;
+  border-top-color: var(--accent-gold);
+  border-radius: 50%;
+  animation: spin 2s linear infinite;
+  animation-delay: 0.5s;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-text {
+  margin-top: 1.5rem;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--primary-dark);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* ====================================
+   Success State Styling
+==================================== */
+.success-container {
+  width: 100%;
+  max-width: 600px;
+  background-color: var(--white);
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  position: relative;
+  padding: 3rem;
+  text-align: center;
+  animation: fadeIn 0.8s ease-out forwards;
+}
+
+.success-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 8px;
+  background: linear-gradient(90deg, var(--primary-red) 0%, var(--accent-gold) 50%, var(--success-green) 100%);
+}
+
+.success-icon {
+  width: 100px;
+  height: 100px;
+  background-color: #f0f9f0;
+  border-radius: 50%;
+  margin: 0 auto 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  box-shadow: 0 8px 16px rgba(46, 125, 50, 0.15);
+}
+
+.success-icon::before {
+  content: '✓';
+  font-size: 4rem;
+  color: var(--success-green);
+}
+
+.success-icon::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  border: 2px solid var(--success-green);
+  animation: pulse 2s infinite;
+}
+
+.success-title {
+  font-size: 2.25rem;
+  font-weight: 700;
+  color: var(--success-green);
+  margin-bottom: 1rem;
+}
+
+.success-message {
+  font-size: 1.25rem;
+  color: var(--gray-700);
+  margin-bottom: 0.5rem;
+}
+
+.redirect-message {
+  font-size: 1rem;
+  color: var(--gray-600);
+  margin-top: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.redirect-spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(153, 0, 0, 0.3);
+  border-radius: 50%;
+  border-top-color: var(--primary-red);
+  animation: spin 1s linear infinite;
+  margin-right: 0.75rem;
+}
+
+/* ====================================
+   Password Strength Meter
+==================================== */
+.password-strength {
+  margin-top: 0.75rem;
+}
+
+.strength-meter {
+  height: 6px;
+  border-radius: 3px;
+  background-color: var(--gray-200);
+  margin-bottom: 0.5rem;
+  overflow: hidden;
+}
+
+.strength-progress {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s ease, background-color 0.3s ease;
+}
+
+.strength-text {
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.strength-weak .strength-progress {
+  width: 25%;
+  background-color: #f44336;
+}
+
+.strength-medium .strength-progress {
+  width: 50%;
+  background-color: #ff9800;
+}
+
+.strength-strong .strength-progress {
+  width: 75%;
+  background-color: #4caf50;
+}
+
+.strength-very-strong .strength-progress {
+  width: 100%;
+  background-color: #2e7d32;
+}
+
+.strength-weak .strength-text {
+  color: #f44336;
+}
+
+.strength-medium .strength-text {
+  color: #ff9800;
+}
+
+.strength-strong .strength-text {
+  color: #4caf50;
+}
+
+.strength-very-strong .strength-text {
+  color: #2e7d32;
+}
+
+/* ====================================
+   Responsive Styles
+==================================== */
+@media screen and (max-width: 768px) {
+  .card-content {
+    padding: 2rem;
+  }
+  
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .progress-steps {
+    margin-bottom: 1.5rem;
+  }
+  
+  .step-number {
+    width: 35px;
+    height: 35px;
+    font-size: 0.9rem;
+  }
+  
+  .step-text {
+    font-size: 0.75rem;
+    display: none;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .premium-create-account {
+    padding: 1rem 0.5rem;
+  }
+  
+  .card-content {
+    padding: 1.5rem 1rem;
+  }
+  
+  .form-title {
+    font-size: 1.5rem;
+  }
+  
+  .step-number {
+    width: 30px;
+    height: 30px;
+    font-size: 0.8rem;
+  }
+  
+  .success-container {
+    padding: 2rem 1.5rem;
+  }
+  
+  .success-icon {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 1.5rem;
+  }
+  
+  .success-title {
+    font-size: 1.8rem;
+  }
+  
+  .success-message {
+    font-size: 1.1rem;
+  }
+}
+/* Add these styles to your premium-createaccount.css file */
+
+/* Enhanced select dropdown styling */
+select.input-field {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23616161' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 1.25rem center;
+  background-size: 1.25rem;
+  padding-right: 2.5rem;
+  cursor: pointer;
+}
+
+select.input-field:focus {
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230A2541' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+}
+
+select.input-field option {
+  background-color: var(--white);
+  color: var(--gray-800);
+  padding: 1rem;
+  font-size: 1rem;
+}
+
+/* Additional styling for the dropdown on hover */
+select.input-field:hover {
+  border-color: var(--gray-400);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+/* Disabled option styling */
+select.input-field option[disabled] {
+  color: var(--gray-400);
+}
+
+/* Field category styling (for vehicle section) */
+.field-category {
+  grid-column: 1 / -1;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.category-title {
+  display: flex;
+  align-items: center;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--primary-dark);
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.category-icon {
+  margin-right: 0.75rem;
+  font-size: 1.2rem;
+}
+
+/* Vehicle controls styling */
+.vehicle-controls {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 1rem;
+  grid-column: 1 / -1;
+}
+
+.btn-vehicle {
+  background-color: var(--white);
+  color: var(--gray-700);
+  border: 1px solid var(--gray-300);
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 0.75rem 1.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+}
+
+.btn-vehicle:hover {
+  background-color: var(--gray-50);
+  border-color: var(--gray-400);
+}
+
+.btn-vehicle:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(10, 37, 65, 0.1);
+}
+
+.btn-add-vehicle {
+  color: var(--primary-dark);
+  margin-right: 1rem;
+}
+
+.btn-add-vehicle:before {
+  content: "+";
+  margin-right: 0.5rem;
+  font-size: 1.1rem;
+}
+
+.btn-remove-vehicle {
+  color: var(--error-dark);
+}
+
+.btn-remove-vehicle:before {
+  content: "−";
+  margin-right: 0.5rem;
+  font-size: 1.1rem;
+}
+
+/* Vehicle wrapper for spacing */
+.vehicle-wrapper {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px dashed var(--gray-200);
+}
+
+.vehicle-wrapper:last-child {
+  border-bottom: none;
+}
+
+/* Vehicle counter badge */
+.vehicle-counter {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--primary-red);
+  color: white;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-right: 0.75rem;
+}
+/* Add these styles to your premium-createaccount.css file for better validation UI */
+
+/* Highlight input fields with errors */
+.input-error {
+  border-color: var(--error-dark) !important;
+  background-color: rgba(255, 235, 238, 0.3);
+  box-shadow: 0 0 0 1px rgba(198, 40, 40, 0.2) !important;
+}
+
+.input-error:focus {
+  box-shadow: 0 0 0 3px rgba(198, 40, 40, 0.15) !important;
+}
+
+/* Error animation */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+  20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+.field-error {
+  animation: shake 0.5s ease-in-out;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.field-error::before {
+  content: "⚠️";
+  font-size: 1em;
+}
+
+/* Improved helper text */
+.helper-text {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--gray-600);
+  margin-top: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.input-error + .helper-text {
+  color: var(--error-dark);
+}
+
+.highlight-text {
+  font-weight: 500;
+  color: var(--primary-dark);
+  background-color: rgba(10, 37, 65, 0.05);
+  padding: 3px 8px;
+  border-radius: 4px;
+  border-left: 3px solid var(--primary-dark);
+}
+
+/* Real-time validation indicator */
+.input-field {
+  padding-right: 40px;
+  background-position: calc(100% - 12px) center;
+  background-repeat: no-repeat;
+  background-size: 20px;
+  transition: all 0.3s ease, background-position 0s;
+}
+
+.input-field:focus {
+  background-image: none;
+}
+
+.input-field.input-valid {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%232e7d32' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'%3E%3C/polyline%3E%3C/svg%3E");
+  border-color: var(--success-green);
+}
+
+.input-field.input-error {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23c62828' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='10'%3E%3C/circle%3E%3Cline x1='12' y1='8' x2='12' y2='12'%3E%3C/line%3E%3Cline x1='12' y1='16' x2='12.01' y2='16'%3E%3C/line%3E%3C/svg%3E");
+}
+
+/* Enhanced API error message */
+.api-error-message {
+  background-color: var(--error-light);
+  color: var(--error-dark);
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  border-left: 4px solid var(--error-dark);
+  animation: slideIn 0.3s ease, shake 0.5s ease 0.3s;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(198, 40, 40, 0.1);
+}
+
+.api-error-message span {
+  margin-right: 10px;
+  font-size: 1.2rem;
+}
+
+/* Password strength improvements */
+.password-strength {
+  margin-top: 0.75rem;
+}
+
+.strength-meter {
+  height: 6px;
+  border-radius: 3px;
+  background-color: var(--gray-200);
+  margin-bottom: 0.5rem;
+  overflow: hidden;
+  position: relative;
+}
+
+.strength-progress {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s ease, background-color 0.3s ease;
+  position: relative;
+}
+
+.strength-progress::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, 
+    rgba(255, 255, 255, 0.1) 0%, 
+    rgba(255, 255, 255, 0.3) 50%, 
+    rgba(255, 255, 255, 0.1) 100%);
+  animation: shine 2s infinite;
+}
+
+.strength-text {
+  font-size: 0.85rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.strength-weak .strength-progress {
+  width: 25%;
+  background-color: #f44336;
+}
+
+.strength-medium .strength-progress {
+  width: 50%;
+  background-color: #ff9800;
+}
+
+.strength-strong .strength-progress {
+  width: 75%;
+  background-color: #4caf50;
+}
+
+.strength-very-strong .strength-progress {
+  width: 100%;
+  background-color: #2e7d32;
+}
+
+.strength-weak .strength-text::before {
+  content: "⚠️";
+  font-size: 0.9rem;
+}
+
+.strength-medium .strength-text::before {
+  content: "⚠️";
+  font-size: 0.9rem;
+}
+
+.strength-strong .strength-text::before {
+  content: "✅";
+  font-size: 0.9rem;
+}
+
+.strength-very-strong .strength-text::before {
+  content: "🔒";
+  font-size: 0.9rem;
+}
+
+.strength-weak .strength-text {
+  color: #f44336;
+}
+
+.strength-medium .strength-text {
+  color: #ff9800;
+}
+
+.strength-strong .strength-text {
+  color: #4caf50;
+}
+
+.strength-very-strong .strength-text {
+  color: #2e7d32;
+}

@@ -1,0 +1,1632 @@
+/* Premium Search Parking Page Styling */
+:root {
+  --primary-red: #900;
+  --primary-dark: #0A2541;
+  --accent-gold: #d4af37;
+  --white: #ffffff;
+  --gray-50: #f9fafb;
+  --gray-100: #f3f4f6;
+  --gray-200: #e5e7eb;
+  --gray-300: #d1d5db;
+  --gray-400: #9ca3af;
+  --gray-500: #6b7280;
+  --gray-600: #4b5563;
+  --gray-700: #374151;
+  --gray-800: #1f2937;
+  --red-50: #fef2f2;
+  --red-100: #fee2e2;
+  --blue-50: #eff6ff;
+  --blue-100: #dbeafe;
+  --gold-50: #fffbeb;
+  --gold-100: #fef3c7;
+  --success-green: #10b981;
+  --warning-orange: #f59e0b;
+  --info-blue: #3b82f6;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(30px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideInLeft {
+  from { transform: translateX(-30px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -1000px 0; }
+  100% { background-position: 1000px 0; }
+}
+
+@keyframes slideDown {
+  from { transform: translateY(-10px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* Page layout */
+.premium-search-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: linear-gradient(135deg, var(--gray-50) 0%, var(--gray-100) 100%);
+  font-family: 'Inter', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  color: var(--gray-800);
+  position: relative;
+}
+
+/* Header styling */
+.premium-header {
+  background-color: var(--white);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  padding: 0.75rem 2rem;
+  position: relative;
+  z-index: 10;
+}
+
+.search-container {
+  display: flex;
+  flex: 1;
+  padding: 1.5rem 2rem;
+  gap: 1.5rem;
+  max-width: 1600px;
+  margin: 0 auto;
+  width: 100%;
+  position: relative;
+  align-items: stretch; 
+  min-height: 0; 
+}
+
+/* Sidebar filter panel */
+.filters-panel {
+  width: 320px;
+  background-color: var(--white);
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  animation: slideInLeft 0.8s ease-out forwards;
+  opacity: 0;
+  flex-shrink: 0;
+  height: fit-content;
+  position: sticky;
+  top: 1.5rem;
+}
+
+.filters-header {
+  padding: 1.25rem 1.5rem;
+  background: linear-gradient(135deg, var(--primary-dark) 0%, #153b63 100%);
+  color: var(--white);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-bottom: 1px solid var(--gray-100);
+}
+
+.filters-header h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.filters-icon {
+  width: 24px;
+  height: 24px;
+  color: var(--accent-gold);
+}
+
+.filters-body {
+  padding: 1.5rem;
+}
+
+.filter-group {
+  margin-bottom: 1.5rem;
+}
+
+.filter-group:last-child {
+  margin-bottom: 0;
+}
+
+.filter-label {
+  display: block;
+  font-weight: 600;
+  color: var(--gray-700);
+  margin-bottom: 0.75rem;
+  font-size: 0.95rem;
+}
+
+.filter-input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--gray-300);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+}
+
+.filter-input:focus {
+  outline: none;
+  border-color: var(--primary-dark);
+  box-shadow: 0 0 0 3px rgba(10, 37, 65, 0.1);
+}
+
+.filter-select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--gray-300);
+  border-radius: 8px;
+  font-size: 0.95rem;
+  background-color: var(--white);
+  transition: all 0.3s ease;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1rem;
+  padding-right: 2.5rem;
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: var(--primary-dark);
+  box-shadow: 0 0 0 3px rgba(10, 37, 65, 0.1);
+}
+
+.filter-checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.filter-checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.filter-checkbox-item input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--primary-red);
+  cursor: pointer;
+}
+
+.filter-checkbox-item label {
+  font-size: 0.95rem;
+  color: var(--gray-700);
+  cursor: pointer;
+}
+
+.filter-actions {
+  display: flex;
+  margin-top: 2rem;
+  gap: 0.75rem;
+}
+
+.filter-clear-btn, .filter-apply-btn {
+  padding: 0.75rem 1.25rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+  flex: 1;
+  text-align: center;
+}
+
+.filter-clear-btn {
+  background-color: var(--white);
+  color: var(--gray-700);
+  border: 1px solid var(--gray-300);
+}
+
+.filter-clear-btn:hover {
+  background-color: var(--gray-100);
+}
+
+.filter-apply-btn {
+  background-color: var(--primary-red);
+  color: var(--white);
+  border: none;
+  box-shadow: 0 2px 4px rgba(153, 0, 0, 0.1);
+}
+
+.filter-apply-btn:hover {
+  background-color: #7a0000;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(153, 0, 0, 0.2);
+}
+
+.active-filters-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0.75rem 0 0 0.5rem;
+  align-items: center;
+}
+
+.filter-tag {
+  background: #ffe5e5;
+  color: var(--primary-red);
+  border-radius: 999px;
+  padding: 0.15rem 0.7rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 1px 4px rgba(153,0,0,0.04);
+  transition: background 0.2s;
+  margin-bottom: 0.1rem;
+}
+
+.filter-tag .remove-tag-btn {
+  background: none;
+  border: none;
+  color: var(--primary-red);
+  font-size: 1.1em;
+  margin-left: 0.5em;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+}
+
+.filter-tag .remove-tag-btn:hover {
+  color: #7a0000;
+}
+
+/* Main content area */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 1200px;
+  width: 100%;
+  min-height: 0;
+  
+
+}
+
+/* Search bar styling */
+.search-bar-container {
+  width: 100%;
+  
+  background-color: var(--white);
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  padding: 1.5rem;
+  animation: slideDown 0.6s ease-out forwards;
+  position: relative;
+  z-index: 5;
+}
+
+.search-bar-wrapper {
+  display: flex;
+  align-items: center; /* Vertically center items */
+  width: 100%;
+}
+
+/* Typical “dropdown” style below the search input */
+.suggestions {
+  position: absolute;
+  top: 100%;          /* just below the .premium-search-bar */
+  left: 0;
+  width: 100%;        /* match the parent container width */
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  z-index: 9999;      /* keep it above other elements (like the map) */
+  max-height: 300px;  /* limit how tall the dropdown can get */
+  overflow-y: auto;   /* scroll if too many suggestions */
+  padding: 0.5rem 0; 
+}
+
+/* Each suggestion item */
+.suggestion-item {
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  font-size: 1rem;
+  border-bottom: 1px solid #eee;
+}
+
+.suggestion-item:last-child {
+  border-bottom: none;
+}
+
+/* Hover effect */
+.suggestion-item:hover {
+  background-color: #f3f3f3;
+}
+/* Recenter Button in Spot Card Header (replaces "Available" text) */
+.spot-card-controls {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem; /* space between buttons */
+  z-index: 2;
+}
+
+/* Recenter button remains unchanged, for example: */
+.spot-card-recenter {
+  background-color: var(--gray-200);
+  border: none;
+  padding: 0.3rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.spot-card-recenter img {
+  width: 20px;
+  height: 20px;
+}
+
+.spot-card-recenter:hover {
+  background-color: var(--gray-300);
+}
+.spot-card-recenter img,
+.spot-card-show-spot-btn img {
+  display: block;
+}
+/* New Show Spot button, styled similarly */
+.spot-card-show-spot-btn {
+  background-color: var(--gray-200);
+  border: none;
+  padding: 0.3rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.spot-card-show-spot-btn img {
+  width: 20px;
+  height: 20px;
+} 
+
+.spot-card-show-spot-btn:hover {
+  background-color: var(--gray-300);
+}
+
+
+.directions-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.directions-back-btn {
+  position: absolute;
+  top: 20px;
+  right: 10px;
+  z-index: 10;
+  background-color: var(--primary-red);
+  color: var(--white);
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.directions-back-btn:hover {
+  background-color: #7a0000;
+}
+
+
+.premium-search-bar  {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  border: 2px solid var(--gray-200);
+  border-radius: 10px;
+  background-color: var(--white);
+  transition: all 0.3s ease;
+}
+
+
+.premium-search-bar:focus-within {
+  border-color: var(--primary-dark);
+  box-shadow: 0 0 0 4px rgba(10, 37, 65, 0.1);
+}
+
+
+
+.search-input-wrapper {
+  position: relative;
+  flex: 1;
+}
+
+/* Adjust the input within this wrapper */
+.search-input-wrapper input {
+  width: 100%;
+  padding: 1rem 2.5rem 1rem 1.25rem; /* extra right padding to leave room for the cancel “X” */
+  border: none;
+  font-size: 1rem;
+  outline: none;
+  background: transparent;
+  color: var(--gray-800);
+}
+
+.premium-search-bar button[type="submit"] {
+  background-color: var(--primary-red);
+  color: var(--white);
+  border: none;
+  padding: 1rem 1.5rem;
+  cursor: pointer;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: background-color 0.3s ease;
+}
+
+.premium-search-bar button[type="submit"]:hover {
+  background-color: #7a0000;
+}
+
+.search-icon {
+  width: 18px;
+  height: 18px;
+}
+
+.cancel-search-btn {
+  position: absolute;
+  right: 0.75rem;           /* Adjust this value if needed */
+  top: 50%;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.1); /* faint, subtle circle */
+  color: #666;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.cancel-search-btn:hover {
+  background-color: rgba(0, 0, 0, 0.2);
+  color: #333;
+}
+
+.cancel-search-btn svg {
+  width: 12px;
+  height: 12px;
+  stroke: currentColor;
+}
+
+/* Map and results layout */
+.results-map-container {
+  display: flex;
+  flex: 1;
+  width: 100%;
+  /* max-height: 660px; */
+  overflow: hidden;
+  position: relative;
+  transition: all 0.5s ease-in-out;
+  min-height: 0;
+  /* No gap here so that when results are hidden the map aligns with the page edge */
+}
+
+.results-panel {
+  width: 400px;
+  height: 100%;           /* Make it span the available height */
+  max-height: 100%;       /* Prevent it from growing beyond its container */
+  overflow-x: hidden;
+  overflow-y: auto;       /* Allow vertical scrolling for excess content */
+  background-color: var(--white);
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  position: relative;     /* So that inner overlays (like loading) are confined */
+  transition: width 0.5s ease-in-out;
+}
+
+/* When collapsed, results panel becomes 0 width */
+.results-panel.collapsed {
+  width: 0;
+}
+
+.results-content {
+  /* Put your “spot-card” listings here. 
+     If you want them hidden while collapsed, 
+     you can conditionally render them in React 
+     or fade them out with CSS transitions. */
+  padding: 1rem;
+}
+
+/* Loading overlay for results panel */
+.results-loading {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.8); /* semi-transparent overlay */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s ease-out;
+  z-index: 1;
+}
+
+/* The spinner element */
+.results-loading .spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--gray-200);
+  border-top-color: var(--primary-red);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: 1rem;
+}
+
+/* Fade in animation for the overlay */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Spinner rotation animation */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+/* Map section */
+.map-container {
+  flex: 1;
+  position: relative; /* so the button can be absolutely positioned inside */
+  background-color: var(--white);
+  border-radius: 16px; /* full rounding on all corners for a “card” feel */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  min-height: 0;
+  overflow: hidden; 
+  transition: all 0.5s ease-in-out;
+  z-index: 1;
+}
+
+
+.lot-map-view-container {
+  width: 100%;
+  max-width: 100vw;      /* Prevent the container from exceeding the viewport */
+  overflow-x: hidden;    /* Hide any horizontal overflow */
+  box-sizing: border-box;
+}
+
+
+.collapse-button {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 40px;
+  background-color: var(--primary-red); /* red background */
+  color: var(--white);
+  border: none;
+  border-radius: 0 8px 8px 0; /* curved right edge */
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+  z-index: 1000;
+}
+
+.collapse-button:hover {
+  background-color: #7a0000; /* darker red on hover */
+}
+
+
+/* Disabled state (if no results) */
+.collapse-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+/* 
+.results-map-container.show-results .results-list {
+  width: 370px;
+}
+
+.results-map-container.show-results .map-container {
+  width: calc(100% - 400px - 1.5rem);
+} */
+
+
+/* Parking spot cards */
+.spot-card {
+  background-color: var(--white);
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  transition: all 0.3s ease;
+  position: relative;
+  animation: fadeIn 0.8s ease-out forwards;
+  opacity: 0;
+}
+
+.spot-card:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.spot-card:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+.spot-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.spot-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 80px;
+  height: 80px;
+  background-color: var(--red-50);
+  border-radius: 0 0 0 80px;
+  z-index: 1;
+}
+
+.spot-card-header {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--gray-100);
+  position: relative;
+}
+
+.spot-availability {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.5rem;
+  color: var(--primary-red);
+  font-weight: 700;
+  font-size: 0.9rem;
+  z-index: 2;
+}
+
+.spot-card-title {
+  margin: 0 0 0.5rem 0;
+  color: var(--primary-dark);
+  font-size: 1.25rem;
+  font-weight: 700;
+  padding-right: 80px;
+}
+
+.spot-card-subtitle {
+  display: flex;
+  align-items: center;
+  color: var(--gray-600);
+  font-size: 0.95rem;
+  margin-top: 0.5rem;
+  font-weight: 500;
+}
+
+.spot-card-body {
+  padding: 1.25rem 1.5rem;
+}
+
+.spot-detail {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.spot-detail:last-child {
+  margin-bottom: 0;
+}
+
+.spot-detail-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 0.75rem;
+  color: var(--gray-500);
+  flex-shrink: 0;
+}
+
+.spot-detail-label {
+  font-weight: 600;
+  color: var(--gray-700);
+  margin-right: 0.5rem;
+}
+
+.spot-detail-value {
+  color: var(--gray-700);
+  flex: 1;
+}
+
+.spot-card-footer {
+  padding: 1.25rem 1.5rem;
+  background-color: var(--gray-50);
+  border-top: 1px solid var(--gray-100);
+  display: flex;
+  gap: 1rem;
+}
+
+.spot-card-btn {
+  padding: 0.75rem 1.25rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.spot-card-btn svg,
+.spot-card-btn img {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
+
+
+/* 
+.map-wrapper {
+  width: 100%;
+  height: 100%;
+  position: relative;
+} */
+
+
+/* .parking-lot-polygon {
+  position: absolute;
+  top: 75%;
+  left: 17%;
+  width: 100px;
+  height: 100px;
+  transform: translate(-50%, -50%);
+  background-color: rgba(153, 0, 0, 0.3);
+  cursor: pointer;
+  clip-path: polygon(95% 27%, 86% 83%, 50% 100%, 0% 94%, 18% 15%);
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.parking-lot-polygon:hover {
+  background-color: rgba(153, 0, 0, 0.5);
+  transform: translate(-50%, -50%) scale(1.1);
+} */
+
+/* .zoomed-map-view {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  background-color: var(--gray-50);
+} */
+
+  .reservation-type-toggle {
+    display: flex;
+    gap: 0.25rem;
+    margin-bottom: 0.5rem;
+    justify-content: flex-start;
+    background: var(--gray-50);
+    border-radius: 999px;
+    padding: 0.25rem;
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  .reservation-type-toggle-btn {
+    padding: 0.3rem 1rem;
+    border: none;
+    border-radius: 999px;
+    background: transparent;
+    color: var(--primary-red);
+    font-weight: 600;
+    font-size: 0.98rem;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    outline: none;
+    min-width: 80px;
+    box-shadow: none;
+  }
+  
+  .reservation-type-toggle-btn.active,
+  .reservation-type-toggle-btn:focus {
+    background: var(--primary-red);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(153,0,0,0.08);
+  }
+  
+  .reservation-type-toggle-btn:not(.active):hover {
+    background: #ffe5e5;
+    color: var(--primary-red);
+  }
+  
+.lot-svg {
+  width: 100%;
+  height: 100%;
+  background: var(--gray-50);
+}
+
+/* Loading and error states */
+.loading-indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  text-align: center;
+  height: 100%;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--gray-200);
+  border-top-color: var(--primary-red);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: 1rem;
+}
+
+.loading-text {
+  color: var(--gray-600);
+  font-weight: 500;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.error-message {
+  background-color: var(--red-50);
+  color: var(--primary-red);
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  margin: 1rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border-left: 4px solid var(--primary-red);
+}
+
+.error-icon {
+  flex-shrink: 0;
+}
+
+/* Detailed lot modal */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 2rem;
+}
+
+.modal-content {
+  background-color: var(--white);
+  border-radius: 16px;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+  width: 100%;
+  max-width: 900px;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: fadeIn 0.5s ease-out forwards;
+  position: relative;
+}
+
+.modal-header {
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid var(--gray-200);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--primary-dark);
+  margin: 0;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  color: var(--gray-500);
+  font-size: 1.5rem;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.close-button:hover {
+  background-color: var(--gray-100);
+  color: var(--gray-800);
+}
+
+.modal-body {
+  padding: 2rem;
+}
+
+.lot-svg {
+  width: 100%;
+  max-height: 70vh;
+}
+
+.lot-info {
+  margin-bottom: 2rem;
+}
+
+.lot-info-title {
+  font-weight: 700;
+  color: var(--primary-dark);
+  margin-bottom: 0.75rem;
+  font-size: 1.25rem;
+}
+
+.lot-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+.lot-info-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.lot-info-icon {
+  width: 40px;
+  height: 40px;
+  background-color: var(--blue-50);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--info-blue);
+  flex-shrink: 0;
+}
+
+.lot-info-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.lot-info-label {
+  font-size: 0.9rem;
+  color: var(--gray-500);
+}
+
+.lot-info-value {
+  font-weight: 600;
+  color: var(--gray-800);
+  font-size: 1.1rem;
+}
+
+.lot-actions {
+  padding: 1.5rem 2rem;
+  background-color: var(--gray-50);
+  border-top: 1px solid var(--gray-200);
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+.lot-action-btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+}
+
+.cancel-btn {
+  background-color: var(--white);
+  color: var(--gray-700);
+  border: 1px solid var(--gray-300);
+}
+
+.cancel-btn:hover {
+  background-color: var(--gray-100);
+}
+
+.reserve-btn {
+  background-color: var(--primary-red);
+  color: var(--white);
+  border: none;
+  box-shadow: 0 2px 4px rgba(153, 0, 0, 0.1);
+}
+
+
+
+.reserve-btn:hover {
+  background-color: #7a0000;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(153, 0, 0, 0.2);
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+  .search-container {
+    padding: 1rem;
+  }
+  
+  .results-map-container {
+    flex-direction: column;
+  }
+  
+  .results-list {
+    width: 100%;
+  }
+  
+  .map-container {
+    height: 600px;
+  }
+}
+
+@media (max-width: 992px) {
+  .search-container {
+    flex-direction: column;
+  }
+  
+  .filters-panel {
+    width: 100%;
+    position: static;
+  }
+  
+  .lot-info-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .spot-card-footer {
+    flex-direction: column;
+  }
+  
+  .modal-content {
+    max-width: 90%;
+    max-height: 80vh;
+  }
+  
+  .modal-header, .modal-body, .lot-actions {
+    padding: 1.25rem;
+  }
+  
+  .lot-info-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .filter-actions {
+    flex-direction: column;
+  }
+}
+
+
+/* --- Three-Column Layout for Spot Card Footer (Revised) --- */
+.spot-card-footer.three-col {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  column-gap: 0.5rem;
+  align-items: stretch; /* stretch columns to the same height */
+  padding: 0.75rem 1rem;
+}
+
+/* Left Column: Two stacked buttons */
+.footer-left-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+/* Middle & Right Columns: Single centered buttons */
+.footer-middle-col,
+.footer-right-col {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Base styling for all footer buttons */
+.spot-card-footer.three-col .spot-card-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.3rem 0.75rem;
+  font-size: 0.75rem; /* smaller text for left column buttons */
+  border-radius: 6px;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  min-height: 38px;    /* enforce consistent height */
+  min-width: 100px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Left Column Buttons: Subtle blue styling */
+
+
+.spot-view-details-btn {
+  background-color: #237fe0; /* slightly darker blue */
+  color: var(--white);
+  border: none;
+}
+.spot-view-details-btn:hover {
+  background-color: #0b325a;
+  transform: translateY(-1px);
+}
+
+.spot-back-btn {
+  background-color: #237fe0; /* Blue background */
+  color: var(--white);
+  border: none;
+  padding: 0.75rem 1.25rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.spot-back-btn:hover {
+  background-color: #0b325a;
+  transform: translateY(-1px);
+}
+
+/* Middle Column: Reserve Button (red) */
+.spot-reserve-btn {
+  background-color: var(--primary-red);
+  color: var(--white);
+  border: none;
+  min-height: 38px;
+}
+.spot-reserve-btn:hover {
+  background-color: #7a0000;
+  transform: translateY(-1px);
+}
+
+/* Right Column: Get Directions Button (green) */
+.spot-get-directions-btn {
+  background-color: #198754;
+  color: #fff;
+  border: none;
+  min-height: 38px;
+}
+.spot-get-directions-btn:hover {
+  background-color: #157347;
+  transform: translateY(-1px);
+}
+
+
+.no-results-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 2rem;
+  text-align: center;
+  color: var(--gray-500);
+  font-size: 1.1rem;
+}
+
+.no-results-message svg {
+  width: 48px;
+  height: 48px;
+  margin-bottom: 1rem;
+  fill: var(--gray-300);
+}
+
+.detail-columns {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.detail-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.spot-detail-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.spot-detail-row .icon {
+  flex-shrink: 0;
+}
+
+.spot-detail-row .label {
+  font-weight: 600;
+  color: var(--gray-700);
+  min-width: 110px;
+}
+
+.spot-detail-row .value {
+  color: var(--gray-800);
+}
+
+/* Categories Section: Badges with a Light Red Theme */
+.spot-categories {
+  margin-top: 1.5rem;
+}
+
+.categories-inline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.categories-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.category-badge {
+  background-color: #ffe5e5; /* Light red background */
+  color: var(--primary-red); /* Use your red theme */
+  padding: 0.3rem 0.6rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.filters-sidebar {
+  width: 320px; /* Match your .filters-panel width */
+  min-width: 320px;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  flex-shrink: 0;
+  height: 100%;
+}
+
+.reservation-datetime-bar.vertical {
+  background: var(--white);
+  border-radius: 14px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  padding: 0.7rem 1rem 0.7rem 1rem;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+  width: 100%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+.reservation-datetime-label.inline {
+  color: var(--primary-red);
+  font-weight: 700;
+  font-size: 1rem;
+  min-width: 56px;   /* Make sure both labels have the same width */
+  width: 56px;
+  margin-bottom: 0;
+  text-align: left;
+  display: inline-block;
+}
+  
+  /* Compact row for start/end */
+  .reservation-datetime-row {
+    display: flex;
+    align-items: center;
+    gap: 0.1rem;
+    margin-bottom: 0.2rem;
+    width: 100%;
+  }
+  
+
+  .reservation-datetime-input {
+    border: 1.5px solid var(--gray-200);
+    border-radius: 8px;
+    padding: 0.25rem 0.1rem;
+    font-size: 0.98rem;
+    background: var(--white);
+    color: var(--primary-dark);
+    outline: none;
+    transition: border 0.2s;
+    width: 220; /* increased width for full date/time visibility */
+    height: 32px;
+  }
+
+
+  
+.reservation-datetime-input:focus {
+  border-color: var(--primary-red);
+}
+
+/* Semester select */
+.reservation-datetime-input.semester {
+  margin-left: 30px;
+  width: 200px;
+  font-weight: 400;
+}
+
+
+.back-button-details {
+  background-color: #237fe0; /* Blue background */
+  color: var(--white);
+  border: none;
+  padding: 0.75rem 1.25rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.back-button-details:hover {
+  background-color: #0b325a;
+  transform: translateY(-1px);
+}
+
+/* Add these styles to your premium-search-parking.css */
+
+/* ===== Reservation Type Toggle in Search Page ===== */
+.reservation-type-toggle {
+  display: flex;
+  margin-bottom: 1rem;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--gray-200);
+  background-color: var(--gray-100);
+  width: 100%;
+}
+
+.reservation-type-toggle-btn {
+  flex: 1;
+  padding: 10px 16px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--gray-700);
+  transition: all 0.2s ease;
+  position: relative;
+  outline: none;
+}
+
+.reservation-type-toggle-btn:not(:last-child) {
+  border-right: 1px solid var(--gray-200);
+}
+
+.reservation-type-toggle-btn:hover {
+  background-color: var(--gray-200);
+}
+
+.reservation-type-toggle-btn.active {
+  background-color: var(--primary-red);
+  color: white;
+}
+
+/* ===== Fix for Date/Time Input in Search Page ===== */
+
+/* Date/time container for better containment */
+.reservation-datetime-bar.vertical {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px;
+  background-color: var(--gray-50);
+  border-radius: 8px;
+  border: 1px solid var(--gray-200);
+  margin-bottom: 1rem;
+}
+
+/* Fix alignment of rows */
+.reservation-datetime-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+/* Ensure labels have consistent width */
+.reservation-datetime-label.inline {
+  min-width: 40px;
+  font-weight: 600;
+  color: var(--gray-700);
+}
+
+/* Constrain input sizes */
+/* .reservation-datetime-input {
+  flex: 1;
+  padding: 8px 10px;
+  border: 1px solid var(--gray-300);
+  border-radius: 4px;
+  font-size: 0.9rem;
+  min-width: 0;
+  max-width: 140px;
+} */
+
+/* Special styling for time inputs to make them smaller */
+.reservation-datetime-input[type="time"] {
+  max-width: 100px;
+}
+
+/* Semester dropdown should be larger */
+.reservation-datetime-input.semester {
+  max-width: 100%;
+  width: 100%;
+}
+
+/* Media queries for smaller screens */
+@media (max-width: 768px) {
+  .reservation-datetime-row {
+    flex-wrap: wrap;
+  }
+  
+  .reservation-datetime-input {
+    max-width: none;
+    width: 100%;
+  }
+}
+
+/* Improve filter panel styling */
+.filters-panel {
+  margin-top: 1rem;
+}
+
+/* Fix for the search bar alignment */
+.search-bar-container {
+  margin-bottom: 1rem;
+}
+
+.premium-search-bar {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.search-input-wrapper {
+  flex: 1;
+  position: relative;
+}
+
+/* Additional Daily Inputs Specific Fix */
+
+/* Container for daily inputs in the search page */
+.daily-inputs-container {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+  margin-left: 0.2rem; /* More to the left */
+}
+
+.daily-input-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  margin-bottom: 0;
+}
+
+.daily-input-label {
+  font-weight: 600;
+  color: var(--primary-red);
+  min-width: 38px;
+  font-size: 0.93rem;
+  flex-shrink: 0;
+  margin-right: 2px;
+}
+
+.daily-input-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+  max-width: 260px; /* Shorter length */
+}
+
+.daily-date-input,
+.daily-time-input {
+  flex: 1 1 0;
+  padding: 5px 8px;
+  border: 1.2px solid var(--gray-300);
+  border-radius: 6px; /* Less curve, more rectangular */
+  font-size: 0.93rem;
+  min-width: 0;
+  background: var(--white);
+  color: var(--primary-dark);
+  transition: border 0.2s;
+  height: 28px;
+  box-sizing: border-box;
+  max-width: 130px; /* Squish horizontally */
+}
+
+.daily-date-input:focus,
+.daily-time-input:focus {
+  border-color: var(--primary-red);
+  outline: none;
+}
+
+/* Helper text */
+.daily-helper-text {
+  color: #999;
+  font-size: 0.8rem;
+  text-align: center;
+  margin-top: 6px;
+  width: 100%;
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+  .daily-input-group {
+    flex-direction: column;
+    align-items: flex-start;
+    max-width: 100%;
+  }
+  
+  .daily-date-input,
+  .daily-time-input {
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  .daily-input-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .daily-input-label {
+    margin-bottom: 4px;
+  }
+}
+
+
+

@@ -1,0 +1,785 @@
+/* Professional Signin Page Styling */
+:root {
+    --primary-red: #900;
+    --primary-dark: #0A2541;
+    --accent-gold: #d4af37;
+    --white: #ffffff;
+    --gray-50: #fafafa;
+    --gray-100: #f5f5f5;
+    --gray-200: #eeeeee;
+    --gray-300: #e0e0e0;
+    --gray-600: #757575;
+    --gray-700: #616161;
+    --gray-800: #424242;
+    --blue-50: #e3f2fd;
+    --error-light: #ffebee;
+    --error-dark: #c62828;
+    --success-green: #2e7d32;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  @keyframes slideIn {
+    from { transform: translateX(-20px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+  
+  @keyframes shimmer {
+    0% { background-position: -100% 0; }
+    100% { background-position: 200% 0; }
+  }
+  
+  @keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
+  }
+  
+  @keyframes glow {
+    0% { box-shadow: 0 0 5px rgba(212, 175, 55, 0.5); }
+    50% { box-shadow: 0 0 20px rgba(212, 175, 55, 0.8); }
+    100% { box-shadow: 0 0 5px rgba(212, 175, 55, 0.5); }
+  }
+  
+  .pro-signin {
+    display: flex;
+    min-height: 100vh;
+    font-family: 'Inter', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    overflow: hidden;
+    position: relative;
+    background-color: var(--white);
+  }
+  
+  /* Campus showcase panel */
+  .campus-showcase {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .campus-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 8s ease;
+  }
+  
+  .pro-signin:hover .campus-image {
+    transform: scale(1.05);
+  }
+  
+  .image-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      135deg, 
+      rgba(10, 37, 65, 0.7) 0%, 
+      rgba(153, 0, 0, 0.5) 100%
+    );
+    z-index: 1;
+  }
+  
+  .campus-content {
+    position: relative;
+    z-index: 2;
+    color: var(--white);
+    max-width: 80%;
+    animation: fadeIn 1s ease-out forwards;
+  }
+  
+  .campus-headline {
+    font-size: 3.5rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    line-height: 1.2;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    background: linear-gradient(120deg, var(--white) 0%, rgba(255, 255, 255, 0.8) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  .campus-subheadline {
+    font-size: 1.5rem;
+    font-weight: 300;
+    margin-bottom: 2rem;
+    line-height: 1.5;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    max-width: 80%;
+  }
+  
+  .campus-badge {
+    display: inline-flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    margin-bottom: 2rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+  
+  .badge-icon {
+    margin-right: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+  }
+  
+  .badge-text {
+    font-size: 1rem;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+  }
+  
+  .campus-features {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-top: 2rem;
+  }
+  
+  .feature-item {
+    display: flex;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+    padding: 1rem;
+    border-radius: 12px;
+    width: calc(50% - 0.75rem);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+  }
+  
+  .feature-item:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    transform: translateY(-3px);
+  }
+  
+  .feature-icon {
+    margin-right: 1rem;
+    background-color: rgba(255, 255, 255, 0.2);
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 1.25rem;
+  }
+  
+  .feature-text {
+    font-weight: 500;
+  }
+  
+  /* Form panel styling */
+  .signin-panel {
+    width: 550px;
+    background-color: var(--white);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.1);
+    z-index: 5;
+    overflow-y: auto;
+  }
+  
+  .form-decoration {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 6px;
+    background: linear-gradient(
+      90deg, 
+      var(--primary-red) 0%, 
+      var(--accent-gold) 50%, 
+      var(--primary-dark) 100%
+    );
+    z-index: 10;
+  }
+  
+  .signin-header {
+    padding: 3rem 4rem 0;
+  }
+  
+  .university-logo {
+    display: flex;
+    align-items: center;
+    margin-bottom: 2.5rem;
+  }
+  
+  .logo-icon {
+    width: 50px;
+    height: 50px;
+    margin-right: 0.75rem;
+  }
+  
+  .logo-text {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary-dark);
+    letter-spacing: -0.5px;
+  }
+  
+  .form-content {
+    padding: 0 4rem 3rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .welcomeline {
+    font-size: 2.25rem;
+    font-weight: 800;
+    color: var(--primary-dark);
+    margin-bottom: 0.75rem;
+    letter-spacing: -0.5px;
+    animation: fadeIn 0.8s ease-out forwards;
+    animation-delay: 0.3s;
+    opacity: 0;
+  }
+  
+  .signin-subheading {
+    font-size: 1.1rem;
+    color: var(--gray-600);
+    margin-bottom: 2.5rem;
+    animation: fadeIn 0.8s ease-out forwards;
+    animation-delay: 0.5s;
+    opacity: 0;
+  }
+  
+  .form-container {
+    animation: fadeIn 0.8s ease-out forwards;
+    animation-delay: 0.7s;
+    opacity: 0;
+  }
+  
+  .error-message {
+    background-color: var(--error-light);
+    color: var(--error-dark);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    border-left: 4px solid var(--error-dark);
+    animation: slideIn 0.3s ease;
+  }
+  
+  .error-icon {
+    margin-right: 0.75rem;
+    font-size: 1.25rem;
+  }
+  
+  .input-group {
+    margin-bottom: 1.75rem;
+    position: relative;
+  }
+  
+  .input-label {
+    display: block;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--gray-700);
+    margin-bottom: 0.75rem;
+  }
+  
+  .input-field {
+    width: 100%;
+    padding: 1rem 1.25rem;
+    border: 2px solid var(--gray-200);
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background-color: var(--white);
+  }
+  
+  .input-field:focus {
+    outline: none;
+    border-color: var(--primary-dark);
+    box-shadow: 0 0 0 4px rgba(10, 37, 65, 0.1);
+  }
+  
+  .input-field::placeholder {
+    color: var(--gray-300);
+  }
+  
+  .input-icon {
+    position: absolute;
+    right: 1.25rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--gray-600);
+    cursor: pointer;
+  }
+  
+  .signin-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+  }
+  
+  .remember-option {
+    display: flex;
+    align-items: center;
+  }
+  
+  .remember-checkbox {
+    position: relative;
+    width: 18px;
+    height: 18px;
+    margin-right: 0.5rem;
+    accent-color: var(--primary-red);
+  }
+  
+  .remember-label {
+    font-size: 0.9rem;
+    color: var(--gray-700);
+  }
+  
+  .forgot-link {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--primary-red);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+  
+  .forgot-link:hover {
+    color: var(--primary-dark);
+    text-decoration: underline;
+  }
+  
+  .signin-btn {
+    padding: 1rem;
+    border-radius: 10px;
+    background: linear-gradient(
+      135deg, 
+      var(--primary-red) 0%, 
+      #7a0000 100%
+    );
+    color: var(--white);
+    font-size: 1rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 4px 6px rgba(153, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+    display: block; /* Added this line */
+    margin-left: auto; /* Added this line */
+    margin-right: auto; /* Added this line */
+    text-align: center; /* Added this line */
+  }
+  
+  .signin-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 7px 14px rgba(153, 0, 0, 0.2), 0 3px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .signin-btn:after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+      to right, 
+      rgba(255, 255, 255, 0) 0%, 
+      rgba(255, 255, 255, 0.3) 50%, 
+      rgba(255, 255, 255, 0) 100%
+    );
+    transform: rotate(30deg);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  
+  .signin-btn:hover:after {
+    opacity: 1;
+    animation: shimmer 1.5s infinite;
+  }
+  
+  .divider {
+    display: flex;
+    align-items: center;
+    margin: 2rem 0;
+  }
+  
+  .divider-line {
+    flex: 1;
+    height: 1px;
+    background-color: var(--gray-200);
+  }
+  
+  .divider-text {
+    padding: 0 1rem;
+    font-size: 0.9rem;
+    color: var(--gray-600);
+    font-weight: 500;
+  }
+  
+  .social-options {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+  }
+  
+  .social-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 2px solid var(--gray-200);
+    background-color: var(--white);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1.25rem;
+    color: var(--gray-700);
+  }
+  
+  .social-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    border-color: var(--gray-300);
+  }
+  
+  .signup-prompt {
+    text-align: center;
+    font-size: 0.95rem;
+    color: var(--gray-700);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: auto;
+    padding-top: 2rem;
+  }
+  
+  .signup-link {
+    margin-top: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background-color: var(--white);
+    border: 2px solid var(--primary-dark);
+    color: var(--primary-dark);
+    font-weight: 600;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: inline-block;
+  }
+  
+  .signup-link:hover {
+    background-color: var(--primary-dark);
+    color: var(--white);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(10, 37, 65, 0.2);
+  }
+  
+  /* Decorative elements */
+  .corner-decoration {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 150px;
+    height: 150px;
+    background: radial-gradient(circle at bottom right, rgba(212, 175, 55, 0.1), transparent 70%);
+    z-index: 1;
+  }
+  
+  .floating-shape {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    background-color: rgba(212, 175, 55, 0.2);
+    border-radius: 50%;
+    z-index: 1;
+    animation: float 6s ease-in-out infinite;
+  }
+  
+  .shape1 {
+    top: 15%;
+    right: 10%;
+    width: 30px;
+    height: 30px;
+    animation-delay: 1s;
+  }
+  
+  .shape2 {
+    bottom: 20%;
+    right: 15%;
+    width: 20px;
+    height: 20px;
+    border-radius: 5px;
+    background-color: rgba(153, 0, 0, 0.15);
+    animation-delay: 0s;
+  }
+  
+  .shape3 {
+    top: 30%;
+    right: 30%;
+    width: 15px;
+    height: 15px;
+    animation-delay: 2s;
+  }
+  
+  /* Gold accent elements */
+  .logo-accent {
+    position: absolute;
+    top: 0;
+    right: 10%;
+    width: 80px;
+    height: 80px;
+    background-color: var(--accent-gold);
+    opacity: 0.03;
+    border-radius: 0 0 50% 50%;
+  }
+  
+  .bottom-accent {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(
+      90deg, 
+      transparent 0%, 
+      var(--accent-gold) 50%, 
+      transparent 100%
+    );
+  }
+  
+  /* Loading spinner overlay */
+  .loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(5px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  
+  .spinner-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .spinner {
+    position: relative;
+    width: 60px;
+    height: 60px;
+  }
+  
+  .spinner-outer {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border: 3px solid transparent;
+    border-top-color: var(--primary-red);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+  
+  .spinner-inner {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    border: 3px solid transparent;
+    border-top-color: var(--primary-dark);
+    border-radius: 50%;
+    animation: spin 1.5s linear infinite reverse;
+  }
+  
+  .spinner-center {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    right: 20px;
+    bottom: 20px;
+    border: 3px solid transparent;
+    border-top-color: var(--accent-gold);
+    border-radius: 50%;
+    animation: spin 2s linear infinite;
+    animation-delay: 0.5s;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  .loading-text {
+    margin-top: 1.5rem;
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--primary-dark);
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+  
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+  }
+  
+  /* Responsive styles */
+  @media screen and (max-width: 1200px) {
+    .campus-headline {
+      font-size: 3rem;
+    }
+    
+    .campus-features {
+      flex-direction: column;
+    }
+    
+    .feature-item {
+      width: 100%;
+    }
+    
+    .signin-panel {
+      width: 500px;
+    }
+    
+    .signin-header, .form-content {
+      padding-left: 3rem;
+      padding-right: 3rem;
+    }
+  }
+  
+  @media screen and (max-width: 992px) {
+    .pro-signin {
+      flex-direction: column;
+    }
+    
+    .campus-showcase {
+      height: 300px;
+    }
+    
+    .campus-content {
+      padding: 2rem;
+      max-width: 100%;
+    }
+    
+    .campus-headline {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+    
+    .campus-subheadline {
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+    }
+    
+    .campus-features {
+      display: none;
+    }
+    
+    .signin-panel {
+      width: 100%;
+      max-width: 100%;
+    }
+  }
+  
+  @media screen and (max-width: 576px) {
+    .campus-headline {
+      font-size: 2rem;
+    }
+    
+    .signin-header, .form-content {
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+    
+    .university-logo {
+      margin-bottom: 1.5rem;
+    }
+    
+    .welcomeline {
+      font-size: 1.75rem;
+    }
+    
+    .signin-options {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+    
+    .social-options {
+      gap: 1rem;
+    }
+    
+    .social-btn {
+      width: 45px;
+      height: 45px;
+    }
+  }
+
+  /* Add these styles to your premium-signin.css file */
+
+/* Password input container for proper positioning */
+.password-input-container {
+  position: relative;
+  width: 100%;
+}
+
+/* Password toggle button styling */
+.password-toggle-btn {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--gray-600);
+  cursor: pointer;
+  padding: 8px;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  transition: color 0.2s ease;
+}
+
+.password-toggle-btn:hover {
+  color: var(--primary-dark);
+}
+
+.password-toggle-btn:focus {
+  outline: none;
+}
+
+/* Make sure the input field works correctly with the button */
+.password-input-container .input-field {
+  width: 100%;
+  padding-right: 45px; /* Make space for the button */
+}
