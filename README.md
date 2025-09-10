@@ -2,7 +2,7 @@
 
 ## 🚗 Overview
 
-**P4SBU Smart Parking System** is a sophisticated, scalable web application crafted to revolutionize parking management at Stony Brook University (SBU). Designed for both everyday users and administrators, it utilizes a React frontend, Node.js/Express backend, and powerful databases (MongoDB + Neo4j) to deliver real-time parking analytics, secure spot reservations, seamless payments, automated campus guidance, and robust admin controls.
+**P4SBU Smart Parking System** is a sophisticated, scalable web application for parking management at Stony Brook University (SBU). Designed for both everyday users and administrators, it utilizes a React frontend, Node.js/Express backend, and 2 databases (MongoDB + Neo4j) to deliver real-time parking analytics, secure spot reservations, seamless payments, and robust admin controls.
 
 ---
 
@@ -12,11 +12,11 @@
 
 ## 📦 Technology Stack
 
-- **Frontend:** React.js, Axios, React Router, Material UI
+- **Frontend:** React.js, Axios, React Router, Leaflet
 - **Backend:** Node.js, Express.js, RESTful API
 - **Databases:**
-  - **MongoDB:** Central repository for users, lots, spots, reservations, payments, feedback, occupancy analytics
-  - **Neo4j:** Graph database for campus map, wayfinding, route optimization
+  - **MongoDB:** Central repository for users, lots, spots, reservations, payments, feedback, occupancy analytics, admin
+  - **Neo4j:** Graph database for wayfinding, route optimization
 - **Authentication & Authorization:** JWT-based authentication, role-based access (Admin, Staff, Student)
 - **DevOps & Configuration:** dotenv for environment variables, CORS, body-parser, mongoose, neo4j-driver
 
@@ -40,7 +40,7 @@
 - **Transaction History:** View and download payment receipts
 
 ### 🗺️ Wayfinding & Campus Navigation
-- **Graph-Based Routing:** Neo4j-powered optimal pathfinding to lots/spots
+- **Graph-Based Routing:** Neo4j-powered optimal pathfinding to lots/spots, GoogleMaps API for walking directions and distance
 - **Map Visualization:** Interactive campus maps for users
 
 ### 📊 Analytics & Feedback
@@ -100,7 +100,7 @@ npm install
 ```bash
 cd client
 npm install
-# Installs axios, react-router-dom, material-ui, etc.
+# Installs axios, react-router-dom, leaflet, etc.
 ```
 
 ---
@@ -124,6 +124,7 @@ ADMIN_PASSWORD=your_admin_password
 **client/.env**
 ```
 REACT_APP_API_BASE_URL=http://localhost:5000
+GOOGLEMAPAPIL=http://localhost:5000
 ```
 
 > **IMPORTANT:** Never commit your `.env` files or secrets to version control!
